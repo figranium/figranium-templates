@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Questrial, Geist_Mono } from "next/font/google";
+import { Questrial, Space_Mono } from "next/font/google";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import "./globals.css";
@@ -11,9 +11,10 @@ const questrial = Questrial({
   display: "swap",
 });
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
+const spaceMono = Space_Mono({
+  variable: "--font-space-mono",
   subsets: ["latin"],
+  weight: ["400", "700"],
 });
 
 export const metadata: Metadata = {
@@ -35,7 +36,7 @@ export default function RootLayout({
         <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet" />
       </head>
       <body
-        className={`${questrial.variable} ${geistMono.variable} font-sans antialiased bg-[#050505] text-foreground min-h-screen flex flex-col`}
+        className={`${questrial.variable} ${spaceMono.variable} font-sans antialiased bg-[#050505] text-foreground min-h-screen flex flex-col`}
       >
         <Navbar />
         <main className="flex-1">
