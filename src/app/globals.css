@@ -47,7 +47,7 @@
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
   --font-sans: var(--font-questrial);
-  --font-mono: var(--font-geist-mono);
+  --font-mono: var(--font-space-mono);
 }
 
 @layer base {
