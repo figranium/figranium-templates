@@ -1,18 +1,10 @@
 import { Pool } from 'pg';
 
 const pool = new Pool({
-    connectionString: process.env.DATABASE_URL,
+    connectionString: process.env.DATABASE_URL?.replace('?sslmode=require', ''),
     ssl: {
         rejectUnauthorized: false
-    },
-    options: '-c search_path=app,public'
-});
-
-// Ensure search_path is set on every new connection
-pool.on('connect', (client) => {
-    client.query('SET search_path TO app, public').catch((err) => {
-        console.error('Failed to set search_path:', err);
-    });
+    }
 });
 
 export default pool;
