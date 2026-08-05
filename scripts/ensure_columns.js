@@ -5,7 +5,7 @@ const path = require('path');
 dotenv.config({ path: path.resolve(__dirname, '../.env.local') });
 
 const client = new Client({
-    connectionString: process.env.DATABASE_URL + (process.env.DATABASE_URL.includes('?') ? '&' : '?') + 'sslmode=no-verify',
+    connectionString: process.env.DATABASE_URL,
     ssl: { rejectUnauthorized: false }
 });
 
