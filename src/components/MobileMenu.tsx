@@ -15,7 +15,7 @@ export function MobileMenu({ isLoggedIn, isAdmin, signOutNode }: MobileMenuProps
     const [isOpen, setIsOpen] = useState(false);
 
     return (
-        <div className="md:hidden">
+        <div className="lg:hidden">
             <button
                 onClick={() => setIsOpen(true)}
                 className="p-2 text-muted-foreground hover:text-foreground transition-colors outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-background rounded-md"
@@ -49,7 +49,7 @@ export function MobileMenu({ isLoggedIn, isAdmin, signOutNode }: MobileMenuProps
                         </button>
                     </div>
 
-                    <div className="flex flex-col gap-6 text-sm uppercase tracking-wide font-semibold">
+                    <div className="flex flex-col gap-6 text-sm uppercase tracking-[0.2em]">
                         <a href="https://figranium.dev/docs" target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-foreground transition-colors">
                             Docs
                         </a>

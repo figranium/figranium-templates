@@ -1,10 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { useRouter } from "next/navigation";
 import MaterialIcon from "@/components/MaterialIcon";
 
-const ICONS = ["extension", "search", "public", "table_chart", "monitor", "webhook", "smart_toy", "bug_report"];
 const CATEGORIES = ["QA Testing", "Lead Gen", "Social Media", "Shopping", "Monitoring", "AI", "Jobs", "News", "Videos", "Reviews", "Developer Tools", "SEO", "Real Estate", "Travel", "Other"];
 
 function getDomainFromUrl(url: string) {
@@ -13,6 +12,38 @@ function getDomainFromUrl(url: string) {
     } catch {
         return null;
     }
+}
+
+/**
+ * Normalize pasted or imported JSON. Supports both a raw task configuration
+ * and a Figranium task-export wrapper of the shape:
+ *   { exportedAt: "...", tasks: [ { name, url, mode, actions, ... }, ... ] }
+ * Returns the resolved task object, the number of tasks found, and any error.
+ */
+function resolveTaskJson(raw: unknown): { task: any; taskCount: number } {
+    if (!raw || typeof raw !== "object" || Array.isArray(raw)) {
+        throw new Error("Invalid JSON: expected an object or a task export.");
+    }
+
+    const obj = raw as Record<string, unknown>;
+    const isExportWrapper = Array.isArray(obj.tasks);
+    const tasks = isExportWrapper ? (obj.tasks as any[]) : [raw];
+    const task = tasks.length > 0 ? tasks[0] : null;
+
+    if (!task || typeof task !== "object" || Array.isArray(task)) {
+        throw new Error("No valid task found in the JSON.");
+    }
+
+    return { task: task as any, taskCount: tasks.length };
+}
+
+function applyTaskToForm(task: any) {
+    const domain = task?.url ? getDomainFromUrl(task.url) : null;
+    return {
+        title: typeof task.name === "string" && task.name ? task.name : "",
+        type: task.mode === "agent" ? "AGENT" : task.mode === "scrape" ? "SCRAPE" : "SCRAPE",
+        icon: domain ? domain : "extension",
+    };
 }
 
 export default function NewPresetPage() {
@@ -29,8 +60,9 @@ export default function NewPresetPage() {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState("");
     const [jsonError, setJsonError] = useState("");
-    const [generating, setGenerating] = useState(false);
+    const [importNote, setImportNote] = useState("");
     const [iconType, setIconType] = useState<"favicon" | "upload">("upload");
+    const fileInputRef = useRef<HTMLInputElement>(null);
     const router = useRouter();
 
     const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -59,91 +91,102 @@ export default function NewPresetPage() {
         reader.readAsDataURL(file);
     };
 
+    const ingestTask = (task: any) => {
+        try {
+            JSON.parse(JSON.stringify(task));
+        } catch {
+            throw new Error("Task is not serializable JSON.");
+        }
+
+        const redacted = JSON.parse(JSON.stringify(task));
+        const deepRedactVersions = (obj: any) => {
+            if (!obj || typeof obj !== 'object') return;
+            if (Array.isArray(obj)) {
+                for (let i = 0; i < obj.length; i++) {
+                    deepRedactVersions(obj[i]);
+                }
+            } else {
+                if ('versions' in obj) {
+                    obj.versions = [];
+                }
+                for (const key of Object.keys(obj)) {
+                    deepRedactVersions(obj[key]);
+                }
+            }
+        };
+        deepRedactVersions(redacted);
+
+        const redactedValue = JSON.stringify(redacted, null, 2);
+        const fields = applyTaskToForm(task);
+
+        setFormData(prev => ({
+            ...prev,
+            title: fields.title || prev.title,
+            type: fields.type || prev.type,
+            configuration: redactedValue,
+            icon: fields.icon || prev.icon,
+        }));
+        setJsonError("");
+    };
+
     const handleJsonChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
         const value = e.target.value;
         setFormData({ ...formData, configuration: value });
-        setJsonError("");
+        setImportNote("");
+
+        if (!value.trim()) {
+            setJsonError("");
+            return;
+        }
+
+        let parsed: unknown;
+        try {
+            parsed = JSON.parse(value);
+        } catch (err: unknown) {
+            if (err instanceof Error) setJsonError(err.message);
+            return;
+        }
 
         try {
-            if (!value.trim()) return;
-            const json = JSON.parse(value);
-
-            // Basic Schema Validation
-            if (!json.name || typeof json.name !== "string") throw new Error("Missing 'name' field");
-            if (!json.url || typeof json.url !== "string") throw new Error("Missing 'url' field");
-            if (!json.mode || (json.mode !== "agent" && json.mode !== "scrape")) throw new Error("Invalid 'mode' (must be 'agent' or 'scrape')");
-
-            // Redact 'versions' recursively
-            const deepRedactVersions = (obj: any) => {
-                if (!obj || typeof obj !== 'object') return;
-                if (Array.isArray(obj)) {
-                    for (let i = 0; i < obj.length; i++) {
-                        deepRedactVersions(obj[i]);
-                    }
-                } else {
-                    if ('versions' in obj) {
-                        obj.versions = [];
-                    }
-                    for (const key of Object.keys(obj)) {
-                        deepRedactVersions(obj[key]);
-                    }
-                }
-            };
-
-            deepRedactVersions(json);
-            const redactedValue = JSON.stringify(json, null, 2);
-
-            // Auto-fill fields and icon type if URL exists
-            const domain = json.url ? getDomainFromUrl(json.url) : null;
-
-            setFormData(prev => ({
-                ...prev,
-                title: json.name || prev.title,
-                type: json.mode === "agent" ? "AGENT" : "SCRAPE",
-                configuration: redactedValue,
-                icon: domain && iconType === "favicon" ? domain : prev.icon
-            }));
-
-        } catch (err: unknown) {
-            if (err instanceof Error) {
-                setJsonError(err.message);
+            const { task, taskCount } = resolveTaskJson(parsed);
+            ingestTask(task);
+            if (taskCount > 1) {
+                setImportNote(`${taskCount} tasks found in export; used the first task. Paste additional tasks individually or edit the JSON.`);
             }
+        } catch (err: unknown) {
+            if (err instanceof Error) setJsonError(err.message);
         }
     };
 
-    const handleAutoFill = async () => {
-        if (!formData.configuration.trim() || jsonError) return;
-        setGenerating(true);
-        setError("");
+    const handleFileImport = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
 
-        try {
-            const res = await fetch("/api/presets/generate-meta", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ configuration: formData.configuration }),
-            });
-
-            if (!res.ok) {
-                const data = await res.json();
-                throw new Error(data.error || "Failed to generate metadata");
-            }
-
-            const data = await res.json();
-            setFormData(prev => ({
-                ...prev,
-                title: data.title || prev.title,
-                description: data.description || prev.description,
-                category: data.category || prev.category
-            }));
-        } catch (err: unknown) {
-            if (err instanceof Error) {
-                setError(err.message);
-            } else {
-                setError("An unknown error occurred during auto-fill");
-            }
-        } finally {
-            setGenerating(false);
+        if (!file.name.toLowerCase().endsWith(".json") && file.type !== "application/json") {
+            setJsonError("Please select a .json file.");
+            return;
         }
+
+        const reader = new FileReader();
+        reader.onload = () => {
+            try {
+                const text = (reader.result as string) || "";
+                const parsed = JSON.parse(text);
+                const { task, taskCount } = resolveTaskJson(parsed);
+                ingestTask(task);
+                setFormData(prev => ({ ...prev, configuration: JSON.stringify(parsed, null, 2) }));
+                setImportNote("");
+                if (taskCount > 1) {
+                    setImportNote(`${taskCount} tasks found in export; used the first task.`);
+                }
+            } catch (err: unknown) {
+                if (err instanceof Error) setJsonError(err.message);
+            }
+        };
+        reader.onerror = () => setJsonError("Could not read file.");
+        reader.readAsText(file);
+        // Reset so the same file can be re-selected if needed.
+        e.target.value = "";
     };
 
     const handleSubmit = async (e: React.FormEvent) => {
@@ -158,7 +201,6 @@ export default function NewPresetPage() {
         }
 
         try {
-            // Final JSON validation before submit
             if (!formData.configuration.trim()) {
                 setError("Configuration JSON is required");
                 setLoading(false);
@@ -184,11 +226,8 @@ export default function NewPresetPage() {
             router.push("/");
             router.refresh();
         } catch (err: unknown) {
-            if (err instanceof Error) {
-                setError(err.message);
-            } else {
-                setError("An unknown error occurred");
-            }
+            if (err instanceof Error) setError(err.message);
+            else setError("An unknown error occurred");
         } finally {
             setLoading(false);
         }
@@ -215,27 +254,34 @@ export default function NewPresetPage() {
                                     <label className="block text-xs font-medium text-muted-foreground uppercase tracking-wide">
                                         Task Configuration (JSON)
                                     </label>
-                                    <button
-                                        type="button"
-                                        onClick={handleAutoFill}
-                                        disabled={generating || !formData.configuration.trim() || !!jsonError}
-                                        className="text-xs flex items-center gap-1 text-purple-400 hover:text-purple-300 transition-colors disabled:opacity-50 disabled:cursor-not-allowed bg-purple-500/10 hover:bg-purple-500/20 px-2 py-1 rounded border border-purple-500/20"
-                                    >
-                                        <MaterialIcon name="auto_awesome" className={`text-sm ${generating ? 'animate-pulse' : ''}`} />
-                                        {generating ? "Auto-filling..." : "Auto-fill with AI"}
-                                    </button>
+                                    <div className="flex items-center gap-2">
+                                        <label className="cursor-pointer inline-flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground border border-[#262626] hover:border-zinc-600 px-2 py-1 rounded-md transition-colors">
+                                            <MaterialIcon name="file_open" className="text-sm" />
+                                            Import JSON file
+                                            <input
+                                                type="file"
+                                                accept=".json,application/json"
+                                                className="hidden"
+                                                ref={fileInputRef}
+                                                onChange={handleFileImport}
+                                            />
+                                        </label>
+                                    </div>
                                 </div>
-                                <p className="text-xs text-muted-foreground mb-2">Paste your task JSON here. Title and Type will be auto-filled.</p>
+                                <p className="text-xs text-muted-foreground mb-2">Paste your task JSON or import a JSON file. Task title and type are auto-filled from the pasted/imported configuration.</p>
                                 <textarea
                                     required
                                     rows={20}
                                     className={`w-full bg-[#121212] border rounded-lg px-3 py-2 text-foreground font-mono text-xs focus:outline-none transition-colors resize-none ${jsonError ? 'border-red-500/50' : 'border-[#262626] focus:border-zinc-700'}`}
                                     value={formData.configuration}
                                     onChange={handleJsonChange}
-                                    placeholder='{ "name": "My Task", "url": "...", "mode": "agent", ... }'
+                                    placeholder='{ "name": "My Task", "url": "https://example.com", "mode": "agent", "actions": [...] }'
                                 />
                                 {jsonError && (
                                     <p className="text-red-500 text-xs mt-1">{jsonError}</p>
+                                )}
+                                {importNote && (
+                                    <p className="text-emerald-400 text-xs mt-1">{importNote}</p>
                                 )}
                             </div>
                         </div>
@@ -295,8 +341,9 @@ export default function NewPresetPage() {
                                                 try {
                                                     if (formData.configuration) {
                                                         const json = JSON.parse(formData.configuration);
-                                                        if (json.url) {
-                                                            const domain = getDomainFromUrl(json.url);
+                                                        const { task } = resolveTaskJson(json);
+                                                        if (task.url) {
+                                                            const domain = getDomainFromUrl(task.url);
                                                             if (domain) setFormData({ ...formData, icon: domain });
                                                         }
                                                     }

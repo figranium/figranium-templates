@@ -108,12 +108,15 @@ export default function EditPresetPage() {
             if (!value.trim()) return;
             const json = JSON.parse(value);
 
-            // Auto-fill logic (optional, maybe we don't want to overwrite title on edit unless valid)
-            if (json.name) {
-                setFormData(prev => ({ ...prev, title: json.name }));
+            // Support both a raw task config and a Figranium export wrapper
+            // of the shape: { exportedAt: "...", tasks: [ {...}, ... ] }
+            const task = Array.isArray(json?.tasks) && json.tasks.length > 0 ? json.tasks[0] : json;
+
+            if (task?.name) {
+                setFormData(prev => ({ ...prev, title: task.name }));
             }
-            if (json.mode) {
-                setFormData(prev => ({ ...prev, type: json.mode === "agent" ? "AGENT" : "SCRAPE" }));
+            if (task?.mode) {
+                setFormData(prev => ({ ...prev, type: task.mode === "agent" ? "AGENT" : "SCRAPE" }));
             }
 
         } catch (err: unknown) {

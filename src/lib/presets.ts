@@ -1,5 +1,12 @@
 import { query } from "@/lib/db";
 import { unstable_noStore as noStore, unstable_cache as cache } from 'next/cache';
+import { searchPresets, algoliaConfig } from "@/lib/algolia";
+
+// Shape of an Algolia preset record
+interface AlgoliaPreset {
+    objectID: string;
+    [key: string]: unknown;
+}
 
 // Cache the category counts for 1 hour to reduce database load
 const getCategoryCounts = cache(async () => {
@@ -41,11 +48,39 @@ export async function getPresets(category?: string, sort?: string, search?: stri
             paramIndex++;
         }
 
-        // Filter by search
-        if (search && search.trim()) {
-            conditions.push(`(title ILIKE $${paramIndex} OR description ILIKE $${paramIndex})`);
-            params.push(`%${search.trim()}%`);
-            paramIndex++;
+        // Filter by search — use Algolia when configured, otherwise fall back to SQL ILIKE
+        const searchTerm = search?.trim();
+        let algoliaIds: string[] | null = null;
+
+        if (searchTerm) {
+            if (algoliaConfig.isConfigured) {
+                // Search Algolia for matching preset object IDs
+                try {
+                    const response = await searchPresets<AlgoliaPreset>(searchTerm, { hitsPerPage: 1000 });
+                    algoliaIds = response.hits.map((hit) => hit.objectID);
+                } catch (err) {
+                    console.error("Algolia search failed, falling back to SQL search:", err);
+                    algoliaIds = null;
+                }
+            }
+
+            if (algoliaIds) {
+                if (algoliaIds.length === 0) {
+                    // No Algolia matches — return empty set
+                    conditions.push(`1 = 0`);
+                } else {
+                    // Filter by the matched preset IDs (cast id to text for comparison)
+                    const idPlaceholders = algoliaIds.map((_, i) => `$${paramIndex + i}`).join(', ');
+                    conditions.push(`id::text = ANY(ARRAY[${idPlaceholders}]::text[])`);
+                    params.push(...algoliaIds);
+                    paramIndex += algoliaIds.length;
+                }
+            } else {
+                // Fallback to SQL ILIKE search
+                conditions.push(`(title ILIKE $${paramIndex} OR description ILIKE $${paramIndex})`);
+                params.push(`%${searchTerm}%`);
+                paramIndex++;
+            }
         }
 
         const whereClause = conditions.length > 0 ? `WHERE ${conditions.join(' AND ')}` : '';

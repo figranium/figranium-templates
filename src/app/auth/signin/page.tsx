@@ -34,7 +34,7 @@ function SigninContent() {
                 throw new Error(data.error || "Invalid credentials");
             }
 
-            router.push("/");
+            router.replace("/dashboard");
             router.refresh(); // Refresh to update Navbar
         } catch (err: unknown) {
             if (err instanceof Error) {

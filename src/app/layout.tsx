@@ -22,7 +22,7 @@ export const metadata: Metadata = {
     default: "Figranium Templates — Community Automation Presets",
     template: "%s | Figranium Templates",
   },
-  description: "Browse, share, and download community-built automation presets for Figranium.",
+  description: "Download presets for free, then run them on your own local, open-source Figranium instance—no vendor lock-in, no subscription required.",
 };
 
 export default function RootLayout({
@@ -36,10 +36,10 @@ export default function RootLayout({
         <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet" />
       </head>
       <body
-        className={`${questrial.variable} ${spaceMono.variable} font-sans antialiased bg-[#050505] text-foreground min-h-screen flex flex-col`}
+        className={`${questrial.variable} ${spaceMono.variable} font-sans antialiased bg-black text-foreground min-h-screen flex flex-col`}
       >
         <Navbar />
-        <main className="flex-1">
+        <main className="flex-1 pt-[120px] md:pt-[135px]">
           {children}
         </main>
         <Footer />

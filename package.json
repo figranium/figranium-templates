@@ -6,7 +6,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "sync:algolia": "node scripts/sync_algolia.js"
   },
   "dependencies": {
     "@google/generative-ai": "^0.24.1",
@@ -14,6 +15,7 @@
     "@types/nodemailer": "^7.0.10",
     "@types/pg": "^8.16.0",
     "@types/react-syntax-highlighter": "^15.5.13",
+    "algoliasearch": "^5.56.0",
     "bcrypt": "^6.0.0",
     "cheerio": "^1.2.0",
     "clsx": "^2.1.1",

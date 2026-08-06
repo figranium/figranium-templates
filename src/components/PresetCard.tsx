@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import MaterialIcon from "@/components/MaterialIcon";
-import { useState, memo } from "react";
+import { useState, memo, useEffect } from "react";
 
 export interface PresetProps {
     id: string; // Added ID
@@ -13,6 +13,30 @@ export interface PresetProps {
     time: string;
     type: "SCRAPE" | "AGENT";
     icon: string;
+}
+
+interface AccountSettings {
+    displayName: string;
+    profilePicture: string;
+}
+
+function useAuthorInfo(username: string): { displayName: string; profilePicture: string } {
+    const [info, setInfo] = useState({ displayName: username, profilePicture: "" });
+
+    useEffect(() => {
+        const stored = window.localStorage.getItem(`figranium-account-settings:${username}`);
+        if (stored) {
+            try {
+                const parsed = JSON.parse(stored) as AccountSettings;
+                setInfo({
+                    displayName: parsed.displayName || username,
+                    profilePicture: parsed.profilePicture || "",
+                });
+            } catch { /* ignore */ }
+        }
+    }, [username]);
+
+    return info;
 }
 
 function PresetIcon({ icon }: { icon: string }) {
@@ -46,6 +70,24 @@ function PresetIcon({ icon }: { icon: string }) {
     );
 }
 
+function AuthorCell({ username }: { username: string }) {
+    const { displayName, profilePicture } = useAuthorInfo(username);
+    const initial = (displayName || username).trim().charAt(0).toUpperCase();
+
+    return (
+        <div className="flex items-center gap-2 mt-1">
+            <div className="w-6 h-6 rounded-full overflow-hidden shrink-0 flex items-center justify-center text-[10px] font-semibold border border-[#262626] bg-[#121212] text-muted-foreground">
+                {profilePicture ? (
+                    <img src={profilePicture} alt="" className="w-full h-full object-cover" />
+                ) : (
+                    initial
+                )}
+            </div>
+            <span className="text-xs text-muted-foreground truncate max-w-[140px]">{displayName}</span>
+        </div>
+    );
+}
+
 export const PresetCard = memo(function PresetCard({ id, title, description, author, downloads, time, type, icon }: PresetProps) {
     return (
         <div className="group bg-[#0a0a0a] border border-[#262626] rounded-xl p-5 hover:border-zinc-700 transition-all flex flex-col h-full relative overflow-hidden">
@@ -59,7 +101,7 @@ export const PresetCard = memo(function PresetCard({ id, title, description, aut
                     </div>
                     <div>
                         <h3 className="font-semibold text-foreground text-base">{title}</h3>
-                        <p className="text-xs text-muted-foreground">By {author}</p>
+                        <AuthorCell username={author} />
                     </div>
                 </div>
                 <span className="px-2 py-0.5 rounded text-[10px] font-mono border border-[#262626] text-muted-foreground bg-[#121212]">

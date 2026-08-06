@@ -4,6 +4,7 @@ import MaterialIcon from "@/components/MaterialIcon";
 import DownloadButton from "@/components/DownloadButton";
 import type { Metadata } from "next";
 import CodeBlock from "@/components/CodeBlock";
+import { PresetAuthor } from "@/components/PresetAuthor";
 import { cookies } from "next/headers";
 import { verifyToken } from "@/lib/auth";
 import { sanitizeUrl } from "@/lib/utils";
@@ -246,7 +247,7 @@ export default async function ViewPresetPage({ params }: PageProps) {
                             </div>
                             <div>
                                 <h1 className="text-3xl font-bold text-foreground">{preset.title}</h1>
-                                <p className="text-muted-foreground">By {preset.author_name || "Unknown"}</p>
+                                <PresetAuthor username={preset.author_name || "Unknown"} />
                             </div>
                         </div>
                         <div className="flex items-center gap-3">
