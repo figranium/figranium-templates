@@ -7,7 +7,9 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "sync:algolia": "node scripts/sync_algolia.js"
+    "sync:algolia": "node scripts/sync_algolia.js",
+    "db:migrate": "node scripts/apply_schema.js",
+    "db:ensure-columns": "node scripts/ensure_columns.js"
   },
   "dependencies": {
     "@google/generative-ai": "^0.24.1",

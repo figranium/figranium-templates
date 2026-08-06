@@ -34,7 +34,6 @@ CREATE TABLE IF NOT EXISTS presets (
     icon TEXT NOT NULL DEFAULT 'extension', -- Material Icon name
     downloads INTEGER DEFAULT 0,
     time_estimate TEXT, -- e.g. "12s"
-    time_estimate TEXT, -- e.g. "12s"
     category TEXT,
     configuration JSONB,
     target_url TEXT,
