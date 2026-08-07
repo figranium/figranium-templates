@@ -12,14 +12,46 @@ export function PresetAuthor({ username, isAdmin }: { username: string; isAdmin?
     const [profilePicture, setProfilePicture] = useState("");
 
     useEffect(() => {
-        const stored = window.localStorage.getItem(`figranium-account-settings:${username}`);
-        if (stored) {
+        let mounted = true;
+
+        async function loadProfile() {
+            // Try to fetch from database first
             try {
-                const parsed = JSON.parse(stored) as AccountSettings;
-                setDisplayName(parsed.displayName || username);
-                setProfilePicture(parsed.profilePicture || "");
+                const res = await fetch(`/api/auth/user?username=${encodeURIComponent(username)}`);
+                if (res.ok) {
+                    const data = await res.json();
+                    if (mounted) {
+                        setDisplayName(data.displayName || username);
+                        setProfilePicture(data.profilePicture || "");
+                        // Cache in localStorage for faster subsequent loads
+                        if (data.displayName || data.profilePicture) {
+                            window.localStorage.setItem(
+                                `figranium-account-settings:${username}`,
+                                JSON.stringify({
+                                    displayName: data.displayName || username,
+                                    profilePicture: data.profilePicture || "",
+                                })
+                            );
+                        }
+                    }
+                    return;
+                }
             } catch { /* ignore */ }
+
+            // Fallback to localStorage
+            const stored = window.localStorage.getItem(`figranium-account-settings:${username}`);
+            if (stored && mounted) {
+                try {
+                    const parsed = JSON.parse(stored) as AccountSettings;
+                    setDisplayName(parsed.displayName || username);
+                    setProfilePicture(parsed.profilePicture || "");
+                } catch { /* ignore */ }
+            }
         }
+
+        loadProfile();
+
+        return () => { mounted = false; };
     }, [username]);
 
     const initial = (displayName || username).trim().charAt(0).toUpperCase();

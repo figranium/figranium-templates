@@ -73,19 +73,44 @@ function PresetIcon({ icon }: { icon: string }) {
 
 function AuthorCell({ username, isAdmin }: { username: string; isAdmin?: boolean }) {
     const { displayName, profilePicture } = useAuthorInfo(username);
+    const [dbDisplayName, setDbDisplayName] = useState<string | null>(null);
+    const [dbProfilePicture, setDbProfilePicture] = useState<string | null>(null);
     const initial = (displayName || username).trim().charAt(0).toUpperCase();
+
+    // Fetch from database
+    useEffect(() => {
+        let mounted = true;
+        
+        async function loadFromDb() {
+            try {
+                const res = await fetch(`/api/auth/user?username=${encodeURIComponent(username)}`);
+                if (res.ok && mounted) {
+                    const data = await res.json();
+                    setDbDisplayName(data.displayName);
+                    setDbProfilePicture(data.profilePicture);
+                }
+            } catch { /* ignore */ }
+        }
+        
+        loadFromDb();
+        return () => { mounted = false; };
+    }, [username]);
+
+    // Use database values if available, otherwise fall back to localStorage
+    const finalDisplayName = dbDisplayName || displayName || username;
+    const finalProfilePicture = dbProfilePicture || profilePicture || "";
 
     return (
         <div className="flex items-center gap-2 mt-1">
             <div className="w-6 h-6 rounded-full overflow-hidden shrink-0 flex items-center justify-center text-[10px] font-semibold border border-[#262626] bg-[#121212] text-muted-foreground">
-                {profilePicture ? (
-                    <img src={profilePicture} alt="" className="w-full h-full object-cover" />
+                {finalProfilePicture ? (
+                    <img src={finalProfilePicture} alt="" className="w-full h-full object-cover" />
                 ) : (
                     initial
                 )}
             </div>
             <span className="text-xs text-muted-foreground truncate max-w-[140px] flex items-center gap-1">
-                {displayName}
+                {finalDisplayName}
                 {isAdmin && (
                     <span title="Verified Admin">
                         <svg className="w-3.5 h-3.5 text-blue-400 shrink-0" viewBox="0 0 24 24" fill="currentColor">

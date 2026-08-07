@@ -51,16 +51,38 @@ export default function AccountSettingsPage() {
         loadAccount();
     }, [router]);
 
-    const handleSave = (event: React.FormEvent) => {
+    const handleSave = async (event: React.FormEvent) => {
         event.preventDefault();
-        const nextSettings: AccountSettings = {
-            displayName: displayName.trim(),
-            profilePicture: profilePicture.trim(),
-        };
+        const trimmedDisplayName = displayName.trim();
+        const trimmedProfilePicture = profilePicture.trim();
 
-        window.localStorage.setItem(getStorageKey(username), JSON.stringify(nextSettings));
-        window.dispatchEvent(new CustomEvent("figranium-account-settings-updated", { detail: nextSettings }));
-        setSaved(true);
+        // Save to database
+        try {
+            const res = await fetch("/api/auth/profile", {
+                method: "PUT",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    displayName: trimmedDisplayName,
+                    profilePicture: trimmedProfilePicture,
+                }),
+            });
+
+            if (!res.ok) {
+                throw new Error("Failed to save");
+            }
+
+            // Also keep localStorage for backward compatibility and instant UI updates
+            const nextSettings: AccountSettings = {
+                displayName: trimmedDisplayName,
+                profilePicture: trimmedProfilePicture,
+            };
+            window.localStorage.setItem(getStorageKey(username), JSON.stringify(nextSettings));
+            window.dispatchEvent(new CustomEvent("figranium-account-settings-updated", { detail: nextSettings }));
+            setSaved(true);
+        } catch (error) {
+            console.error("Failed to save profile:", error);
+            alert("Failed to save profile. Please try again.");
+        }
     };
 
     if (loading) {
