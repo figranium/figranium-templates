@@ -76,6 +76,87 @@ export default async function ViewPresetPage({ params }: PageProps) {
 
     const renderExpectedOutput = (output: string) => {
         const trimmed = output.trim();
+        
+        // Check if it's JSON that looks like tabular data (array of arrays or array of objects)
+        if ((trimmed.startsWith('{') || trimmed.startsWith('[')) && (trimmed.includes(',') || trimmed.includes('\n'))) {
+            try {
+                const parsed = JSON.parse(trimmed);
+                
+                // Check if it's an array of arrays (e.g., [[header1, header2], [row1col1, row1col2], ...])
+                if (Array.isArray(parsed) && parsed.length > 0 && Array.isArray(parsed[0])) {
+                    const headers = parsed[0];
+                    const rows = parsed.slice(1);
+                    
+                    return (
+                        <div className="mt-2 overflow-x-auto border border-[#262626] rounded-lg">
+                            <table className="w-full text-left text-xs text-muted-foreground min-w-max wrap-break-word">
+                                <thead className="bg-[#121212] text-foreground uppercase border-b border-[#262626]">
+                                    <tr>
+                                        {headers.map((h: any, i: number) => (
+                                            <th key={i} className="px-4 py-3 font-medium border-r border-[#262626]/50 last:border-0 min-w-[150px] max-w-[300px] whitespace-normal">
+                                                {String(h)}
+                                            </th>
+                                        ))}
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {rows.map((row: any, i: number) => (
+                                        <tr key={i} className="border-b border-[#262626] last:border-0 hover:bg-[#121212]/50 transition-colors">
+                                            {row.map((cell: any, j: number) => (
+                                                <td key={j} className="px-4 py-3 border-r border-[#262626]/50 last:border-0 align-top min-w-[150px] max-w-[300px] whitespace-normal break-words">
+                                                    <div className="line-clamp-3" title={String(cell)}>
+                                                        {String(cell)}
+                                                    </div>
+                                                </td>
+                                            ))}
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        </div>
+                    );
+                }
+                
+                // Check if it's an array of objects (e.g., [{col1: val1, col2: val2}, ...])
+                if (Array.isArray(parsed) && parsed.length > 0 && typeof parsed[0] === 'object' && !Array.isArray(parsed[0])) {
+                    const headers = Object.keys(parsed[0]);
+                    const rows = parsed;
+                    
+                    return (
+                        <div className="mt-2 overflow-x-auto border border-[#262626] rounded-lg">
+                            <table className="w-full text-left text-xs text-muted-foreground min-w-max wrap-break-word">
+                                <thead className="bg-[#121212] text-foreground uppercase border-b border-[#262626]">
+                                    <tr>
+                                        {headers.map((h, i) => (
+                                            <th key={i} className="px-4 py-3 font-medium border-r border-[#262626]/50 last:border-0 min-w-[150px] max-w-[300px] whitespace-normal">
+                                                {h}
+                                            </th>
+                                        ))}
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {rows.map((row: any, i: number) => (
+                                        <tr key={i} className="border-b border-[#262626] last:border-0 hover:bg-[#121212]/50 transition-colors">
+                                            {headers.map((header, j) => (
+                                                <td key={j} className="px-4 py-3 border-r border-[#262626]/50 last:border-0 align-top min-w-[150px] max-w-[300px] whitespace-normal break-words">
+                                                    <div className="line-clamp-3" title={String(row[header])}>
+                                                        {String(row[header] ?? '')}
+                                                    </div>
+                                                </td>
+                                            ))}
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        </div>
+                    );
+                }
+            } catch {
+                // If JSON parsing fails, fall through to other renderers
+            }
+        }
+        
+        // If not tabular JSON, render as code block
         if (trimmed.startsWith('{') || trimmed.startsWith('[')) {
             return (
                 <div className="bg-[#1e1e1e] border border-[#262626] rounded-lg relative group overflow-hidden mt-2">
