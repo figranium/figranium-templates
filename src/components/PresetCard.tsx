@@ -9,6 +9,7 @@ export interface PresetProps {
     title: string;
     description: string;
     author: string;
+    authorRole?: string;
     downloads: string;
     time: string;
     type: "SCRAPE" | "AGENT";
@@ -70,7 +71,7 @@ function PresetIcon({ icon }: { icon: string }) {
     );
 }
 
-function AuthorCell({ username }: { username: string }) {
+function AuthorCell({ username, isAdmin }: { username: string; isAdmin?: boolean }) {
     const { displayName, profilePicture } = useAuthorInfo(username);
     const initial = (displayName || username).trim().charAt(0).toUpperCase();
 
@@ -83,12 +84,21 @@ function AuthorCell({ username }: { username: string }) {
                     initial
                 )}
             </div>
-            <span className="text-xs text-muted-foreground truncate max-w-[140px]">{displayName}</span>
+            <span className="text-xs text-muted-foreground truncate max-w-[140px] flex items-center gap-1">
+                {displayName}
+                {isAdmin && (
+                    <span title="Verified Admin">
+                        <svg className="w-3.5 h-3.5 text-blue-400 shrink-0" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>
+                        </svg>
+                    </span>
+                )}
+            </span>
         </div>
     );
 }
 
-export const PresetCard = memo(function PresetCard({ id, title, description, author, downloads, time, type, icon }: PresetProps) {
+export const PresetCard = memo(function PresetCard({ id, title, description, author, authorRole, downloads, time, type, icon }: PresetProps) {
     return (
         <div className="group bg-[#0a0a0a] border border-[#262626] rounded-xl p-5 hover:border-zinc-700 transition-all flex flex-col h-full relative overflow-hidden">
             {/* Hover glow effect */}
@@ -101,7 +111,7 @@ export const PresetCard = memo(function PresetCard({ id, title, description, aut
                     </div>
                     <div>
                         <h3 className="font-semibold text-foreground text-base">{title}</h3>
-                        <AuthorCell username={author} />
+                        <AuthorCell username={author} isAdmin={authorRole === 'admin'} />
                     </div>
                 </div>
                 <span className="px-2 py-0.5 rounded text-[10px] font-mono border border-[#262626] text-muted-foreground bg-[#121212]">

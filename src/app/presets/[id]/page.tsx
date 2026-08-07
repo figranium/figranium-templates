@@ -20,7 +20,12 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     return { title: rows[0].title };
 }
 async function getPreset(id: string) {
-    const { rows } = await query('SELECT * FROM presets WHERE id = $1', [id]);
+    const { rows } = await query(`
+        SELECT p.*, u.role as author_role
+        FROM presets p
+        LEFT JOIN users u ON p.user_id = u.id
+        WHERE p.id = $1
+    `, [id]);
     if (rows.length === 0) return null;
     return rows[0];
 }
@@ -247,7 +252,7 @@ export default async function ViewPresetPage({ params }: PageProps) {
                             </div>
                             <div>
                                 <h1 className="text-3xl font-bold text-foreground">{preset.title}</h1>
-                                <PresetAuthor username={preset.author_name || "Unknown"} />
+                                <PresetAuthor username={preset.author_name || "Unknown"} isAdmin={preset.author_role === 'admin'} />
                             </div>
                         </div>
                         <div className="flex items-center gap-3">
