@@ -97,10 +97,8 @@ export async function getPresets(category?: string, sort?: string, search?: stri
             p.type,
             p.icon,
             p.target_url,
-            p.category,
-            u.role as author_role
+            p.category
         FROM presets p
-        LEFT JOIN users u ON p.user_id = u.id
         ${whereClause}
         ORDER BY ${orderBy}
     `;
@@ -126,7 +124,6 @@ export async function getPresets(category?: string, sort?: string, search?: stri
             id: r.id,
             title: r.title,
             author: r.author_name || "Unknown",
-            authorRole: r.author_role || "user",
             description: r.description,
             downloads: String(r.downloads || "0"),
             time: r.time_estimate || "—",

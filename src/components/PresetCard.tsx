@@ -5,11 +5,10 @@ import MaterialIcon from "@/components/MaterialIcon";
 import { useState, memo, useEffect } from "react";
 
 export interface PresetProps {
-    id: string; // Added ID
+    id: string;
     title: string;
     description: string;
     author: string;
-    authorRole?: string;
     downloads: string;
     time: string;
     type: "SCRAPE" | "AGENT";
@@ -123,7 +122,9 @@ function AuthorCell({ username, isAdmin }: { username: string; isAdmin?: boolean
     );
 }
 
-export const PresetCard = memo(function PresetCard({ id, title, description, author, authorRole, downloads, time, type, icon }: PresetProps) {
+export const PresetCard = memo(function PresetCard({ id, title, description, author, downloads, time, type, icon }: PresetProps) {
+    const isAdmin = author === process.env.NEXT_PUBLIC_ADMIN_USERNAME || author === process.env.ADMIN_USERNAME;
+    
     return (
         <div className="group bg-[#0a0a0a] border border-[#262626] rounded-xl p-5 hover:border-zinc-700 transition-all flex flex-col h-full relative overflow-hidden">
             {/* Hover glow effect */}
@@ -136,7 +137,7 @@ export const PresetCard = memo(function PresetCard({ id, title, description, aut
                     </div>
                     <div>
                         <h3 className="font-semibold text-foreground text-base">{title}</h3>
-                        <AuthorCell username={author} isAdmin={authorRole === 'admin'} />
+                        <AuthorCell username={author} isAdmin={isAdmin} />
                     </div>
                 </div>
                 <span className="px-2 py-0.5 rounded text-[10px] font-mono border border-[#262626] text-muted-foreground bg-[#121212]">
