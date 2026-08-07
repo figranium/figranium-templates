@@ -12,6 +12,7 @@ interface Preset {
     created_at: string;
     downloads: number;
     author_username?: string;
+    author_role?: string;
     target_url?: string;
     icon?: string;
 }
@@ -35,7 +36,24 @@ export default function AdminDashboardPage() {
             }
             if (!res.ok) throw new Error("Failed to fetch presets");
             const data = await res.json();
-            setPresets(data);
+            
+            // Fetch author roles for all presets
+            const presetsWithRoles = await Promise.all(
+                data.map(async (preset: Preset) => {
+                    if (preset.author_username) {
+                        try {
+                            const userRes = await fetch(`/api/auth/user?username=${encodeURIComponent(preset.author_username)}`);
+                            if (userRes.ok) {
+                                const userData = await userRes.json();
+                                return { ...preset, author_role: userData.role || 'user' };
+                            }
+                        } catch { /* ignore */ }
+                    }
+                    return preset;
+                })
+            );
+            
+            setPresets(presetsWithRoles);
         } catch (err) {
             setError("Could not load presets.");
         } finally {
@@ -92,7 +110,16 @@ export default function AdminDashboardPage() {
                                 presets.map(preset => (
                                     <tr key={preset.id} className="border-b border-[#262626] last:border-0 hover:bg-[#0f0f0f] transition-colors group">
                                         <td className="p-4">
-                                            <span className="text-sm font-medium text-blue-400">@{preset.author_username || "Unknown"}</span>
+                                            <span className="text-sm font-medium text-blue-400 flex items-center gap-1.5">
+                                                @{preset.author_username || "Unknown"}
+                                                {preset.author_role === 'admin' && (
+                                                    <span title="Verified Admin">
+                                                        <svg className="w-4 h-4 text-blue-400" viewBox="0 0 24 24" fill="currentColor">
+                                                            <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>
+                                                        </svg>
+                                                    </span>
+                                                )}
+                                            </span>
                                         </td>
                                         <td className="p-4">
                                             <div className="flex items-center gap-3">

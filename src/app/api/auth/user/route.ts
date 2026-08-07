@@ -25,6 +25,7 @@ export async function GET(request: Request) {
         return NextResponse.json({
             displayName: userProfile.display_name || null,
             profilePicture: userProfile.profile_picture || null,
+            role: userProfile.role || 'user',
         });
     } catch (error) {
         console.error("Error fetching user profile:", error);

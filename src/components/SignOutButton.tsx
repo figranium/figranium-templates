@@ -112,8 +112,15 @@ export function SignOutButton({ username, isAdmin }: SignOutButtonProps) {
 
             {isOpen && (
                 <div className="absolute right-0 mt-2 w-56 rounded-xl border border-white/10 bg-[#0f0f0f] p-2 shadow-2xl shadow-black/40">
-                    <div className="px-3 py-2 text-[10px] uppercase tracking-[0.25em] text-white/45">
-                        {username ? `Hi, ${displayName || username}` : "Account"}
+                    <div className="px-3 py-2 text-[10px] uppercase tracking-[0.25em] text-white/45 flex items-center gap-1.5">
+                        <span>{username ? `Hi, ${displayName || username}` : "Account"}</span>
+                        {isAdmin && (
+                            <span title="Verified Admin">
+                                <svg className="w-3.5 h-3.5 text-blue-400" viewBox="0 0 24 24" fill="currentColor">
+                                    <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>
+                                </svg>
+                            </span>
+                        )}
                     </div>
 
                     <div className="flex flex-col">
