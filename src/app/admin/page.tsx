@@ -110,15 +110,8 @@ export default function AdminDashboardPage() {
                                 presets.map(preset => (
                                     <tr key={preset.id} className="border-b border-[#262626] last:border-0 hover:bg-[#0f0f0f] transition-colors group">
                                         <td className="p-4">
-                                            <span className="text-sm font-medium text-blue-400 flex items-center gap-1.5">
+                                            <span className="text-sm font-medium text-blue-400">
                                                 @{preset.author_username || "Unknown"}
-                                                {preset.author_role === 'admin' && (
-                                                    <span className="inline-flex items-center justify-center w-4 h-4 rounded-full bg-blue-500 text-white" title="Verified Admin">
-                                                        <svg className="w-3 h-3" viewBox="0 0 24 24" fill="currentColor">
-                                                            <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>
-                                                        </svg>
-                                                    </span>
-                                                )}
                                             </span>
                                         </td>
                                         <td className="p-4">
