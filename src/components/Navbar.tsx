@@ -65,11 +65,6 @@ export async function Navbar() {
                         </Link>
                     )}
                     <GithubStarPill />
-                    {isLoggedIn && (
-                        <span className="text-xs text-white/60">
-                            {displayName || username}
-                        </span>
-                    )}
                     {isLoggedIn ? (
                         <SignOutButton username={username} isAdmin={isAdmin} />
                     ) : (
