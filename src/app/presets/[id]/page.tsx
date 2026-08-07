@@ -25,6 +25,17 @@ async function getPreset(id: string) {
     return rows[0];
 }
 
+function getVariableDetails(variable: any) {
+    if (variable !== null && typeof variable === 'object') {
+        const type = variable.type || 'string';
+        const value = variable.value !== undefined && variable.value !== null ? String(variable.value) : 'No default value';
+        return { type, value };
+    }
+    const type = variable === null ? 'string' : typeof variable;
+    const value = variable !== undefined && variable !== null ? String(variable) : 'No default value';
+    return { type, value };
+}
+
 export default async function ViewPresetPage({ params }: PageProps) {
     const { id } = await params;
     const preset = await getPreset(id);
@@ -370,20 +381,23 @@ export default async function ViewPresetPage({ params }: PageProps) {
                                     Variables
                                 </h2>
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                    {Object.entries(config.variables).map(([key, variable]: [string, any]) => (
-                                        <div key={key} className="bg-[#0a0a0a] border border-[#262626] rounded-lg p-4 relative group hover:border-zinc-700 transition-colors">
-                                            <div className="absolute top-0 left-0 bottom-0 w-1 bg-blue-500/50 group-hover:bg-blue-500 transition-colors" />
-                                            <div className="pl-2">
-                                                <div className="flex items-center justify-between mb-2">
-                                                    <span className="font-mono text-sm font-bold text-foreground">{key}</span>
-                                                    <span className="text-xs bg-[#121212] border border-[#262626] px-2 py-0.5 rounded text-muted-foreground uppercase">{variable.type || "string"}</span>
+                                    {Object.entries(config.variables).map(([key, variable]: [string, any]) => {
+                                        const { type, value } = getVariableDetails(variable);
+                                        return (
+                                            <div key={key} className="bg-[#0a0a0a] border border-[#262626] rounded-lg p-4 relative group hover:border-zinc-700 transition-colors">
+                                                <div className="absolute top-0 left-0 bottom-0 w-1 bg-blue-500/50 group-hover:bg-blue-500 transition-colors" />
+                                                <div className="pl-2">
+                                                    <div className="flex items-center justify-between mb-2">
+                                                        <span className="font-mono text-sm font-bold text-foreground">{key}</span>
+                                                        <span className="text-xs bg-[#121212] border border-[#262626] px-2 py-0.5 rounded text-muted-foreground uppercase">{type}</span>
+                                                    </div>
+                                                    <p className="text-sm text-muted-foreground break-all bg-[#121212] px-3 py-2 rounded border border-[#262626]">
+                                                        {value}
+                                                    </p>
                                                 </div>
-                                                <p className="text-sm text-muted-foreground break-all bg-[#121212] px-3 py-2 rounded border border-[#262626]">
-                                                    {variable.value || "No default value"}
-                                                </p>
                                             </div>
-                                        </div>
-                                    ))}
+                                        );
+                                    })}
                                 </div>
                             </section>
                         )}
