@@ -7,13 +7,13 @@ import { cookies } from 'next/headers';
 import { revalidateTag } from 'next/cache';
 
 export const createPresetSchema = z.object({
-    title: z.string().min(3).max(255),
-    description: z.string().min(10).max(5000),
+    title: z.string().min(3),
+    description: z.string().min(10),
     type: z.enum(['AGENT', 'SCRAPE']),
     category: z.enum(['QA Testing', 'Lead Gen', 'Social Media', 'Shopping', 'Monitoring', 'AI', 'Jobs', 'News', 'Videos', 'Reviews', 'Developer Tools', 'SEO', 'Real Estate', 'Travel', 'Other']),
-    icon: z.string().max(500),
-    time_estimate: z.string().max(50),
-    configuration: z.string().max(100000).refine((val) => {
+    icon: z.string(),
+    time_estimate: z.string(),
+    configuration: z.string().refine((val) => {
         try {
             const json = JSON.parse(val);
             return json.mode === 'agent' || json.mode === 'scrape';
@@ -21,7 +21,7 @@ export const createPresetSchema = z.object({
             return false;
         }
     }, "Invalid JSON configuration"),
-    expected_output: z.string().max(100000).optional(),
+    expected_output: z.string().optional(),
 });
 
 export async function GET(req: Request) {
