@@ -34,7 +34,16 @@ function SigninContent() {
                 throw new Error(data.error || "Invalid credentials");
             }
 
-            router.replace("/dashboard");
+            // Check if user has set up their profile (first-time login detection)
+            const meRes = await fetch("/api/auth/me");
+            const meData = await meRes.json();
+            
+            // If no display name set, redirect to account settings
+            if (!meData.displayName) {
+                router.replace("/account/settings");
+            } else {
+                router.replace("/dashboard");
+            }
             router.refresh(); // Refresh to update Navbar
         } catch (err: unknown) {
             if (err instanceof Error) {
