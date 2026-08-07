@@ -15,7 +15,7 @@ export default async function Home({ searchParams }: { searchParams: Promise<{ c
 
         <div className="flex flex-col md:flex-row gap-8 md:gap-12 px-4 md:px-6 py-6 md:py-8">
           <Sidebar counts={counts} />
-          <PresetGrid presets={presets} />
+          <PresetGrid presets={presets} adminUsername={process.env.ADMIN_USERNAME} />
         </div>
 
         <CTASection />

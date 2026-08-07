@@ -328,7 +328,7 @@ export default async function ViewPresetPage({ params }: PageProps) {
                             </div>
                             <div>
                                 <h1 className="text-3xl font-bold text-foreground">{preset.title}</h1>
-                                <PresetAuthor username={preset.author_name || "Unknown"} />
+                                <PresetAuthor username={preset.author_name || "Unknown"} adminUsername={process.env.ADMIN_USERNAME} />
                             </div>
                         </div>
                         <div className="flex items-center gap-3">

@@ -7,6 +7,7 @@ import MaterialIcon from "@/components/MaterialIcon";
 
 interface PresetGridProps {
     presets: PresetProps[];
+    adminUsername?: string;
 }
 
 function EmptyState() {
@@ -35,7 +36,7 @@ function EmptyState() {
     );
 }
 
-export function PresetGrid({ presets }: PresetGridProps) {
+export function PresetGrid({ presets, adminUsername }: PresetGridProps) {
     const router = useRouter();
     const searchParams = useSearchParams();
     const currentSort = searchParams.get("sort") || "popular";
@@ -73,9 +74,9 @@ export function PresetGrid({ presets }: PresetGridProps) {
             {presets.length > 0 ? (
                 <>
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
-                        {presets.map((preset) => (
-                            <PresetCard key={preset.id} {...preset} />
-                        ))}
+                    {presets.map((preset) => (
+                        <PresetCard key={preset.id} {...preset} adminUsername={adminUsername} />
+                    ))}
                     </div>
 
                     {/* Pagination Controls match original design */}

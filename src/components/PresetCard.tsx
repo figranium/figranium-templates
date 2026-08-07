@@ -122,8 +122,8 @@ function AuthorCell({ username, isAdmin }: { username: string; isAdmin?: boolean
     );
 }
 
-export const PresetCard = memo(function PresetCard({ id, title, description, author, downloads, time, type, icon }: PresetProps) {
-    const isAdmin = author === process.env.NEXT_PUBLIC_ADMIN_USERNAME || author === process.env.ADMIN_USERNAME;
+export const PresetCard = memo(function PresetCard({ id, title, description, author, downloads, time, type, icon, adminUsername }: PresetProps & { adminUsername?: string }) {
+    const isAdmin = adminUsername ? author === adminUsername : false;
     
     return (
         <div className="group bg-[#0a0a0a] border border-[#262626] rounded-xl p-5 hover:border-zinc-700 transition-all flex flex-col h-full relative overflow-hidden">

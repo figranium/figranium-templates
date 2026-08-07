@@ -7,8 +7,8 @@ interface AccountSettings {
     profilePicture: string;
 }
 
-export function PresetAuthor({ username }: { username: string }) {
-    const isAdmin = username === process.env.NEXT_PUBLIC_ADMIN_USERNAME || username === process.env.ADMIN_USERNAME;
+export function PresetAuthor({ username, adminUsername }: { username: string; adminUsername?: string }) {
+    const isAdmin = adminUsername ? username === adminUsername : false;
     const [displayName, setDisplayName] = useState(username);
     const [profilePicture, setProfilePicture] = useState("");
 
