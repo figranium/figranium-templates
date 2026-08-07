@@ -112,8 +112,8 @@ function AuthorCell({ username, isAdmin }: { username: string; isAdmin?: boolean
             <span className="text-xs text-muted-foreground truncate max-w-[140px] flex items-center gap-1">
                 {finalDisplayName}
                 {isAdmin && (
-                    <span title="Verified Admin">
-                        <svg className="w-3.5 h-3.5 text-blue-400 shrink-0" viewBox="0 0 24 24" fill="currentColor">
+                    <span className="inline-flex items-center justify-center w-4 h-4 rounded-full bg-blue-500 text-white shrink-0" title="Verified Admin">
+                        <svg className="w-3 h-3" viewBox="0 0 24 24" fill="currentColor">
                             <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>
                         </svg>
                     </span>

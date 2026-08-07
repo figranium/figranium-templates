@@ -71,8 +71,8 @@ export async function Navbar() {
                                 {displayName || username}
                             </span>
                             {isAdmin && (
-                                <span title="Verified Admin">
-                                    <svg className="w-4 h-4 text-blue-400" viewBox="0 0 24 24" fill="currentColor">
+                                <span className="inline-flex items-center justify-center w-4 h-4 rounded-full bg-blue-500 text-white" title="Verified Admin">
+                                    <svg className="w-3 h-3" viewBox="0 0 24 24" fill="currentColor">
                                         <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>
                                     </svg>
                                 </span>
