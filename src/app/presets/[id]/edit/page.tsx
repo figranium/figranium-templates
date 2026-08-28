@@ -248,8 +248,9 @@ export default function EditPresetPage() {
                                                 try {
                                                     if (formData.configuration) {
                                                         const json = JSON.parse(formData.configuration);
-                                                        if (json.url) {
-                                                            const domain = getDomainFromUrl(json.url);
+                                                        const task = Array.isArray(json?.tasks) && json.tasks.length > 0 ? json.tasks[0] : json;
+                                                        if (task?.url) {
+                                                            const domain = getDomainFromUrl(task.url);
                                                             if (domain) setFormData({ ...formData, icon: domain });
                                                         }
                                                     }

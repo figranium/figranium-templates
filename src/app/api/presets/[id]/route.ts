@@ -108,7 +108,8 @@ export async function PUT(req: Request, { params }: { params: Promise<{ id: stri
 
             try {
                 const config = JSON.parse(configuration);
-                const safeUrl = sanitizeUrl(config.url);
+                const task = Array.isArray(config?.tasks) && config.tasks.length > 0 ? config.tasks[0] : config;
+                const safeUrl = sanitizeUrl(task?.url);
                 if (safeUrl) {
                     fields.push(`target_url = $${idx++}`);
                     values.push(safeUrl);

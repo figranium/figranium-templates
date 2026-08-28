@@ -16,7 +16,14 @@ export const createPresetSchema = z.object({
     configuration: z.string().refine((val) => {
         try {
             const json = JSON.parse(val);
-            return json.mode === 'agent' || json.mode === 'scrape';
+            if (json.mode === 'agent' || json.mode === 'scrape') {
+                return true;
+            }
+            if (Array.isArray(json.tasks) && json.tasks.length > 0) {
+                const taskMode = json.tasks[0]?.mode;
+                return taskMode === 'agent' || taskMode === 'scrape';
+            }
+            return false;
         } catch {
             return false;
         }
@@ -63,7 +70,8 @@ export async function POST(req: Request) {
         let targetUrl = "";
         try {
             const config = JSON.parse(configuration);
-            targetUrl = sanitizeUrl(config.url) || "";
+            const task = Array.isArray(config?.tasks) && config.tasks.length > 0 ? config.tasks[0] : config;
+            targetUrl = sanitizeUrl(task?.url) || "";
         } catch {
             // Should be caught by Zod refine, but safe fallback
         }
