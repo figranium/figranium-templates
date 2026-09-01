@@ -35,6 +35,12 @@ async function migrate() {
          `);
         console.log('Added category column (if not exists)');
 
+        await client.query(`
+             ALTER TABLE presets
+             ADD COLUMN IF NOT EXISTS readme TEXT NOT NULL DEFAULT '';
+         `);
+        console.log('Added readme column (if not exists)');
+
     } catch (err) {
         console.error('Migration error:', err);
     } finally {

@@ -11,6 +11,9 @@ CREATE TABLE IF NOT EXISTS users (
     email_verified TIMESTAMP WITH TIME ZONE,
     verification_token TEXT,
     image TEXT,
+    display_name TEXT,
+    profile_picture TEXT,
+    role TEXT DEFAULT 'user',
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
@@ -38,9 +41,12 @@ CREATE TABLE IF NOT EXISTS presets (
     configuration JSONB,
     target_url TEXT,
     expected_output TEXT,
+    readme TEXT NOT NULL DEFAULT '',
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
+
+ALTER TABLE presets ADD COLUMN IF NOT EXISTS readme TEXT NOT NULL DEFAULT '';
 
 -- Preset Downloads
 CREATE TABLE IF NOT EXISTS preset_downloads (

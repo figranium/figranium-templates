@@ -36,10 +36,10 @@ export default function RootLayout({
         <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet" />
       </head>
       <body
-        className={`${questrial.variable} ${spaceMono.variable} font-sans antialiased bg-black text-foreground min-h-screen flex flex-col`}
+        className={`${questrial.variable} ${spaceMono.variable} font-sans antialiased bg-background text-foreground min-h-screen`}
       >
         <Navbar />
-        <main className="flex-1 pt-[120px] md:pt-[135px]">
+        <main className="app-content min-h-screen pt-16 lg:ml-[72px] lg:pt-0">
           {children}
         </main>
         <Footer />

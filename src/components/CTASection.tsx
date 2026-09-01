@@ -3,21 +3,21 @@ import MaterialIcon from "@/components/MaterialIcon";
 
 export function CTASection() {
     return (
-        <div className="flex flex-col items-center text-center py-20 px-4 border-t border-border mt-20">
-            <h2 className="text-2xl md:text-3xl font-bold mb-4">Can&apos;t find what you need?</h2>
-            <p className="text-muted-foreground mb-8 text-sm md:text-base">
+        <section className="mx-4 mb-10 mt-16 flex flex-col items-start justify-between gap-7 rounded-[18px] border border-white/[0.085] bg-[#080808] px-6 py-8 sm:mx-8 sm:flex-row sm:items-center sm:px-8 lg:mx-10">
+            <div><p className="mb-3 text-[9px] font-bold uppercase tracking-[0.18em] text-white/28">Build locally</p><h2 className="mb-3 text-2xl font-bold tracking-[-0.035em]">Can&apos;t find what you need?</h2>
+            <p className="max-w-xl text-[13px] leading-6 text-white/42">
                 Build your own automation task locally with our visual builder and share it with the world.
-            </p>
+            </p></div>
 
             <div className="flex items-center gap-4">
                 <Link
                     href="https://figranium.dev/docs"
-                    className="px-6 py-2.5 rounded-lg text-sm font-semibold border border-border hover:bg-white/5 transition-colors text-foreground flex items-center gap-2"
+                    className="flex h-11 items-center gap-2 rounded-[10px] bg-white px-5 text-[10px] font-bold uppercase tracking-[0.12em] text-black transition hover:bg-white/88"
                 >
                     Read Documentation
                     <MaterialIcon name="arrow_forward" className="text-sm" />
                 </Link>
             </div>
-        </div>
+        </section>
     );
 }

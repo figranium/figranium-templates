@@ -1,486 +1,276 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import MaterialIcon from "@/components/MaterialIcon";
+import { MarkdownContent } from "@/components/MarkdownContent";
 
-const CATEGORIES = ["QA Testing", "Lead Gen", "Social Media", "Shopping", "Monitoring", "AI", "Jobs", "News", "Videos", "Reviews", "Developer Tools", "SEO", "Real Estate", "Travel", "Other"];
-
-function getDomainFromUrl(url: string) {
-    try {
-        return new URL(url).hostname;
-    } catch {
-        return null;
-    }
-}
-
-/**
- * Normalize pasted or imported JSON. Supports both a raw task configuration
- * and a Figranium task-export wrapper of the shape:
- *   { exportedAt: "...", tasks: [ { name, url, mode, actions, ... }, ... ] }
- * Returns the resolved task object, the number of tasks found, and any error.
- */
-function resolveTaskJson(raw: unknown): { task: any; taskCount: number } {
-    if (!raw || typeof raw !== "object" || Array.isArray(raw)) {
-        throw new Error("Invalid JSON: expected an object or a task export.");
-    }
-
-    const obj = raw as Record<string, unknown>;
-    const isExportWrapper = Array.isArray(obj.tasks);
-    const tasks = isExportWrapper ? (obj.tasks as any[]) : [raw];
-    const task = tasks.length > 0 ? tasks[0] : null;
-
-    if (!task || typeof task !== "object" || Array.isArray(task)) {
-        throw new Error("No valid task found in the JSON.");
-    }
-
-    return { task: task as any, taskCount: tasks.length };
-}
-
-function applyTaskToForm(task: any) {
-    const domain = task?.url ? getDomainFromUrl(task.url) : null;
-    return {
-        title: typeof task.name === "string" && task.name ? task.name : "",
-        type: task.mode === "agent" ? "AGENT" : task.mode === "scrape" ? "SCRAPE" : "SCRAPE",
-        icon: domain ? domain : "extension",
-    };
-}
+type PresetDraft = {
+    title: string;
+    description: string;
+    type: "AGENT" | "SCRAPE";
+    category: string;
+    icon: string;
+    time_estimate: string;
+    target_url: string;
+    configuration: string;
+    expected_output: string;
+    readme: string;
+};
 
 export default function NewPresetPage() {
-    const [formData, setFormData] = useState({
-        title: "",
-        description: "",
-        type: "SCRAPE",
-        category: "QA Testing",
-        icon: "extension",
-        time_estimate: "5s",
-        configuration: "",
-        expected_output: "",
-    });
-    const [loading, setLoading] = useState(false);
-    const [error, setError] = useState("");
-    const [jsonError, setJsonError] = useState("");
-    const [importNote, setImportNote] = useState("");
-    const [iconType, setIconType] = useState<"favicon" | "upload">("upload");
-    const fileInputRef = useRef<HTMLInputElement>(null);
     const router = useRouter();
+    const inputRef = useRef<HTMLInputElement>(null);
+    const iconInputRef = useRef<HTMLInputElement>(null);
+    const [draft, setDraft] = useState<PresetDraft | null>(null);
+    const [fileName, setFileName] = useState("");
+    const [note, setNote] = useState("");
+    const [error, setError] = useState("");
+    const [generating, setGenerating] = useState(false);
+    const [publishing, setPublishing] = useState(false);
+    const [iconMode, setIconMode] = useState<"upload" | "favicon">("upload");
 
-    const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const file = e.target.files?.[0];
-        if (!file) return;
+    const useFavicon = () => {
+        if (!draft) return;
+        try {
+            const domain = new URL(draft.target_url).hostname;
+            setDraft({ ...draft, icon: domain });
+        } catch {
+            setDraft({ ...draft, icon: "" });
+        }
+        setIconMode("favicon");
+    };
 
+    const uploadIcon = (file: File) => {
+        if (!draft) return;
         const reader = new FileReader();
-        reader.onload = (event) => {
-            const img = new Image();
-            img.onload = () => {
+        reader.onload = event => {
+            const image = new Image();
+            image.onload = () => {
                 const canvas = document.createElement("canvas");
                 canvas.width = 96;
                 canvas.height = 96;
-                const ctx = canvas.getContext("2d");
-                if (ctx) {
-                    const size = Math.min(img.width, img.height);
-                    const sx = (img.width - size) / 2;
-                    const sy = (img.height - size) / 2;
-                    ctx.drawImage(img, sx, sy, size, size, 0, 0, 96, 96);
-                    const dataUrl = canvas.toDataURL("image/webp", 0.9);
-                    setFormData(prev => ({ ...prev, icon: dataUrl }));
-                }
+                const context = canvas.getContext("2d");
+                if (!context) return;
+                const size = Math.min(image.width, image.height);
+                context.drawImage(image, (image.width - size) / 2, (image.height - size) / 2, size, size, 0, 0, 96, 96);
+                setDraft(current => current ? { ...current, icon: canvas.toDataURL("image/webp", 0.9) } : current);
+                setIconMode("upload");
             };
-            img.src = event.target?.result as string;
+            image.src = event.target?.result as string;
         };
         reader.readAsDataURL(file);
     };
 
-    const ingestTask = (task: any) => {
-        try {
-            JSON.parse(JSON.stringify(task));
-        } catch {
-            throw new Error("Task is not serializable JSON.");
-        }
-
-        const redacted = JSON.parse(JSON.stringify(task));
-        const deepRedactVersions = (obj: any) => {
-            if (!obj || typeof obj !== 'object') return;
-            if (Array.isArray(obj)) {
-                for (let i = 0; i < obj.length; i++) {
-                    deepRedactVersions(obj[i]);
-                }
-            } else {
-                if ('versions' in obj) {
-                    obj.versions = [];
-                }
-                for (const key of Object.keys(obj)) {
-                    deepRedactVersions(obj[key]);
-                }
-            }
-        };
-        deepRedactVersions(redacted);
-
-        const redactedValue = JSON.stringify(redacted, null, 2);
-        const fields = applyTaskToForm(task);
-
-        setFormData(prev => ({
-            ...prev,
-            title: fields.title || prev.title,
-            type: fields.type || prev.type,
-            configuration: redactedValue,
-            icon: fields.icon || prev.icon,
-        }));
-        setJsonError("");
-    };
-
-    const handleJsonChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-        const value = e.target.value;
-        setFormData({ ...formData, configuration: value });
-        setImportNote("");
-
-        if (!value.trim()) {
-            setJsonError("");
-            return;
-        }
-
-        let parsed: unknown;
-        try {
-            parsed = JSON.parse(value);
-        } catch (err: unknown) {
-            if (err instanceof Error) setJsonError(err.message);
-            return;
-        }
-
-        try {
-            const { task, taskCount } = resolveTaskJson(parsed);
-            ingestTask(task);
-            if (taskCount > 1) {
-                setImportNote(`${taskCount} tasks found in export; used the first task. Paste additional tasks individually or edit the JSON.`);
-            }
-        } catch (err: unknown) {
-            if (err instanceof Error) setJsonError(err.message);
-        }
-    };
-
-    const handleFileImport = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const file = e.target.files?.[0];
-        if (!file) return;
+    const generateFromFile = async (file: File) => {
+        setError("");
+        setNote("");
+        setDraft(null);
 
         if (!file.name.toLowerCase().endsWith(".json") && file.type !== "application/json") {
-            setJsonError("Please select a .json file.");
+            setError("Choose a JSON file exported from Figranium.");
+            return;
+        }
+        if (file.size > 2 * 1024 * 1024) {
+            setError("The JSON file must be smaller than 2 MB.");
             return;
         }
 
-        const reader = new FileReader();
-        reader.onload = () => {
-            try {
-                const text = (reader.result as string) || "";
-                const parsed = JSON.parse(text);
-                const { task, taskCount } = resolveTaskJson(parsed);
-                ingestTask(task);
-                setFormData(prev => ({ ...prev, configuration: JSON.stringify(parsed, null, 2) }));
-                setImportNote("");
-                if (taskCount > 1) {
-                    setImportNote(`${taskCount} tasks found in export; used the first task.`);
-                }
-            } catch (err: unknown) {
-                if (err instanceof Error) setJsonError(err.message);
-            }
-        };
-        reader.onerror = () => setJsonError("Could not read file.");
-        reader.readAsText(file);
-        // Reset so the same file can be re-selected if needed.
-        e.target.value = "";
-    };
-
-    const handleSubmit = async (e: React.FormEvent) => {
-        e.preventDefault();
-        setLoading(true);
-        setError("");
-
-        if (jsonError) {
-            setError("Please fix JSON errors before submitting.");
-            setLoading(false);
-            return;
-        }
-
+        setFileName(file.name);
+        setGenerating(true);
         try {
-            if (!formData.configuration.trim()) {
-                setError("Configuration JSON is required");
-                setLoading(false);
-                return;
-            }
-            JSON.parse(formData.configuration);
-
-            const res = await fetch("/api/presets", {
+            const configuration = await file.text();
+            JSON.parse(configuration);
+            const response = await fetch("/api/presets/generate", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(formData),
+                body: JSON.stringify({ configuration }),
             });
-
-            if (!res.ok) {
-                if (res.status === 401) {
-                    router.push("/auth/signin");
-                    return;
-                }
-                const data = await res.json();
-                throw new Error(data.error || "Failed to create preset");
+            const data = await response.json();
+            if (response.status === 401) {
+                router.push("/auth/signin");
+                return;
             }
+            if (!response.ok) throw new Error(data.error || "Could not prepare this preset.");
+            setDraft(data.draft);
+            setNote(data.note || "Deterministic fields were extracted and the marketplace copy was generated by AI.");
+        } catch (cause) {
+            setError(cause instanceof SyntaxError ? "The selected file is not valid JSON." : cause instanceof Error ? cause.message : "Could not prepare this preset.");
+        } finally {
+            setGenerating(false);
+            if (inputRef.current) inputRef.current.value = "";
+        }
+    };
 
+    const publish = async () => {
+        if (!draft) return;
+        if (!draft.icon.trim()) {
+            setError("Choose an uploaded icon or favicon before publishing.");
+            return;
+        }
+        setPublishing(true);
+        setError("");
+        try {
+            const response = await fetch("/api/presets", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(draft),
+            });
+            const data = await response.json();
+            if (response.status === 401) {
+                router.push("/auth/signin");
+                return;
+            }
+            if (!response.ok) throw new Error(data.error || "Could not publish this preset.");
             router.push("/");
             router.refresh();
-        } catch (err: unknown) {
-            if (err instanceof Error) setError(err.message);
-            else setError("An unknown error occurred");
+        } catch (cause) {
+            setError(cause instanceof Error ? cause.message : "Could not publish this preset.");
         } finally {
-            setLoading(false);
+            setPublishing(false);
         }
     };
 
     return (
-        <div className="flex flex-col items-center justify-center min-h-[80vh] py-8 md:py-12">
-            <div className="w-full max-w-6xl p-6 md:p-10 bg-[#0a0a0a] border border-[#262626] rounded-xl">
-                <h1 className="text-2xl font-bold mb-6">Submit a new Preset</h1>
+        <div className="flex min-h-[80vh] flex-col items-center px-5 py-12 sm:px-8 lg:px-10 lg:py-16">
+            <div className="w-full max-w-[960px]">
+                <p className="page-kicker mb-3">Workspace / Publish</p>
+                <h1 className="text-3xl font-bold tracking-[-0.045em] sm:text-4xl">Publish from JSON</h1>
+                <p className="mt-3 max-w-2xl text-[14px] leading-6 text-white/42">
+                    Upload one Figranium task. The app extracts everything it can reliably determine, then AI writes the description, category, and README. You can optionally add an expected-output example before publishing.
+                </p>
 
                 {error && (
-                    <div className="mb-6 p-3 bg-red-500/10 border border-red-500/20 text-red-500 text-sm rounded-lg flex items-center gap-2">
-                        <MaterialIcon name="error" className="text-sm" />
-                        {error}
+                    <div className="mt-7 flex items-center gap-2 rounded-[11px] border border-red-500/25 bg-red-500/10 p-3 text-sm text-red-300">
+                        <MaterialIcon name="error" className="text-lg" /> {error}
                     </div>
                 )}
 
-                <form onSubmit={handleSubmit} className="space-y-6">
-                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
-                        {/* Left Column: Configuration */}
-                        <div className="space-y-4">
+                <div className="product-panel mt-8 p-5 sm:p-7">
+                    <button
+                        type="button"
+                        disabled={generating || publishing}
+                        onClick={() => inputRef.current?.click()}
+                        onDragOver={event => event.preventDefault()}
+                        onDrop={event => {
+                            event.preventDefault();
+                            const file = event.dataTransfer.files[0];
+                            if (file) void generateFromFile(file);
+                        }}
+                        className="flex min-h-56 w-full flex-col items-center justify-center rounded-[14px] border border-dashed border-white/[0.14] bg-white/[0.018] px-6 text-center transition hover:border-white/30 hover:bg-white/[0.035] disabled:cursor-wait disabled:opacity-60"
+                    >
+                        <span className="mb-5 flex h-12 w-12 items-center justify-center rounded-[12px] border border-white/[0.1] bg-white/[0.04]">
+                            <MaterialIcon name={generating ? "progress_activity" : "upload_file"} className={`text-2xl ${generating ? "animate-spin" : ""}`} />
+                        </span>
+                        <span className="text-[15px] font-semibold">{generating ? "Reading the task and writing its page…" : "Drop your preset JSON here"}</span>
+                        <span className="mt-2 text-xs text-white/35">{fileName && generating ? fileName : "or click to choose a file · 2 MB max"}</span>
+                    </button>
+                    <input
+                        ref={inputRef}
+                        type="file"
+                        accept=".json,application/json"
+                        className="hidden"
+                        onChange={event => {
+                            const file = event.target.files?.[0];
+                            if (file) void generateFromFile(file);
+                        }}
+                    />
+                </div>
+
+                {draft && (
+                    <div className="mt-8 space-y-6">
+                        <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
                             <div>
-                                <div className="flex items-center justify-between mb-1.5">
-                                    <label className="block text-xs font-medium text-muted-foreground uppercase tracking-wide">
-                                        Task Configuration (JSON)
-                                    </label>
-                                    <div className="flex items-center gap-2">
-                                        <label className="cursor-pointer inline-flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground border border-[#262626] hover:border-zinc-600 px-2 py-1 rounded-md transition-colors">
-                                            <MaterialIcon name="file_open" className="text-sm" />
-                                            Import JSON file
-                                            <input
-                                                type="file"
-                                                accept=".json,application/json"
-                                                className="hidden"
-                                                ref={fileInputRef}
-                                                onChange={handleFileImport}
-                                            />
-                                        </label>
-                                    </div>
-                                </div>
-                                <p className="text-xs text-muted-foreground mb-2">Paste your task JSON or import a JSON file. Task title and type are auto-filled from the pasted/imported configuration.</p>
-                                <textarea
-                                    required
-                                    rows={20}
-                                    className={`w-full bg-[#121212] border rounded-lg px-3 py-2 text-foreground font-mono text-xs focus:outline-none transition-colors resize-none ${jsonError ? 'border-red-500/50' : 'border-[#262626] focus:border-zinc-700'}`}
-                                    value={formData.configuration}
-                                    onChange={handleJsonChange}
-                                    placeholder='{ "name": "My Task", "url": "https://example.com", "mode": "agent", "actions": [...] }'
-                                />
-                                {jsonError && (
-                                    <p className="text-red-500 text-xs mt-1">{jsonError}</p>
-                                )}
-                                {importNote && (
-                                    <p className="text-emerald-400 text-xs mt-1">{importNote}</p>
-                                )}
+                                <p className="page-kicker mb-2">Ready to publish</p>
+                                <h2 className="text-2xl font-bold tracking-[-0.035em]">Generated marketplace page</h2>
+                                <p className="mt-2 text-xs text-emerald-300/75">{note}</p>
                             </div>
-                        </div>
-
-                        {/* Right Column: Metadata */}
-                        <div className="space-y-6">
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                <div>
-                                    <label className="block text-xs font-medium text-muted-foreground mb-1.5 uppercase tracking-wide">
-                                        Title
-                                    </label>
-                                    <input
-                                        type="text"
-                                        required
-                                        className="w-full bg-[#121212] border border-[#262626] rounded-lg px-3 py-2 text-foreground focus:outline-none focus:border-zinc-700 transition-colors"
-                                        value={formData.title}
-                                        onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                                    />
-                                </div>
-
-                                <div>
-                                    <label className="block text-xs font-medium text-muted-foreground mb-1.5 uppercase tracking-wide">
-                                        Type
-                                    </label>
-                                    <select
-                                        className="w-full bg-[#121212] border border-[#262626] rounded-lg px-3 py-2 text-foreground focus:outline-none focus:border-zinc-700 transition-colors opacity-50 cursor-not-allowed"
-                                        value={formData.type}
-                                        disabled
-                                        title="Derived from configuration"
-                                    >
-                                        <option value="SCRAPE">Scrape</option>
-                                        <option value="AGENT">Agent</option>
-                                    </select>
-                                </div>
-                            </div>
-
-                            <div>
-                                <label className="block text-xs font-medium text-muted-foreground mb-1.5 uppercase tracking-wide">
-                                    Icon
-                                </label>
-                                <div className="space-y-3">
-                                    <div className="flex bg-[#121212] p-1 rounded-lg border border-[#262626]">
-                                        <button
-                                            type="button"
-                                            onClick={() => {
-                                                setIconType("upload");
-                                                setFormData({ ...formData, icon: "" });
-                                            }}
-                                            className={`flex-1 text-xs py-1.5 rounded-md transition-colors ${iconType === "upload" ? "bg-[#262626] text-white" : "text-muted-foreground hover:text-white"}`}
-                                        >
-                                            Upload Image
-                                        </button>
-                                        <button
-                                            type="button"
-                                            onClick={() => {
-                                                setIconType("favicon");
-                                                try {
-                                                    if (formData.configuration) {
-                                                        const json = JSON.parse(formData.configuration);
-                                                        const { task } = resolveTaskJson(json);
-                                                        if (task.url) {
-                                                            const domain = getDomainFromUrl(task.url);
-                                                            if (domain) setFormData({ ...formData, icon: domain });
-                                                        }
-                                                    }
-                                                } catch { }
-                                            }}
-                                            className={`flex-1 text-xs py-1.5 rounded-md transition-colors ${iconType === "favicon" ? "bg-[#262626] text-white" : "text-muted-foreground hover:text-white"}`}
-                                        >
-                                            Site Favicon
-                                        </button>
-                                    </div>
-
-                                    {iconType === "upload" ? (
-                                        <div className="flex flex-col gap-2">
-                                            <div className="flex items-center gap-3">
-                                                <div className="w-12 h-12 rounded-lg bg-[#121212] border border-[#262626] flex items-center justify-center overflow-hidden shrink-0">
-                                                    {formData.icon && formData.icon.startsWith("data:image/") ? (
-                                                        <img src={formData.icon} alt="Preview" className="w-full h-full object-cover" />
-                                                    ) : (
-                                                        <MaterialIcon name="image" className="text-muted-foreground" />
-                                                    )}
-                                                </div>
-                                                <label className="flex-1 cursor-pointer bg-[#171717] border border-[#262626] border-dashed hover:bg-[#262626] rounded-lg px-3 py-2 text-xs font-medium text-center transition-colors text-muted-foreground hover:text-foreground">
-                                                    Choose Image...
-                                                    <input type="file" accept="image/*" className="hidden" onChange={handleImageUpload} />
-                                                </label>
-                                            </div>
-                                            <p className="text-[10px] text-muted-foreground">Image will be cropped to 96x96 pixels</p>
-                                        </div>
-                                    ) : (
-                                        <div className="bg-[#121212] border border-[#262626] rounded-lg px-3 py-2 text-foreground focus-within:border-zinc-700 transition-colors flex items-center gap-2">
-                                            {formData.icon && formData.icon.includes(".") ? (
-                                                <img src={`https://www.google.com/s2/favicons?domain=${formData.icon}&sz=32`} className="w-5 h-5 object-contain" alt="" />
-                                            ) : (
-                                                <MaterialIcon name="language" className="text-xl text-muted-foreground" />
-                                            )}
-                                            <input
-                                                type="text"
-                                                className="w-full bg-transparent border-none focus:outline-none text-sm placeholder:text-muted-foreground"
-                                                placeholder="example.com"
-                                                value={formData.icon}
-                                                onChange={(e) => setFormData({ ...formData, icon: e.target.value })}
-                                            />
-                                        </div>
-                                    )}
-                                </div>
-                            </div>
-
-                            <div>
-                                <label className="block text-xs font-medium text-muted-foreground mb-1.5 uppercase tracking-wide">
-                                    Category
-                                </label>
-                                <select
-                                    className="w-full bg-[#121212] border border-[#262626] rounded-lg px-3 py-2 text-foreground focus:outline-none focus:border-zinc-700 transition-colors"
-                                    value={formData.category}
-                                    onChange={(e) => setFormData({ ...formData, category: e.target.value })}
-                                >
-                                    {CATEGORIES.map(cat => (
-                                        <option key={cat} value={cat}>{cat}</option>
-                                    ))}
-                                </select>
-                            </div>
-
-                            <div>
-                                <label className="block text-xs font-medium text-muted-foreground mb-1.5 uppercase tracking-wide">
-                                    Description
-                                </label>
-                                <textarea
-                                    required
-                                    rows={4}
-                                    className="w-full bg-[#121212] border border-[#262626] rounded-lg px-3 py-2 text-foreground focus:outline-none focus:border-zinc-700 transition-colors resize-none"
-                                    value={formData.description}
-                                    onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                                />
-                            </div>
-
-                            <div>
-                                <label className="flex text-xs font-medium text-muted-foreground mb-1.5 uppercase tracking-wide justify-between">
-                                    <span>Expected Output</span>
-                                    <span className="text-zinc-500 font-normal normal-case">Optional</span>
-                                </label>
-                                <textarea
-                                    rows={4}
-                                    placeholder="Paste expected JSON, HTML, or CSV output here..."
-                                    className="w-full bg-[#121212] border border-[#262626] rounded-lg px-3 py-2 text-foreground font-mono text-xs focus:outline-none focus:border-zinc-700 transition-colors resize-none"
-                                    value={formData.expected_output}
-                                    onChange={(e) => setFormData({ ...formData, expected_output: e.target.value })}
-                                />
-                            </div>
-
-                            <div>
-                                <label className="block text-xs font-medium text-muted-foreground mb-1.5 uppercase tracking-wide">
-                                    Time Estimate
-                                </label>
-                                <div className="space-y-2">
-                                    <input
-                                        type="text"
-                                        required
-                                        disabled={formData.time_estimate === "Highly variable"}
-                                        className="w-full bg-[#121212] border border-[#262626] rounded-lg px-3 py-2 text-foreground focus:outline-none focus:border-zinc-700 transition-colors disabled:opacity-50"
-                                        value={formData.time_estimate}
-                                        onChange={(e) => setFormData({ ...formData, time_estimate: e.target.value })}
-                                        onBlur={(e) => {
-                                            const val = e.target.value.trim();
-                                            if (/^\d+$/.test(val) && val !== "") {
-                                                setFormData({ ...formData, time_estimate: `${val}s` });
-                                            }
-                                        }}
-                                        placeholder="e.g. 5s, 1m"
-                                    />
-                                    <label className="flex items-center gap-2 cursor-pointer w-fit">
-                                        <input
-                                            type="checkbox"
-                                            checked={formData.time_estimate === "Highly variable"}
-                                            onChange={(e) => {
-                                                if (e.target.checked) {
-                                                    setFormData({ ...formData, time_estimate: "Highly variable" });
-                                                } else {
-                                                    setFormData({ ...formData, time_estimate: "" });
-                                                }
-                                            }}
-                                            className="rounded border-[#262626] bg-[#121212] accent-white cursor-pointer"
-                                        />
-                                        <span className="text-xs text-muted-foreground">Highly variable</span>
-                                    </label>
-                                </div>
-                            </div>
-
                             <button
-                                type="submit"
-                                disabled={loading}
-                                className="w-full bg-white text-black font-medium py-2.5 rounded-lg hover:bg-gray-200 transition-colors disabled:opacity-50 mt-6"
+                                type="button"
+                                onClick={() => void publish()}
+                                disabled={publishing}
+                                className="inline-flex h-11 items-center justify-center gap-2 rounded-[10px] bg-white px-5 text-[13px] font-semibold text-black transition hover:bg-white/85 disabled:cursor-wait disabled:opacity-60"
                             >
-                                {loading ? "Creating..." : "Create Preset"}
+                                <MaterialIcon name={publishing ? "progress_activity" : "publish"} className={publishing ? "animate-spin" : ""} />
+                                {publishing ? "Publishing…" : "Publish preset"}
                             </button>
                         </div>
+
+                        <div className="product-panel p-6 sm:p-8">
+                            <div className="flex flex-col gap-5 sm:flex-row sm:items-start">
+                                <div className="flex h-14 w-14 shrink-0 items-center justify-center overflow-hidden rounded-[12px] border border-white/[0.09] bg-white/[0.03]">
+                                    {draft.icon.startsWith("data:image/") ? <img src={draft.icon} className="h-full w-full object-cover" alt="Preset icon" /> : draft.icon.includes(".") ? <img src={`https://www.google.com/s2/favicons?domain=${draft.icon}&sz=64`} className="h-9 w-9 object-contain" alt="" /> : <MaterialIcon name="image" className="text-3xl text-white/30" />}
+                                </div>
+                                <div className="min-w-0 flex-1">
+                                    <div className="flex flex-wrap items-center gap-2">
+                                        <h3 className="text-xl font-bold tracking-[-0.025em]">{draft.title}</h3>
+                                        <span className="rounded border border-white/[0.09] bg-white/[0.03] px-2 py-0.5 text-[10px] text-white/55">{draft.type}</span>
+                                        <span className="rounded border border-white/[0.09] bg-white/[0.03] px-2 py-0.5 text-[10px] text-white/55">{draft.category}</span>
+                                    </div>
+                                    <p className="mt-3 text-[14px] leading-6 text-white/52">{draft.description}</p>
+                                    <div className="mt-4 flex flex-wrap gap-x-5 gap-y-2 text-xs text-white/34">
+                                        <span>{draft.target_url || "No target URL"}</span><span>{draft.time_estimate}</span><span>{fileName}</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div className="mt-6 border-t border-white/[0.08] pt-6">
+                                <div className="mb-3 flex items-center justify-between">
+                                    <p className="text-[10px] font-bold uppercase tracking-[0.14em] text-white/38">Preset icon</p>
+                                    <span className="text-[10px] uppercase tracking-[0.12em] text-white/25">Required</span>
+                                </div>
+                                <div className="grid gap-3 sm:grid-cols-2">
+                                    <button
+                                        type="button"
+                                        onClick={() => iconInputRef.current?.click()}
+                                        className={`flex min-h-11 items-center justify-center gap-2 rounded-[10px] border px-4 text-xs transition ${iconMode === "upload" ? "border-white/25 bg-white/[0.07] text-white" : "border-white/[0.09] text-white/45 hover:text-white"}`}
+                                    >
+                                        <MaterialIcon name="upload" className="text-lg" /> Upload image
+                                    </button>
+                                    <button
+                                        type="button"
+                                        onClick={useFavicon}
+                                        className={`flex min-h-11 items-center justify-center gap-2 rounded-[10px] border px-4 text-xs transition ${iconMode === "favicon" ? "border-white/25 bg-white/[0.07] text-white" : "border-white/[0.09] text-white/45 hover:text-white"}`}
+                                    >
+                                        <MaterialIcon name="language" className="text-lg" /> Use site favicon
+                                    </button>
+                                </div>
+                                <input
+                                    ref={iconInputRef}
+                                    type="file"
+                                    accept="image/*"
+                                    className="hidden"
+                                    onChange={event => {
+                                        const file = event.target.files?.[0];
+                                        if (file) uploadIcon(file);
+                                        event.target.value = "";
+                                    }}
+                                />
+                                <p className="mt-3 text-[11px] text-white/28">Uploaded images are cropped to a 96×96 square. Favicon uses the task’s target domain.</p>
+                            </div>
+                        </div>
+
+                        <div className="grid gap-6 lg:grid-cols-2">
+                            <section className="product-panel p-6">
+                                <div className="mb-4 flex items-center justify-between gap-3">
+                                    <h3 className="flex items-center gap-2 text-sm font-semibold uppercase tracking-[0.08em] text-white/60"><MaterialIcon name="output" className="text-lg" /> Expected output</h3>
+                                    <span className="text-[10px] uppercase tracking-[0.12em] text-white/25">Optional</span>
+                                </div>
+                                <textarea
+                                    rows={9}
+                                    value={draft.expected_output}
+                                    onChange={event => setDraft({ ...draft, expected_output: event.target.value })}
+                                    placeholder="Paste an example of what this preset produces…"
+                                    className="w-full resize-y rounded-[10px] border border-white/[0.09] bg-black/40 px-3 py-2 font-mono text-xs leading-6 text-white outline-none transition placeholder:text-white/25 focus:border-white/25"
+                                />
+                            </section>
+                            <section className="product-panel p-6">
+                                <h3 className="mb-4 flex items-center gap-2 text-sm font-semibold uppercase tracking-[0.08em] text-white/60"><MaterialIcon name="description" className="text-lg" /> README</h3>
+                                <MarkdownContent className="max-h-[420px] overflow-auto">{draft.readme}</MarkdownContent>
+                            </section>
+                        </div>
                     </div>
-                </form>
+                )}
             </div>
         </div>
     );

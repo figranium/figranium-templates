@@ -8,9 +8,12 @@ import { PresetAuthor } from "@/components/PresetAuthor";
 import { cookies } from "next/headers";
 import { verifyToken } from "@/lib/auth";
 import { sanitizeUrl } from "@/lib/utils";
+import { MarkdownContent } from "@/components/MarkdownContent";
+import Link from "next/link";
 
 interface PageProps {
     params: Promise<{ id: string }>;
+    searchParams?: Promise<{ tab?: string }>;
 }
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
@@ -36,8 +39,10 @@ function getVariableDetails(variable: any) {
     return { type, value };
 }
 
-export default async function ViewPresetPage({ params }: PageProps) {
+export default async function ViewPresetPage({ params, searchParams }: PageProps) {
     const { id } = await params;
+    const requestedTab = (await searchParams)?.tab;
+    const activeTab = (["readme", "inputs", "steps", "output"].includes(requestedTab || "") ? requestedTab : "readme") as "readme" | "inputs" | "steps" | "output";
     const preset = await getPreset(id);
 
     if (!preset) {
@@ -318,13 +323,22 @@ export default async function ViewPresetPage({ params }: PageProps) {
     };
 
     return (
-        <div className="flex flex-col items-center py-12 px-4 md:px-6">
-            <div className="w-full max-w-5xl space-y-8">
+        <div className="flex flex-col items-center px-5 py-9 sm:px-8 lg:px-10 lg:py-11">
+            <div className="w-full max-w-[1180px] space-y-8">
+                <Link
+                    href="/"
+                    aria-label="Back to templates"
+                    title="Back to templates"
+                    className="flex h-10 w-10 items-center justify-center rounded-lg border border-white/[0.09] bg-white/[0.025] text-muted-foreground transition-colors hover:border-white/[0.16] hover:bg-white/[0.055] hover:text-white"
+                >
+                    <MaterialIcon name="arrow_back" className="text-[20px]" />
+                </Link>
+
                 {/* Header Section */}
-                <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 pb-8 border-b border-[#262626]">
+                <div className="product-panel flex flex-col items-start justify-between gap-6 p-6 md:flex-row md:items-center md:p-8">
                     <div className="space-y-4">
                         <div className="flex items-center gap-4">
-                            <div className="w-16 h-16 flex items-center justify-center overflow-hidden">
+                            <div className="flex h-16 w-16 items-center justify-center overflow-hidden rounded-[14px] border border-white/[0.09] bg-white/[0.03]">
                                 {preset.icon && preset.icon.startsWith("data:image/") ? (
                                     <img src={preset.icon} className="w-16 h-16 object-cover rounded-lg" alt="Icon" />
                                 ) : preset.icon && preset.icon.includes(".") ? (
@@ -338,7 +352,7 @@ export default async function ViewPresetPage({ params }: PageProps) {
                                 )}
                             </div>
                             <div>
-                                <h1 className="text-3xl font-bold text-foreground">{preset.title}</h1>
+                                <p className="page-kicker mb-2">Preset / {preset.category || "General"}</p><h1 className="text-3xl font-bold tracking-[-0.045em] text-white">{preset.title}</h1>
                                 <PresetAuthor username={preset.author_name || "Unknown"} adminUsername={process.env.ADMIN_USERNAME} />
                             </div>
                         </div>
@@ -361,19 +375,47 @@ export default async function ViewPresetPage({ params }: PageProps) {
                     </div>
                 </div>
 
+                <nav className="flex overflow-x-auto border-b border-[#262626]" aria-label="Preset sections">
+                    {[
+                        { id: "readme", label: "README", icon: "menu_book" },
+                        { id: "inputs", label: "Inputs", icon: "data_object" },
+                        { id: "steps", label: "Steps", icon: "account_tree" },
+                        { id: "output", label: "Expected Output", icon: "output" },
+                    ].map((tab) => (
+                        <Link
+                            key={tab.id}
+                            href={`/presets/${id}?tab=${tab.id}`}
+                            aria-current={activeTab === tab.id ? "page" : undefined}
+                            className={`relative flex shrink-0 items-center gap-2 px-4 py-3 text-sm font-medium transition-colors ${
+                                activeTab === tab.id ? "text-white" : "text-muted-foreground hover:text-white"
+                            }`}
+                        >
+                            <MaterialIcon name={tab.icon} className="text-[18px]" />
+                            {tab.label}
+                            {activeTab === tab.id && <span className="absolute inset-x-0 bottom-0 h-0.5 bg-white" />}
+                        </Link>
+                    ))}
+                </nav>
+
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                     {/* Main Content: Description & Steps */}
                     <div className="lg:col-span-2 space-y-8">
-                        <section>
-                            <h2 className="text-lg font-bold mb-3 flex items-center gap-2">
-                                <MaterialIcon name="description" className="text-muted-foreground" />
-                                Description
-                            </h2>
-                            <p className="text-muted-foreground leading-relaxed whitespace-pre-wrap">
-                                {preset.description}
-                            </p>
-                        </section>
+                        {activeTab === "readme" && (
+                            <section>
+                                <div className="rounded-xl border border-[#262626] bg-[#0a0a0a] p-6">
+                                    {preset.readme ? (
+                                        <MarkdownContent>{preset.readme}</MarkdownContent>
+                                    ) : (
+                                        <div className="space-y-3">
+                                            <h2 className="text-lg font-bold">Overview</h2>
+                                            <p className="leading-relaxed text-muted-foreground whitespace-pre-wrap">{preset.description}</p>
+                                        </div>
+                                    )}
+                                </div>
+                            </section>
+                        )}
 
+                        {activeTab === "inputs" && (<>
                         {config.variables && Object.keys(config.variables).length > 0 && (
                             <section>
                                 <h2 className="text-lg font-bold mb-4 flex items-center gap-2">
@@ -482,6 +524,18 @@ export default async function ViewPresetPage({ params }: PageProps) {
                                 </section>
                             )}
 
+                        {!config.selector && (!config.variables || Object.keys(config.variables).length === 0) && !(
+                            config.wait !== undefined || config.rotateUserAgents !== undefined || config.rotateProxies !== undefined ||
+                            config.rotateViewport !== undefined || config.humanTyping !== undefined || config.includeShadowDom !== undefined ||
+                            config.disableRecording !== undefined || config.statelessExecution !== undefined || config.stealth
+                        ) && (
+                            <div className="rounded-xl border border-dashed border-[#262626] p-8 text-center text-muted-foreground">
+                                No configurable inputs were defined for this preset.
+                            </div>
+                        )}
+                        </>)}
+
+                        {activeTab === "steps" && (<>
                         <section>
                             <h2 className="text-lg font-bold mb-4 flex items-center gap-2">
                                 <MaterialIcon name="account_tree" className="text-muted-foreground" />
@@ -523,16 +577,6 @@ export default async function ViewPresetPage({ params }: PageProps) {
                             </div>
                         </section>
 
-                        {preset.expected_output && (
-                            <section>
-                                <h2 className="text-lg font-bold mb-4 flex items-center gap-2">
-                                    <MaterialIcon name="output" className="text-muted-foreground" />
-                                    Expected Output
-                                </h2>
-                                {renderExpectedOutput(preset.expected_output)}
-                            </section>
-                        )}
-
                         {config.extractionScript && (
                             <section>
                                 <h2 className="text-lg font-bold mb-4 flex items-center gap-2">
@@ -545,6 +589,21 @@ export default async function ViewPresetPage({ params }: PageProps) {
                                         <CodeBlock code={config.extractionScript} language="javascript" />
                                     </div>
                                 </div>
+                            </section>
+                        )}
+                        </>)}
+
+                        {activeTab === "output" && (
+                            <section>
+                                <h2 className="text-lg font-bold mb-4 flex items-center gap-2">
+                                    <MaterialIcon name="output" className="text-muted-foreground" />
+                                    Expected Output
+                                </h2>
+                                {preset.expected_output ? renderExpectedOutput(preset.expected_output) : (
+                                    <div className="rounded-xl border border-dashed border-[#262626] p-8 text-center text-muted-foreground">
+                                        No expected output example was provided.
+                                    </div>
+                                )}
                             </section>
                         )}
                     </div>

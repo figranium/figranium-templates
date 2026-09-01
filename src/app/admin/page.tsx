@@ -73,21 +73,21 @@ export default function AdminDashboardPage() {
         }
     };
 
-    if (loading) return <div className="flex justify-center p-12 text-muted-foreground">Loading admin dashboard...</div>;
+    if (loading) return <div className="flex min-h-[60vh] items-center justify-center gap-3 text-xs text-white/35"><MaterialIcon name="progress_activity" className="animate-spin text-[20px]" />Loading administration…</div>;
 
     return (
-        <div className="p-6 md:p-12">
-            <div className="max-w-6xl mx-auto">
-                <div className="flex justify-between items-center mb-8">
-                    <h1 className="text-3xl font-bold uppercase tracking-wide text-red-500 flex items-center gap-3">
-                        <MaterialIcon name="admin_panel_settings" className="text-4xl" />
-                        Admin Dashboard
-                    </h1>
+        <div className="px-5 py-9 sm:px-8 lg:px-10 lg:py-11">
+            <div className="mx-auto max-w-[1320px]">
+                <div className="mb-8 flex items-end justify-between">
+                    <div><p className="page-kicker mb-3">Workspace / Administration</p><h1 className="flex items-center gap-3 text-3xl font-bold tracking-[-0.045em] text-white">
+                        <MaterialIcon name="admin_panel_settings" className="text-[28px] text-red-400" />
+                        Preset administration
+                    </h1><p className="mt-2 text-[13px] text-white/38">Review and moderate every preset in the ecosystem.</p></div>
                 </div>
 
                 {error && <div className="text-red-500 mb-4">{error}</div>}
 
-                <div className="bg-[#0a0a0a] border border-[#262626] rounded-xl overflow-hidden">
+                <div className="product-panel overflow-x-auto">
                     <table className="w-full text-left border-collapse">
                         <thead>
                             <tr className="bg-[#121212] border-b border-[#262626] text-xs uppercase text-muted-foreground">

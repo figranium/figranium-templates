@@ -9,14 +9,17 @@
     "lint": "eslint",
     "sync:algolia": "node scripts/sync_algolia.js",
     "db:migrate": "node scripts/apply_schema.js",
-    "db:ensure-columns": "node scripts/ensure_columns.js"
+    "db:ensure-columns": "node scripts/ensure_columns.js",
+    "backfill:presets": "node scripts/backfill_preset_ai.mjs"
   },
   "dependencies": {
-    "@google/generative-ai": "^0.24.1",
+    "@ai-sdk/google": "^4.0.58",
+    "@ai-sdk/openai-compatible": "^3.0.41",
     "@types/bcrypt": "^6.0.0",
     "@types/nodemailer": "^7.0.10",
     "@types/pg": "^8.16.0",
     "@types/react-syntax-highlighter": "^15.5.13",
+    "ai": "^7.0.85",
     "algoliasearch": "^5.56.0",
     "bcrypt": "^6.0.0",
     "cheerio": "^1.2.0",
@@ -28,7 +31,9 @@
     "pg": "^8.18.0",
     "react": "19.2.3",
     "react-dom": "19.2.3",
+    "react-markdown": "^10.1.0",
     "react-syntax-highlighter": "^16.1.0",
+    "remark-gfm": "^4.0.1",
     "tailwind-merge": "^3.4.1",
     "zod": "^4.3.6"
   },

@@ -60,11 +60,11 @@ export default function DownloadButton({ presetId, presetTitle, configJson, isAu
     };
 
     return (
-        <div className="flex gap-3">
+        <div className="flex flex-col gap-2 sm:flex-row">
             <button
                 onClick={() => handleAction('download')}
                 aria-label={downloaded ? "Download complete" : `Download ${presetTitle} configuration`}
-                className={`flex-1 flex items-center justify-center gap-2 font-medium py-2.5 rounded-lg transition-colors border cursor-pointer focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-background focus-visible:outline-none ${downloaded
+                className={`flex min-h-10 flex-1 items-center justify-center gap-2 rounded-[10px] border px-3 text-[10px] font-bold uppercase tracking-[0.1em] transition ${downloaded
                     ? "bg-green-500/10 border-green-500/30 text-green-400"
                     : "bg-[#171717] hover:bg-[#262626] text-foreground border-[#262626]"
                     }`}
@@ -75,7 +75,7 @@ export default function DownloadButton({ presetId, presetTitle, configJson, isAu
             <button
                 onClick={() => handleAction('copy')}
                 aria-label={copied ? "Copied to clipboard" : `Copy ${presetTitle} configuration to clipboard`}
-                className={`flex-1 flex items-center justify-center gap-2 font-medium py-2.5 rounded-lg transition-colors border cursor-pointer focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-background focus-visible:outline-none ${copied
+                className={`flex min-h-10 flex-1 items-center justify-center gap-2 rounded-[10px] border px-3 text-[10px] font-bold uppercase tracking-[0.1em] transition ${copied
                     ? "bg-green-500/10 border-green-500/30 text-green-400"
                     : "bg-[#171717] hover:bg-[#262626] text-foreground border-[#262626]"
                     }`}

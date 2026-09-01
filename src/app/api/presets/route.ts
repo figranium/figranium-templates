@@ -5,13 +5,14 @@ import { sanitizeUrl } from '@/lib/utils';
 import { z } from 'zod';
 import { cookies } from 'next/headers';
 import { revalidateTag } from 'next/cache';
+import { PRESET_CATEGORIES } from '@/lib/preset-import';
 
 export const createPresetSchema = z.object({
     title: z.string().min(3),
     description: z.string().min(10),
     type: z.enum(['AGENT', 'SCRAPE']),
-    category: z.enum(['QA Testing', 'Lead Gen', 'Social Media', 'Shopping', 'Monitoring', 'AI', 'Jobs', 'News', 'Videos', 'Reviews', 'Developer Tools', 'SEO', 'Real Estate', 'Travel', 'Other']),
-    icon: z.string(),
+    category: z.enum(PRESET_CATEGORIES),
+    icon: z.string().min(1, "Choose an icon before publishing."),
     time_estimate: z.string(),
     configuration: z.string().refine((val) => {
         try {
@@ -29,9 +30,10 @@ export const createPresetSchema = z.object({
         }
     }, "Invalid JSON configuration"),
     expected_output: z.string().optional(),
+    readme: z.string().min(80).max(8000),
 });
 
-export async function GET(req: Request) {
+export async function GET() {
     try {
         const { rows } = await query('SELECT * FROM presets ORDER BY created_at DESC');
         return NextResponse.json(rows);
@@ -64,7 +66,7 @@ export async function POST(req: Request) {
             return NextResponse.json({ error: errorMessage }, { status: 400 });
         }
 
-        const { title, description, type, category, icon, time_estimate, configuration, expected_output } = result.data;
+        const { title, description, type, category, icon, time_estimate, configuration, expected_output, readme } = result.data;
 
         // Extract URL from configuration
         let targetUrl = "";
@@ -77,9 +79,9 @@ export async function POST(req: Request) {
         }
 
         await query(
-            `INSERT INTO presets (user_id, title, description, author_name, type, category, icon, time_estimate, configuration, target_url, expected_output)
-       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)`,
-            [payload.sub, title, description, payload.username, type, category, icon, time_estimate, configuration, targetUrl, expected_output]
+            `INSERT INTO presets (user_id, title, description, author_name, type, category, icon, time_estimate, configuration, target_url, expected_output, readme)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)`,
+            [payload.sub, title, description, payload.username, type, category, icon, time_estimate, configuration, targetUrl, expected_output, readme]
         );
 
         revalidateTag('preset-counts', { expire: 0 });

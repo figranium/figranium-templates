@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useRouter, useParams } from "next/navigation";
 import MaterialIcon from "@/components/MaterialIcon";
 
@@ -18,6 +18,7 @@ function getDomainFromUrl(url: string) {
 export default function EditPresetPage() {
     const params = useParams();
     const router = useRouter();
+    const configurationInputRef = useRef<HTMLInputElement>(null);
 
     const [formData, setFormData] = useState({
         title: "",
@@ -33,6 +34,7 @@ export default function EditPresetPage() {
     const [submitting, setSubmitting] = useState(false);
     const [error, setError] = useState("");
     const [jsonError, setJsonError] = useState("");
+    const [configurationFileName, setConfigurationFileName] = useState("Current preset configuration");
     const [iconType, setIconType] = useState<"favicon" | "upload">("upload");
 
     const presetId = params?.id as string;
@@ -99,28 +101,37 @@ export default function EditPresetPage() {
         fetchPreset();
     }, [presetId]);
 
-    const handleJsonChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-        const value = e.target.value;
-        setFormData({ ...formData, configuration: value });
+    const handleConfigurationUpload = async (file: File) => {
         setJsonError("");
 
         try {
-            if (!value.trim()) return;
-            const json = JSON.parse(value);
+            if (!file.name.toLowerCase().endsWith(".json") && file.type !== "application/json") {
+                throw new Error("Choose a JSON file exported from Figranium.");
+            }
+            if (file.size > 2 * 1024 * 1024) {
+                throw new Error("The JSON file must be smaller than 2 MB.");
+            }
+
+            const json = JSON.parse(await file.text());
 
             // Support both a raw task config and a Figranium export wrapper
             // of the shape: { exportedAt: "...", tasks: [ {...}, ... ] }
             const task = Array.isArray(json?.tasks) && json.tasks.length > 0 ? json.tasks[0] : json;
-
-            if (task?.name) {
-                setFormData(prev => ({ ...prev, title: task.name }));
-            }
-            if (task?.mode) {
-                setFormData(prev => ({ ...prev, type: task.mode === "agent" ? "AGENT" : "SCRAPE" }));
+            if (!task || (task.mode !== "agent" && task.mode !== "scrape")) {
+                throw new Error('The task must have a mode of "agent" or "scrape".');
             }
 
+            setFormData(prev => ({
+                ...prev,
+                configuration: JSON.stringify(task, null, 2),
+                title: typeof task.name === "string" && task.name.trim() ? task.name.trim() : prev.title,
+                type: task.mode === "agent" ? "AGENT" : "SCRAPE",
+            }));
+            setConfigurationFileName(file.name);
         } catch (err: unknown) {
-            if (err instanceof Error) setJsonError(err.message);
+            setJsonError(err instanceof SyntaxError ? "The selected file is not valid JSON." : err instanceof Error ? err.message : "Could not read this JSON file.");
+        } finally {
+            if (configurationInputRef.current) configurationInputRef.current.value = "";
         }
     };
 
@@ -162,9 +173,9 @@ export default function EditPresetPage() {
     if (loading) return <div className="flex justify-center p-12">Loading...</div>;
 
     return (
-        <div className="flex flex-col items-center justify-center min-h-[80vh] px-4 py-8 md:py-12">
-            <div className="w-full max-w-6xl p-6 md:p-10 bg-[#0a0a0a] border border-[#262626] rounded-xl">
-                <h1 className="text-2xl font-bold mb-6">Edit Preset</h1>
+        <div className="flex min-h-[80vh] flex-col items-center justify-center px-5 py-9 sm:px-8 lg:px-10 lg:py-11">
+            <div className="product-panel w-full max-w-6xl p-6 md:p-10">
+                <p className="page-kicker mb-3">Workspace / Edit</p><h1 className="mb-2 text-3xl font-bold tracking-[-0.045em]">Edit preset</h1><p className="mb-8 text-[13px] text-white/38">Update the task configuration and its marketplace presentation.</p>
 
                 {error && (
                     <div className="mb-6 p-3 bg-red-500/10 border border-red-500/20 text-red-500 text-sm rounded-lg flex items-center gap-2">
@@ -181,12 +192,32 @@ export default function EditPresetPage() {
                                 <label className="block text-xs font-medium text-muted-foreground mb-1.5 uppercase tracking-wide">
                                     Task Configuration (JSON)
                                 </label>
-                                <textarea
-                                    required
-                                    rows={20}
-                                    className={`w-full bg-[#121212] border rounded-lg px-3 py-2 text-foreground font-mono text-xs focus:outline-none transition-colors resize-none ${jsonError ? 'border-red-500/50' : 'border-[#262626] focus:border-zinc-700'}`}
-                                    value={formData.configuration}
-                                    onChange={handleJsonChange}
+                                <button
+                                    type="button"
+                                    onClick={() => configurationInputRef.current?.click()}
+                                    onDragOver={event => event.preventDefault()}
+                                    onDrop={event => {
+                                        event.preventDefault();
+                                        const file = event.dataTransfer.files[0];
+                                        if (file) void handleConfigurationUpload(file);
+                                    }}
+                                    className={`flex min-h-56 w-full flex-col items-center justify-center rounded-[14px] border border-dashed bg-white/[0.018] px-6 text-center transition hover:bg-white/[0.035] ${jsonError ? "border-red-500/50" : "border-white/[0.14] hover:border-white/30"}`}
+                                >
+                                    <span className="mb-5 flex h-12 w-12 items-center justify-center rounded-[12px] border border-white/[0.1] bg-white/[0.04]">
+                                        <MaterialIcon name="upload_file" className="text-2xl" />
+                                    </span>
+                                    <span className="text-[15px] font-semibold">Replace task JSON</span>
+                                    <span className="mt-2 max-w-full truncate text-xs text-white/35">{configurationFileName} · click or drop a file · 2 MB max</span>
+                                </button>
+                                <input
+                                    ref={configurationInputRef}
+                                    type="file"
+                                    accept=".json,application/json"
+                                    className="hidden"
+                                    onChange={event => {
+                                        const file = event.target.files?.[0];
+                                        if (file) void handleConfigurationUpload(file);
+                                    }}
                                 />
                                 {jsonError && (
                                     <p className="text-red-500 text-xs mt-1">{jsonError}</p>
@@ -389,7 +420,7 @@ export default function EditPresetPage() {
                                 <button
                                     type="submit"
                                     disabled={submitting}
-                                    className="w-full bg-white text-black font-medium py-2.5 rounded-lg hover:bg-gray-200 transition-colors disabled:opacity-50"
+                                    className="primary-action w-full transition hover:bg-white/88 disabled:opacity-50"
                                 >
                                     {submitting ? "Saving..." : "Save Changes"}
                                 </button>

@@ -86,14 +86,14 @@ export default function AccountSettingsPage() {
     };
 
     if (loading) {
-        return <div className="flex min-h-screen items-center justify-center bg-black text-muted-foreground">Loading account settings…</div>;
+        return <div className="flex min-h-[60vh] items-center justify-center gap-3 text-xs text-white/35"><MaterialIcon name="progress_activity" className="animate-spin text-[20px]" />Loading settings…</div>;
     }
 
     const previewInitial = (displayName || username || "U").trim().charAt(0).toUpperCase();
 
     return (
-        <div className="min-h-screen bg-black px-4 py-16 text-white sm:px-6 lg:px-8 lg:py-24">
-            <div className="mx-auto flex max-w-4xl flex-col gap-8 rounded-3xl border border-white/10 bg-[#0b0b0b] p-8 shadow-2xl shadow-black/30 sm:p-10 lg:p-12">
+        <div className="min-h-screen px-5 py-9 text-white sm:px-8 lg:px-10 lg:py-11">
+            <div className="product-panel mx-auto flex max-w-4xl flex-col gap-8 p-7 sm:p-10 lg:p-12">
                 <div className="flex items-center gap-3">
                     <div className="flex h-12 w-12 items-center justify-center rounded-full border border-white/10 bg-white/10 text-xl font-semibold">
                         {profilePicture ? (
@@ -103,8 +103,8 @@ export default function AccountSettingsPage() {
                         )}
                     </div>
                     <div>
-                        <p className="text-xs uppercase tracking-[0.3em] text-white/45">Account</p>
-                        <h1 className="text-2xl font-semibold">Settings</h1>
+                        <p className="page-kicker">Account / Profile</p>
+                        <h1 className="mt-1 text-2xl font-semibold tracking-[-0.035em]">Settings</h1>
                     </div>
                 </div>
 
@@ -136,7 +136,7 @@ export default function AccountSettingsPage() {
                     <div className="flex items-center gap-3">
                         <button
                             type="submit"
-                            className="flex items-center gap-2 rounded-full bg-white px-4 py-2 text-sm font-semibold text-black transition hover:bg-white/90"
+                            className="primary-action flex items-center gap-2 px-4 transition hover:bg-white/88"
                         >
                             <MaterialIcon name="save" className="text-base" />
                             Save changes

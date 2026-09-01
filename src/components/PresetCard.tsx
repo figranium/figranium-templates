@@ -46,7 +46,7 @@ function PresetIcon({ icon }: { icon: string }) {
     const isDomain = icon && icon.includes(".") && !isDataUrl;
 
     if (isDataUrl) {
-        return <img src={icon} alt="Icon" className="w-8 h-8 object-cover rounded" width="32" height="32" loading="lazy" onError={() => setError(true)} />
+        return <img src={icon} alt="" className="h-8 w-8 rounded-[8px] object-cover" width="32" height="32" loading="lazy" onError={() => setError(true)} />
     }
 
     if (!isDomain) {
@@ -126,31 +126,33 @@ export const PresetCard = memo(function PresetCard({ id, title, description, aut
     const isAdmin = adminUsername ? author === adminUsername : false;
     
     return (
-        <div className="group bg-[#0a0a0a] border border-[#262626] rounded-xl p-5 hover:border-zinc-700 transition-all flex flex-col h-full relative overflow-hidden">
-            {/* Hover glow effect */}
-            <div className="absolute inset-0 bg-linear-to-br from-white/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />
+        <Link
+            href={`/presets/${id}`}
+            aria-label={`Open ${title} preset`}
+            className="group relative flex h-full cursor-pointer flex-col overflow-hidden rounded-[16px] border border-transparent bg-[#080808] p-5 transition duration-200 hover:-translate-y-0.5 hover:border-white/[0.18] hover:bg-[#0b0b0b] hover:shadow-[0_20px_50px_rgba(0,0,0,.28)] focus-visible:border-white/[0.24] focus-visible:outline-none"
+        >
 
             <div className="flex justify-between items-start mb-4">
                 <div className="flex gap-4">
-                    <div className="w-10 h-10 flex items-center justify-center overflow-hidden">
+                    <div className="flex h-11 w-11 items-center justify-center overflow-hidden rounded-[11px] border border-white/[0.08] bg-white/[0.03]">
                         <PresetIcon icon={icon} />
                     </div>
                     <div>
-                        <h3 className="font-semibold text-foreground text-base">{title}</h3>
+                        <h3 className="text-[15px] font-semibold tracking-[-0.015em] text-white">{title}</h3>
                         <AuthorCell username={author} isAdmin={isAdmin} />
                     </div>
                 </div>
-                <span className="px-2 py-0.5 rounded text-[10px] font-mono border border-[#262626] text-muted-foreground bg-[#121212]">
+                <span className="rounded-[7px] border border-white/[0.085] bg-black/30 px-2 py-1 font-mono text-[9px] text-white/42">
                     {type}
                 </span>
             </div>
 
-            <p className="text-sm text-muted-foreground mb-6 line-clamp-3 leading-relaxed">
+            <p className="mb-6 line-clamp-3 text-[13px] leading-6 text-white/42">
                 {description}
             </p>
 
-            <div className="mt-auto flex items-center justify-between">
-                <div className="flex items-center gap-4 text-xs text-muted-foreground font-mono">
+            <div className="mt-auto flex items-center">
+                <div className="flex items-center gap-4 font-mono text-[10px] text-white/32">
                     <div className="flex items-center gap-1.5">
                         <MaterialIcon name="download" className="text-xs" aria-hidden="true" />
                         <span>{downloads}</span>
@@ -161,14 +163,7 @@ export const PresetCard = memo(function PresetCard({ id, title, description, aut
                     </div>
                 </div>
 
-                <Link
-                    href={`/presets/${id}`}
-                    className="text-xs font-semibold bg-[#171717] hover:bg-[#262626] text-foreground px-3 py-1.5 rounded-md transition-colors border border-[#262626] cursor-pointer inline-flex items-center justify-center focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-background focus-visible:outline-none"
-                    aria-label={`Use ${title} preset`}
-                >
-                    Use Preset
-                </Link>
             </div>
-        </div>
+        </Link>
     );
 });

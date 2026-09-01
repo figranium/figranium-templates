@@ -57,9 +57,10 @@ function SigninContent() {
     };
 
     return (
-        <div className="w-full max-w-md p-8 bg-[#0a0a0a] border border-[#262626] rounded-xl">
+        <div className="product-panel w-full max-w-md p-7 sm:p-9">
             <div className="text-center mb-8">
-                <h1 className="text-2xl font-bold mb-2">Welcome back</h1>
+                <div className="mx-auto mb-5 flex h-12 w-12 items-center justify-center rounded-[13px] border border-white/[0.09] bg-white/[0.035]"><MaterialIcon name="login" className="text-[22px] text-white/65" /></div>
+                <p className="page-kicker mb-3">Account access</p><h1 className="text-2xl font-bold tracking-[-0.035em] mb-2">Welcome back</h1>
                 <p className="text-sm text-muted-foreground">
                     Sign in to your Figranium account
                 </p>
@@ -111,7 +112,7 @@ function SigninContent() {
                 <button
                     type="submit"
                     disabled={loading}
-                    className="w-full bg-white text-black font-medium py-2.5 rounded-lg hover:bg-gray-200 transition-colors disabled:opacity-50 mt-6"
+                    className="primary-action mt-6 w-full transition hover:bg-white/88 disabled:opacity-50"
                 >
                     {loading ? "Signing in..." : "Sign In"}
                 </button>
@@ -129,7 +130,7 @@ function SigninContent() {
 
 export default function SigninPage() {
     return (
-        <div className="flex flex-col items-center justify-center py-12 px-4">
+        <div className="flex min-h-[calc(100vh-64px)] flex-col items-center justify-center px-4 py-12 lg:min-h-screen">
             <Suspense fallback={<div className="text-muted-foreground">Loading...</div>}>
                 <SigninContent />
             </Suspense>

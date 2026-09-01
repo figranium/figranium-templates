@@ -54,15 +54,15 @@ export default function DashboardPage() {
         }
     };
 
-    if (loading) return <div className="flex justify-center p-12 text-muted-foreground">Loading dashboard...</div>;
+    if (loading) return <div className="flex min-h-[60vh] items-center justify-center gap-3 text-xs text-white/35"><MaterialIcon name="progress_activity" className="animate-spin text-[20px]" />Loading workspace…</div>;
 
     return (
-        <div className="p-6 md:p-12">
-            <div className="max-w-6xl mx-auto">
-                <div className="flex justify-between items-center mb-8">
-                    <h1 className="text-3xl font-bold">Creator Dashboard</h1>
+        <div className="px-5 py-9 sm:px-8 lg:px-10 lg:py-11">
+            <div className="mx-auto max-w-[1320px]">
+                <div className="mb-8 flex items-end justify-between gap-5">
+                    <div><p className="page-kicker mb-3">Workspace / My presets</p><h1 className="text-3xl font-bold tracking-[-0.045em]">Creator dashboard</h1><p className="mt-2 text-[13px] text-white/38">Manage, review, and publish your community automations.</p></div>
                     <Link href="/presets/new">
-                        <button className="bg-white text-black px-4 py-2 rounded-lg font-medium hover:bg-gray-200 transition-colors flex items-center gap-2">
+                        <button className="primary-action flex items-center gap-2 px-4 transition hover:bg-white/88">
                             <MaterialIcon name="add" className="text-lg" />
                             New Preset
                         </button>
@@ -71,7 +71,7 @@ export default function DashboardPage() {
 
                 {error && <div className="text-red-500 mb-4">{error}</div>}
 
-                <div className="bg-[#0a0a0a] border border-[#262626] rounded-xl overflow-hidden">
+                <div className="product-panel overflow-x-auto">
                     <table className="w-full text-left border-collapse">
                         <thead>
                             <tr className="bg-[#121212] border-b border-[#262626] text-xs uppercase text-muted-foreground">

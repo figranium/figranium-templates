@@ -12,7 +12,7 @@ Figranium Templates is an open marketplace where users can share and discover au
 
 - **Browse Presets** — Search and filter community-submitted automation workflows by category
 - **Download Configs** — Download or copy preset configurations as JSON, ready to import
-- **Submit Presets** — Share your own automation workflows with the community
+- **AI-assisted publishing** — Upload a Figranium JSON export; deterministic metadata is extracted and AI generates the marketplace copy and README
 - **Creator Dashboard** — Manage your submitted presets and track downloads
 
 ## How It Works
@@ -37,7 +37,20 @@ The platform is built as a modern, full-stack web application designed for perfo
 - **Authentication**: Custom implementation using `bcrypt` for password hashing and `jose` for JWT handling.
 - **Database Access**: `pg` (node-postgres) for direct SQL queries.
 - **Validation**: `zod` for schema validation.
-- **UI Components**: Custom components with `lucide-react` for icons.
+- **AI generation**: Vercel AI SDK with AI Gateway, Gemini, and OpenAI-compatible provider support.
+- **UI Components**: Custom components using Material Symbols for functional icons.
+
+### AI provider configuration
+
+Preset publishing uses a provider-neutral environment configuration. Copy `.env.example` and set:
+
+```env
+AI_PROVIDER=gateway
+AI_API_KEY=your_provider_key
+AI_MODEL=provider/model-id
+```
+
+Use `AI_PROVIDER=gemini` with a Gemini model ID for the direct Google API. Use `AI_PROVIDER=openai-compatible` and set `AI_BASE_URL` for any compatible endpoint. AI Gateway model IDs include the provider prefix and can route to any model available in your Gateway account.
 
 ## Under the Hood
 

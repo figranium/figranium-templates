@@ -14,6 +14,7 @@ const updatePresetSchema = z.object({
     time_estimate: z.string().optional(),
     configuration: z.string().optional(),
     expected_output: z.string().optional(),
+    readme: z.string().min(80).max(8000).optional(),
 });
 
 // GET Single Preset
@@ -86,7 +87,7 @@ export async function PUT(req: Request, { params }: { params: Promise<{ id: stri
             return NextResponse.json({ error: (result.error as any).errors[0].message }, { status: 400 });
         }
 
-        const { title, description, type, category, icon, time_estimate, configuration, expected_output } = result.data;
+        const { title, description, type, category, icon, time_estimate, configuration, expected_output, readme } = result.data;
 
         // Build dynamic query
         const fields = [];
@@ -100,6 +101,7 @@ export async function PUT(req: Request, { params }: { params: Promise<{ id: stri
         if (icon) { fields.push(`icon = $${idx++}`); values.push(icon); }
         if (time_estimate) { fields.push(`time_estimate = $${idx++}`); values.push(time_estimate); }
         if (expected_output !== undefined) { fields.push(`expected_output = $${idx++}`); values.push(expected_output); }
+        if (readme !== undefined) { fields.push(`readme = $${idx++}`); values.push(readme); }
 
         // Handle config URL extraction if config changed
         if (configuration) {
