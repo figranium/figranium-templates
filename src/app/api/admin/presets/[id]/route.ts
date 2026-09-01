@@ -1,21 +1,12 @@
 import { NextResponse } from 'next/server';
 import { query } from '@/lib/db';
-import { verifyToken } from '@/lib/auth';
-import { cookies } from 'next/headers';
+import { requireAdmin } from '@/lib/current-user';
 
 export async function DELETE(req: Request, { params }: { params: Promise<{ id: string }> }) {
     try {
         const { id } = await params;
-        const cookieStore = await cookies();
-        const token = cookieStore.get('token')?.value;
-
-        if (!token) {
-            return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-        }
-
-        const payload = await verifyToken(token);
-        if (!payload || !process.env.ADMIN_USERNAME || payload.username !== process.env.ADMIN_USERNAME) {
-            return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+        try { await requireAdmin(); } catch (error) {
+            return NextResponse.json({ error: error instanceof Error && error.message === 'UNAUTHORIZED' ? 'Unauthorized' : 'Forbidden' }, { status: error instanceof Error && error.message === 'UNAUTHORIZED' ? 401 : 403 });
         }
 
         const result = await query('DELETE FROM presets WHERE id = $1', [id]);

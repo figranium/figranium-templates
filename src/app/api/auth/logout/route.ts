@@ -1,7 +1,6 @@
 import { NextResponse } from 'next/server';
 
+// Neon Auth owns sign-out and all authentication cookies.
 export async function POST() {
-    const response = NextResponse.json({ message: 'Logged out' });
-    response.cookies.delete('token');
-    return response;
+    return NextResponse.json({ error: 'Use Neon Auth sign-out.' }, { status: 410 });
 }

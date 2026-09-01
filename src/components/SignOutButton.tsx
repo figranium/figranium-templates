@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import MaterialIcon from "./MaterialIcon";
+import { authClient } from "@/lib/auth-client";
 
 interface AccountSettingsState {
     displayName: string;
@@ -64,7 +65,7 @@ export function SignOutButton({ username, displayName: initialDisplayName, profi
 
     const handleSignOut = async () => {
         setIsOpen(false);
-        await fetch("/api/auth/logout", { method: "POST" });
+        await authClient.signOut();
         router.push("/");
         router.refresh();
     };

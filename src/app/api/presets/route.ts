@@ -1,9 +1,8 @@
 import { NextResponse } from 'next/server';
 import { query } from '@/lib/db';
-import { verifyToken } from '@/lib/auth';
 import { sanitizeUrl } from '@/lib/utils';
 import { z } from 'zod';
-import { cookies } from 'next/headers';
+import { getCurrentUser } from '@/lib/current-user';
 import { revalidateTag } from 'next/cache';
 import { PRESET_CATEGORIES } from '@/lib/preset-import';
 
@@ -45,16 +44,9 @@ export async function GET() {
 
 export async function POST(req: Request) {
     try {
-        const cookieStore = await cookies();
-        const token = cookieStore.get('token')?.value;
-
-        if (!token) {
+        const user = await getCurrentUser();
+        if (!user) {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-        }
-
-        const payload = await verifyToken(token);
-        if (!payload) {
-            return NextResponse.json({ error: 'Invalid token' }, { status: 401 });
         }
 
         const body = await req.json();
@@ -81,7 +73,7 @@ export async function POST(req: Request) {
         await query(
             `INSERT INTO presets (user_id, title, description, author_name, type, category, icon, time_estimate, configuration, target_url, expected_output, readme)
        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)`,
-            [payload.sub, title, description, payload.username, type, category, icon, time_estimate, configuration, targetUrl, expected_output, readme]
+            [user.id, title, description, user.username || user.email, type, category, icon, time_estimate, configuration, targetUrl, expected_output, readme]
         );
 
         revalidateTag('preset-counts', { expire: 0 });

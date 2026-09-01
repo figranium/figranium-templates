@@ -5,11 +5,12 @@ import DownloadButton from "@/components/DownloadButton";
 import type { Metadata } from "next";
 import CodeBlock from "@/components/CodeBlock";
 import { PresetAuthor } from "@/components/PresetAuthor";
-import { cookies } from "next/headers";
-import { verifyToken } from "@/lib/auth";
+import { getCurrentUser } from "@/lib/current-user";
 import { sanitizeUrl } from "@/lib/utils";
 import { MarkdownContent } from "@/components/MarkdownContent";
 import Link from "next/link";
+
+export const dynamic = 'force-dynamic';
 
 interface PageProps {
     params: Promise<{ id: string }>;
@@ -49,14 +50,7 @@ export default async function ViewPresetPage({ params, searchParams }: PageProps
         notFound();
     }
 
-    const cookieStore = await cookies();
-    const token = cookieStore.get("token")?.value;
-    let isAuthenticated = false;
-
-    if (token) {
-        const decoded = await verifyToken(token);
-        isAuthenticated = !!(decoded && decoded.sub);
-    }
+    const isAuthenticated = !!(await getCurrentUser());
 
     const deepRedactVersions = (obj: any) => {
         if (!obj || typeof obj !== 'object') return;

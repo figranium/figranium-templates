@@ -1,6 +1,5 @@
 import { NextResponse } from "next/server";
-import { cookies } from "next/headers";
-import { verifyToken } from "@/lib/auth";
+import { getCurrentUser } from "@/lib/current-user";
 import { generatePresetCopy } from "@/lib/preset-ai";
 import {
     createAiTaskContext,
@@ -13,8 +12,7 @@ export const runtime = "nodejs";
 
 export async function POST(request: Request) {
     try {
-        const token = (await cookies()).get("token")?.value;
-        if (!token || !(await verifyToken(token))) {
+        if (!(await getCurrentUser())) {
             return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
         }
 

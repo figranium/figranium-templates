@@ -1,33 +1,16 @@
 import Link from "next/link";
-import { cookies } from "next/headers";
 import { SignOutButton } from "./SignOutButton";
 import { MobileMenu } from "./MobileMenu";
-import { verifyToken } from "@/lib/auth";
-import { query } from "@/lib/db";
+import { getCurrentUser } from "@/lib/current-user";
 import { AppNavLink } from "@/components/AppNavLink";
 
 export async function Navbar() {
-    const cookieStore = await cookies();
-    const token = cookieStore.get("token")?.value;
-    const isLoggedIn = !!token;
-
-    let isAdmin = false;
-    let username: string | null = null;
-    let displayName: string | null = null;
-    let profilePicture: string | null = null;
-    
-    if (token) {
-        const payload = await verifyToken(token);
-        username = payload?.username || null;
-        
-        isAdmin = !!(process.env.ADMIN_USERNAME && payload?.username === process.env.ADMIN_USERNAME);
-        try {
-            const { rows } = await query('SELECT role, display_name, profile_picture FROM users WHERE username = $1', [payload?.username]);
-            if (rows[0]?.role === 'admin') isAdmin = true;
-            displayName = rows[0]?.display_name || null;
-            profilePicture = rows[0]?.profile_picture || null;
-        } catch { /* retain token-derived identity */ }
-    }
+    const user = await getCurrentUser();
+    const isLoggedIn = !!user;
+    const isAdmin = user?.role === 'admin';
+    const username = user?.username || null;
+    const displayName = user?.displayName || null;
+    const profilePicture = user?.profilePicture || null;
 
     const navItem = "flex min-h-10 items-center justify-center gap-0 rounded-[10px] px-0 text-[13px] text-white/58 transition-all hover:bg-white/[0.055] hover:text-white group-hover/sidebar:justify-start group-hover/sidebar:gap-3 group-hover/sidebar:px-3";
     const navLabel = "max-w-0 translate-x-1 overflow-hidden whitespace-nowrap opacity-0 transition-all duration-200 group-hover/sidebar:max-w-[170px] group-hover/sidebar:translate-x-0 group-hover/sidebar:opacity-100";

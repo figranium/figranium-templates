@@ -1,25 +1,15 @@
 import { NextResponse } from 'next/server';
 import { query } from '@/lib/db';
-import { verifyToken } from '@/lib/auth';
-import { cookies } from 'next/headers';
+import { getCurrentUser } from '@/lib/current-user';
 
 export async function GET(req: Request) {
     try {
-        const cookieStore = await cookies();
-        const token = cookieStore.get('token')?.value;
-
-        if (!token) {
-            return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-        }
-
-        const payload = await verifyToken(token);
-        if (!payload) {
-            return NextResponse.json({ error: 'Invalid token' }, { status: 401 });
-        }
+        const user = await getCurrentUser();
+        if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
         const { rows } = await query(
             'SELECT * FROM presets WHERE user_id = $1 ORDER BY created_at DESC',
-            [payload.sub]
+            [user.id]
         );
 
         return NextResponse.json(rows);

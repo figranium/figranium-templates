@@ -12,7 +12,7 @@ export async function GET(request: Request) {
 
         // Fetch user profile data from database
         const { rows } = await query(
-            'SELECT display_name, profile_picture FROM users WHERE username = $1',
+            'SELECT display_name, profile_picture, role FROM users WHERE username = $1',
             [username]
         );
 

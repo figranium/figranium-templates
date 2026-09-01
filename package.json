@@ -10,11 +10,15 @@
     "sync:algolia": "node scripts/sync_algolia.js",
     "db:migrate": "node scripts/apply_schema.js",
     "db:ensure-columns": "node scripts/ensure_columns.js",
-    "backfill:presets": "node scripts/backfill_preset_ai.mjs"
+    "backfill:presets": "node scripts/backfill_preset_ai.mjs",
+    "neon-auth:discover": "node scripts/neon-auth-discover.mjs",
+    "neon-auth:import-dry-run": "node scripts/neon-auth-import-dry-run.mjs"
   },
   "dependencies": {
     "@ai-sdk/google": "^4.0.58",
     "@ai-sdk/openai-compatible": "^3.0.41",
+    "@neondatabase/auth": "^0.5.0-beta",
+    "@neondatabase/auth-ui": "^0.3.0-beta",
     "@types/bcrypt": "^6.0.0",
     "@types/nodemailer": "^7.0.10",
     "@types/pg": "^8.16.0",
@@ -26,7 +30,7 @@
     "clsx": "^2.1.1",
     "dotenv": "^17.3.1",
     "jose": "^6.1.3",
-    "next": "16.1.6",
+    "next": "16.3.3",
     "nodemailer": "^8.0.1",
     "pg": "^8.18.0",
     "react": "19.2.3",
