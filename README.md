@@ -34,7 +34,7 @@ The platform is built as a modern, full-stack web application designed for perfo
 - **Styling**: [Tailwind CSS](https://tailwindcss.com/)
 
 ### Key Libraries
-- **Authentication**: Custom implementation using `bcrypt` for password hashing and `jose` for JWT handling.
+- **Authentication**: Neon Auth (Managed Better Auth) owns sessions and authentication cookies. Legacy bcrypt hashes remain only for the user-driven transition flow described below.
 - **Database Access**: `pg` (node-postgres) for direct SQL queries.
 - **Validation**: `zod` for schema validation.
 - **AI generation**: Vercel AI SDK with AI Gateway, Gemini, and OpenAI-compatible provider support.
@@ -51,6 +51,20 @@ AI_MODEL=provider/model-id
 ```
 
 Use `AI_PROVIDER=gemini` with a Gemini model ID for the direct Google API. Use `AI_PROVIDER=openai-compatible` and set `AI_BASE_URL` for any compatible endpoint. AI Gateway model IDs include the provider prefix and can route to any model available in your Gateway account.
+
+### Legacy account transition
+
+Existing accounts are not matched to Neon Auth by email alone. That would allow a person who registers a matching email address to claim another user’s presets and downloads.
+
+Until automatic failed-login detection is added, an existing user must open:
+
+```text
+/auth/establish-password?email=their@email.com
+```
+
+The page verifies the old bcrypt password, creates a new Neon Auth credential through the supported SDK, and then maps that Neon identity to the existing `public.users` row. It does not import password hashes, create application-managed session cookies, or write directly to `neon_auth`.
+
+The mapping is stored in `public.users.neon_auth_user_id`, created by `db/migrations/20260901_add_neon_auth_mapping.sql`. The current standard Neon Auth sign-in page does **not** yet automatically redirect a failed legacy-password login to this transition page.
 
 ## Under the Hood
 

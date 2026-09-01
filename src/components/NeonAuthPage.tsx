@@ -49,6 +49,7 @@ export function NeonAuthPage({ view, presets }: NeonAuthPageProps) {
                                 <p className="mt-2 text-sm text-muted-foreground">{view === "SIGN_IN" ? "Enter your email below to login to your account" : "Join the Figranium Templates community"}</p>
                             </div>
                         </div>}
+                        cardFooter={<p className="text-center text-sm text-muted-foreground">Already had an account before Neon Auth? <Link className="underline" href="/auth/establish-password">Continue with your existing password</Link>.</p>}
                     />
                 </div>
             </div>
