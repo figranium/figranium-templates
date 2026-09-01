@@ -18,7 +18,7 @@ export function MobileMenu({ isLoggedIn, isAdmin, signOutNode }: MobileMenuProps
         <div className="lg:hidden">
             <button
                 onClick={() => setIsOpen(true)}
-                className="flex h-10 w-10 items-center justify-center rounded-[10px] border border-white/[0.09] bg-white/[0.03] text-white/55 transition hover:text-white"
+                className="flex h-10 w-10 items-center justify-center text-white/55 transition hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/50"
                 aria-label="Open Mobile Menu"
                 aria-expanded={isOpen}
             >
