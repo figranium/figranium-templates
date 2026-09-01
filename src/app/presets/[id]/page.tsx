@@ -621,11 +621,6 @@ export default async function ViewPresetPage({ params, searchParams }: PageProps
                             </div>
 
                             <div>
-                                <p className="text-xs text-muted-foreground mb-1">Time Estimate</p>
-                                <p className="text-sm text-foreground">{preset.time_estimate || "Unknown"}</p>
-                            </div>
-
-                            <div>
                                 <p className="text-xs text-muted-foreground mb-1">Created</p>
                                 <p className="text-sm text-foreground">{new Date(preset.created_at).toLocaleDateString()}</p>
                             </div>

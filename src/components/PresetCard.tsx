@@ -10,7 +10,6 @@ export interface PresetProps {
     description: string;
     author: string;
     downloads: string;
-    time: string;
     type: "SCRAPE" | "AGENT";
     icon: string;
 }
@@ -122,7 +121,7 @@ function AuthorCell({ username, isAdmin }: { username: string; isAdmin?: boolean
     );
 }
 
-export const PresetCard = memo(function PresetCard({ id, title, description, author, downloads, time, type, icon, adminUsername }: PresetProps & { adminUsername?: string }) {
+export const PresetCard = memo(function PresetCard({ id, title, description, author, downloads, type, icon, adminUsername }: PresetProps & { adminUsername?: string }) {
     const isAdmin = adminUsername ? author === adminUsername : false;
     
     return (
@@ -152,14 +151,10 @@ export const PresetCard = memo(function PresetCard({ id, title, description, aut
             </p>
 
             <div className="mt-auto flex items-center">
-                <div className="flex items-center gap-4 font-mono text-[10px] text-white/32">
+                <div className="flex items-center font-mono text-[10px] text-white/32">
                     <div className="flex items-center gap-1.5">
                         <MaterialIcon name="download" className="text-xs" aria-hidden="true" />
                         <span>{downloads}</span>
-                    </div>
-                    <div className="flex items-center gap-1.5">
-                        <MaterialIcon name="schedule" className="text-xs" aria-hidden="true" />
-                        <span>{time}</span>
                     </div>
                 </div>
 

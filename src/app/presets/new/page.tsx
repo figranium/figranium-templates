@@ -209,7 +209,7 @@ export default function NewPresetPage() {
                                     </div>
                                     <p className="mt-3 text-[14px] leading-6 text-white/52">{draft.description}</p>
                                     <div className="mt-4 flex flex-wrap gap-x-5 gap-y-2 text-xs text-white/34">
-                                        <span>{draft.target_url || "No target URL"}</span><span>{draft.time_estimate}</span><span>{fileName}</span>
+                                        <span>{draft.target_url || "No target URL"}</span><span>{fileName}</span>
                                     </div>
                                 </div>
                             </div>

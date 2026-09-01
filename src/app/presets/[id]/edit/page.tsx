@@ -26,7 +26,6 @@ export default function EditPresetPage() {
         type: "SCRAPE",
         category: "QA Testing",
         icon: "",
-        time_estimate: "5s",
         configuration: "",
         expected_output: "",
     });
@@ -81,7 +80,6 @@ export default function EditPresetPage() {
                     type: data.type,
                     category: data.category || "QA Testing",
                     icon: data.icon || "",
-                    time_estimate: data.time_estimate || "5s",
                     expected_output: data.expected_output || "",
                     configuration: typeof data.configuration === 'object'
                         ? JSON.stringify(data.configuration, null, 2)
@@ -369,44 +367,6 @@ export default function EditPresetPage() {
                                     value={formData.expected_output}
                                     onChange={(e) => setFormData({ ...formData, expected_output: e.target.value })}
                                 />
-                            </div>
-
-                            <div>
-                                <label className="block text-xs font-medium text-muted-foreground mb-1.5 uppercase tracking-wide">
-                                    Time Estimate
-                                </label>
-                                <div className="space-y-2">
-                                    <input
-                                        type="text"
-                                        required
-                                        disabled={formData.time_estimate === "Highly variable"}
-                                        className="w-full bg-[#121212] border border-[#262626] rounded-lg px-3 py-2 text-foreground focus:outline-none focus:border-zinc-700 transition-colors disabled:opacity-50"
-                                        value={formData.time_estimate}
-                                        onChange={(e) => setFormData({ ...formData, time_estimate: e.target.value })}
-                                        onBlur={(e) => {
-                                            const val = e.target.value.trim();
-                                            if (/^\d+$/.test(val) && val !== "") {
-                                                setFormData({ ...formData, time_estimate: `${val}s` });
-                                            }
-                                        }}
-                                        placeholder="e.g. 5s, 1m"
-                                    />
-                                    <label className="flex items-center gap-2 cursor-pointer w-fit">
-                                        <input
-                                            type="checkbox"
-                                            checked={formData.time_estimate === "Highly variable"}
-                                            onChange={(e) => {
-                                                if (e.target.checked) {
-                                                    setFormData({ ...formData, time_estimate: "Highly variable" });
-                                                } else {
-                                                    setFormData({ ...formData, time_estimate: "" });
-                                                }
-                                            }}
-                                            className="rounded border-[#262626] bg-[#121212] accent-white cursor-pointer"
-                                        />
-                                        <span className="text-xs text-muted-foreground">Highly variable</span>
-                                    </label>
-                                </div>
                             </div>
 
                             <div className="flex gap-4">
