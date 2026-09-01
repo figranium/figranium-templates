@@ -28,7 +28,7 @@ export function LegacyPasswordMigration() {
     finally { setPending(false); }
   }
 
-  if (verificationPending) return <div className="space-y-4 rounded-2xl border border-border bg-card p-8 shadow-2xl"><h1 className="text-2xl font-semibold">Check your email</h1><p className="text-sm text-muted-foreground">We created your Neon Auth account. Enter the verification code sent to your email, sign in, then return here and enter your password once more to link your existing profile.</p></div>;
+  if (verificationPending) return <div className="space-y-4 rounded-2xl border border-border bg-card p-8 shadow-2xl"><h1 className="text-2xl font-semibold">Check your email</h1><p className="text-sm text-muted-foreground">We created your Neon Auth account. Verify the email we sent, sign in, then return here and enter your password once more to link your existing profile.</p></div>;
   return <form onSubmit={submit} className="space-y-5 rounded-2xl border border-border bg-card p-8 shadow-2xl">
     <div><h1 className="text-2xl font-semibold">Continue with your password</h1><p className="mt-2 text-sm text-muted-foreground">Confirm your existing password to securely establish your Neon Auth account.</p></div>
     <label className="block text-sm">Email<input required type="email" value={email} onChange={(e) => setEmail(e.target.value)} className="mt-2 w-full rounded-lg border border-border bg-background px-3 py-2" /></label>
