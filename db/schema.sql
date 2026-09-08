@@ -48,12 +48,20 @@ CREATE TABLE IF NOT EXISTS presets (
 
 ALTER TABLE presets ADD COLUMN IF NOT EXISTS readme TEXT NOT NULL DEFAULT '';
 
--- Preset Downloads
+-- Legacy authenticated download records
 CREATE TABLE IF NOT EXISTS preset_downloads (
     preset_id UUID REFERENCES presets(id) ON DELETE CASCADE,
     user_id UUID REFERENCES users(id) ON DELETE CASCADE,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY (preset_id, user_id)
+);
+
+-- Public unique download records. IPs are HMAC-hashed before storage so raw IPs are never persisted.
+CREATE TABLE IF NOT EXISTS preset_download_ips (
+    preset_id UUID REFERENCES presets(id) ON DELETE CASCADE,
+    ip_hash TEXT NOT NULL,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (preset_id, ip_hash)
 );
 
 -- Index for faster queries
