@@ -7,48 +7,31 @@ interface DownloadButtonProps {
     presetId: string;
     presetTitle: string;
     configJson: string;
-    isAuthenticated?: boolean;
 }
 
 export default function DownloadButton({ presetId, presetTitle, configJson }: DownloadButtonProps) {
     const [copied, setCopied] = useState(false);
     const [downloaded, setDownloaded] = useState(false);
-    const downloadCooldown = useRef(false);
-    const copyCooldown = useRef(false);
+    const trackingCooldown = useRef(false);
 
-    const getTrackedConfiguration = async () => {
-        try {
-            const response = await fetch(`/api/presets/${presetId}/download`, { method: "POST" });
-            if (!response.ok) return null;
-            const data = await response.json();
-            return typeof data.configuration === "string" ? data.configuration : null;
-        } catch {
-            return null;
-        }
+    const trackDownload = () => {
+        if (trackingCooldown.current) return;
+        trackingCooldown.current = true;
+        setTimeout(() => { trackingCooldown.current = false; }, 30000);
+
+        // Analytics must never block downloading/copying the template.
+        void fetch(`/api/presets/${presetId}/download`, { method: "POST" }).catch(() => {});
     };
 
     const handleAction = async (action: 'download' | 'copy') => {
-        const isDownload = action === 'download';
-        const cooldownRef = isDownload ? downloadCooldown : copyCooldown;
+        if (!configJson) return;
 
-        let resolvedConfig = configJson;
+        // Count either way, but do not await tracking. The user action succeeds even
+        // if the tracking endpoint or its database migration is unavailable.
+        trackDownload();
 
-        if (!cooldownRef.current || !resolvedConfig) {
-            if (!cooldownRef.current) {
-                cooldownRef.current = true;
-                setTimeout(() => { cooldownRef.current = false; }, 30000);
-            }
-
-            const trackedConfig = await getTrackedConfiguration();
-            if (!resolvedConfig && trackedConfig) {
-                resolvedConfig = trackedConfig;
-            }
-        }
-
-        if (!resolvedConfig) return;
-
-        if (isDownload) {
-            const blob = new Blob([resolvedConfig], { type: "application/json" });
+        if (action === 'download') {
+            const blob = new Blob([configJson], { type: "application/json" });
             const url = URL.createObjectURL(blob);
             const a = document.createElement("a");
             a.href = url;
@@ -61,7 +44,7 @@ export default function DownloadButton({ presetId, presetTitle, configJson }: Do
             setDownloaded(true);
             setTimeout(() => setDownloaded(false), 2000);
         } else {
-            await navigator.clipboard.writeText(resolvedConfig);
+            await navigator.clipboard.writeText(configJson);
             setCopied(true);
             setTimeout(() => setCopied(false), 2000);
         }
