@@ -28,6 +28,44 @@ export const metadata: Metadata = {
   description: "Download presets for free, then run them on your own local, open-source Figranium instance—no vendor lock-in, no subscription required.",
 };
 
+const themeAwareFaviconScript = `
+(() => {
+  const media = window.matchMedia('(prefers-color-scheme: dark)');
+  let objectUrl;
+
+  const updateFavicon = async () => {
+    try {
+      const response = await fetch('/icon.svg', { cache: 'force-cache' });
+      if (!response.ok) return;
+
+      const source = await response.text();
+      const fill = media.matches ? '#FFFFFF' : '#000000';
+      const themed = source.replace(/fill=\"#FFFFFF\"/g, 'fill=\"' + fill + '\"');
+      const blob = new Blob([themed], { type: 'image/svg+xml' });
+      const nextObjectUrl = URL.createObjectURL(blob);
+
+      let link = document.querySelector('link[rel="icon"]');
+      if (!link) {
+        link = document.createElement('link');
+        link.rel = 'icon';
+        document.head.appendChild(link);
+      }
+
+      link.type = 'image/svg+xml';
+      link.href = nextObjectUrl;
+
+      if (objectUrl) URL.revokeObjectURL(objectUrl);
+      objectUrl = nextObjectUrl;
+    } catch {
+      // Keep Next.js' generated favicon if the themed version cannot be built.
+    }
+  };
+
+  updateFavicon();
+  media.addEventListener?.('change', updateFavicon);
+})();
+`;
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -37,6 +75,7 @@ export default function RootLayout({
     <html lang="en" suppressHydrationWarning>
       <head>
         <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet" />
+        <script dangerouslySetInnerHTML={{ __html: themeAwareFaviconScript }} />
       </head>
       <body
         className={`${questrial.variable} ${spaceMono.variable} font-sans antialiased bg-background text-foreground min-h-screen`}
