@@ -10,6 +10,7 @@ const generatedPresetSchema = z.object({
     category: z.enum(PRESET_CATEGORIES),
     description: z.string().min(20).max(600),
     readme: z.string().min(600).max(8000).describe("A substantial 300–500 word Markdown README with section headings and useful bullet lists."),
+    gettingStarted: z.string().min(80).max(900).describe("A concise plain-text in-canvas getting-started note with practical first-run instructions for this task."),
 });
 
 function getAiModel() {
@@ -53,6 +54,7 @@ export async function generatePresetCopy(input: {
     category: PresetCategory;
     description: string;
     readme: string;
+    gettingStarted: string;
 }> {
     let targetHostname = "not specified";
     try {
@@ -69,10 +71,12 @@ export async function generatePresetCopy(input: {
             "Write a substantial 300–500 word README in valid GitHub-flavored Markdown.",
             "The README must use these exact second-level headings: ## Overview, ## What it does, ## Inputs, ## Output, ## How to use, and ## Notes.",
             "Use bullet lists where they improve scanning. Put identifiers in inline code. Do not return an unformatted wall of text.",
-            "Do not reproduce secrets, credentials, private values, or unnecessary internal implementation details in marketplace copy.",
+            "Also write a concise gettingStarted note for the task canvas. It must begin with 'Getting started', use plain text with short numbered steps or bullets, and focus only on what the user should configure before the first run, how to run it, and what output to expect.",
+            "Keep gettingStarted compact enough for a sticky note, ideally 80–140 words. Mention the actual task variables or important prerequisites when relevant. Do not mention the Templates Hub, previews, marketplace metadata, or the existence of the sticky note itself.",
+            "Do not reproduce secrets, credentials, private values, or unnecessary internal implementation details in marketplace copy or gettingStarted.",
             `Category must be one of: ${PRESET_CATEGORIES.join(", ")}.`,
         ].join(" "),
-        prompt: `Create the authored marketplace metadata for this preset.\n\nDeterministic title: ${input.title}\nType: ${input.type}\nTarget hostname: ${targetHostname}\n\nComplete task JSON (credential-like fields are redacted):\n\`\`\`json\n${input.taskJson}\n\`\`\``,
+        prompt: `Create the authored marketplace metadata and getting-started guidance for this preset.\n\nDeterministic title: ${input.title}\nType: ${input.type}\nTarget hostname: ${targetHostname}\n\nComplete task JSON (credential-like fields are redacted):\n\`\`\`json\n${input.taskJson}\n\`\`\``,
     });
 
     return { ...output, readme: normalizeMarkdown(output.readme) };
