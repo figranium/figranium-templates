@@ -6,6 +6,7 @@ import {
     derivePresetMetadata,
     resolvePresetTask,
     sanitizePresetConfiguration,
+    withGettingStartedStickyNote,
 } from "@/lib/preset-import";
 
 export const runtime = "nodejs";
@@ -30,7 +31,8 @@ export async function POST(request: Request) {
         });
 
         const titleWasProvided = typeof task.name === "string" && task.name.trim().length >= 3;
-        const safeConfiguration = sanitizePresetConfiguration(task);
+        const taskWithGettingStarted = withGettingStartedStickyNote(task, generated.gettingStarted);
+        const safeConfiguration = sanitizePresetConfiguration(taskWithGettingStarted);
 
         return NextResponse.json({
             draft: {
