@@ -11,7 +11,7 @@ type JsonObject = Record<string, unknown>;
 
 export const GETTING_STARTED_NOTE_ID = "template_getting_started";
 export const GETTING_STARTED_NOTE_LAYOUT = {
-    x: 80,
+    x: -200,
     y: 120,
     width: 240,
     height: 220,
