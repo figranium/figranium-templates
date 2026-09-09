@@ -9,6 +9,14 @@ export type PresetType = "AGENT" | "SCRAPE";
 
 type JsonObject = Record<string, unknown>;
 
+export const GETTING_STARTED_NOTE_ID = "template_getting_started";
+export const GETTING_STARTED_NOTE_LAYOUT = {
+    x: 80,
+    y: 120,
+    width: 240,
+    height: 220,
+} as const;
+
 const SECRET_KEY = /(api[-_]?key|token|secret|password|passphrase|cookie|authorization|credential|session)/i;
 
 function isObject(value: unknown): value is JsonObject {
@@ -29,6 +37,25 @@ export function resolvePresetTask(input: unknown): { task: JsonObject; taskCount
     }
 
     return { task, taskCount: tasks.length };
+}
+
+export function withGettingStartedStickyNote(task: JsonObject, content: string): JsonObject {
+    const existingNotes = Array.isArray(task.stickyNotes)
+        ? task.stickyNotes.filter(note => !isObject(note) || note.id !== GETTING_STARTED_NOTE_ID)
+        : [];
+
+    return {
+        ...task,
+        stickyNotes: [
+            ...existingNotes,
+            {
+                id: GETTING_STARTED_NOTE_ID,
+                ...GETTING_STARTED_NOTE_LAYOUT,
+                content: content.trim(),
+                color: "default",
+            },
+        ],
+    };
 }
 
 export function sanitizePresetConfiguration(value: unknown): unknown {
