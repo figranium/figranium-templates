@@ -8,7 +8,7 @@ import { z } from "zod";
 loadEnv({ path: ".env.local" });
 
 const NOTE_ID = "template_getting_started";
-const NOTE_LAYOUT = { x: 80, y: 120, width: 240, height: 220 };
+const NOTE_LAYOUT = { x: -200, y: 120, width: 240, height: 220 };
 const SECRET_KEY = /(api[-_]?key|token|secret|password|passphrase|cookie|authorization|credential|session)/i;
 const args = new Set(process.argv.slice(2));
 const dryRun = args.has("--dry-run");
@@ -81,8 +81,20 @@ function sanitize(value) {
     }));
 }
 
+function getManagedNote(task) {
+    return Array.isArray(task.stickyNotes)
+        ? task.stickyNotes.find(note => isObject(note) && note.id === NOTE_ID)
+        : undefined;
+}
+
 function hasManagedNote(task) {
-    return Array.isArray(task.stickyNotes) && task.stickyNotes.some(note => isObject(note) && note.id === NOTE_ID);
+    return !!getManagedNote(task);
+}
+
+function managedNoteNeedsLayoutUpdate(task) {
+    const note = getManagedNote(task);
+    if (!note) return false;
+    return note.x !== NOTE_LAYOUT.x || note.y !== NOTE_LAYOUT.y || note.width !== NOTE_LAYOUT.width || note.height !== NOTE_LAYOUT.height;
 }
 
 function withManagedNote(task, content) {
@@ -121,17 +133,23 @@ async function main() {
     const { rows } = await pool.query("SELECT id, title, configuration FROM presets ORDER BY created_at ASC");
     const eligible = rows
         .map(row => ({ ...row, task: resolveTask(typeof row.configuration === "string" ? JSON.parse(row.configuration) : row.configuration) }))
-        .filter(row => force || !hasManagedNote(row.task))
+        .filter(row => force || !hasManagedNote(row.task) || managedNoteNeedsLayoutUpdate(row.task))
         .slice(offset, limit && Number.isFinite(limit) && limit > 0 ? offset + Math.floor(limit) : undefined);
 
-    console.log(`${eligible.length} preset${eligible.length === 1 ? "" : "s"} ready for getting-started note backfill.`);
+    console.log(`${eligible.length} preset${eligible.length === 1 ? "" : "s"} ready for getting-started note backfill/normalization.`);
     if (dryRun || eligible.length === 0) return;
 
     let completed = 0;
     let skipped = 0;
     for (const preset of eligible) {
         try {
-            const gettingStarted = await generateGettingStarted(preset.task);
+            const existingManagedNote = getManagedNote(preset.task);
+            const existingContent = isObject(existingManagedNote) && typeof existingManagedNote.content === "string"
+                ? existingManagedNote.content.trim()
+                : "";
+            const gettingStarted = !force && existingContent
+                ? existingContent
+                : await generateGettingStarted(preset.task);
             const updatedTask = withManagedNote(preset.task, gettingStarted);
             await pool.query(
                 "UPDATE presets SET configuration=$2, updated_at=CURRENT_TIMESTAMP WHERE id=$1",
