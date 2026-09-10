@@ -1,0 +1,80 @@
+name: Apply site-wide UI declutter
+on: push
+permissions:
+  contents: write
+jobs:
+  apply:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - name: Remove unnecessary casing and boxing
+        run: |
+          cat >> src/app/globals.css <<'EOF'
+
+/* Prefer normal casing and open layouts over decorative UI chrome. */
+.uppercase,
+.page-kicker,
+.primary-action,
+main label[class*="uppercase"],
+main thead[class*="uppercase"] {
+  text-transform: none !important;
+  letter-spacing: normal !important;
+}
+
+.page-kicker {
+  font-size: 11px;
+  font-weight: 500;
+}
+
+.primary-action {
+  font-size: 12px;
+  letter-spacing: normal;
+}
+
+main th {
+  font-size: 11px !important;
+  letter-spacing: normal !important;
+  text-transform: none !important;
+}
+
+/* Section wrappers are layout, not cards. Keep boxes for actual controls/data only. */
+.product-panel {
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+/* Back navigation should read as navigation, not another button/card. */
+a[aria-label^="Back"],
+button[aria-label^="Back"] {
+  border-color: transparent !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+a[aria-label^="Back"]:hover,
+button[aria-label^="Back"]:hover {
+  border-color: transparent !important;
+  background: rgba(255,255,255,.04) !important;
+}
+
+/* README prose should sit directly on the page. Semantic code/table boxes remain. */
+.markdown-content {
+  border: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+EOF
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add src/app/globals.css
+          git commit -m 'Declutter site typography and surfaces'
+          git push
+      - name: Remove temporary workflow
+        run: |
+          git pull --rebase
+          git rm .github/workflows/declutter-ui.yml
+          git commit -m 'Remove temporary UI workflow'
+          git push
