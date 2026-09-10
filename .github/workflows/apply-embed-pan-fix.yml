@@ -1,0 +1,100 @@
+name: Apply Embed pan fix
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - .github/workflows/apply-embed-pan-fix.yml
+
+permissions:
+  contents: write
+
+jobs:
+  apply:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: main
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 24
+      - name: Build latest Figranium Embed
+        run: |
+          git clone --depth=1 https://github.com/figranium/figranium-embed.git /tmp/figranium-embed
+          cd /tmp/figranium-embed
+          npm install
+          npm run build
+      - name: Refresh vendored Embed
+        run: |
+          rm -rf src/vendor/figranium-embed
+          mkdir -p src/vendor/figranium-embed
+          cp /tmp/figranium-embed/dist/index.js src/vendor/figranium-embed/index.js
+          cp /tmp/figranium-embed/dist/react.js src/vendor/figranium-embed/react.js
+          cp /tmp/figranium-embed/dist/style.css src/vendor/figranium-embed/style.css
+      - name: Keep task viewport zoomed out
+        run: |
+          cat > src/components/TaskEmbed.tsx <<'EOF'
+          "use client";
+
+          import { useEffect, useRef } from "react";
+          import { mountFigraniumEmbed } from "@/vendor/figranium-embed/index.js";
+
+          interface TaskEmbedProps {
+              task: any;
+          }
+
+          const EMBED_SCALE = 0.62;
+
+          export default function TaskEmbed({ task }: TaskEmbedProps) {
+              const hostRef = useRef<HTMLDivElement>(null);
+
+              useEffect(() => {
+                  const host = hostRef.current;
+                  if (!host) return;
+
+                  const embed = mountFigraniumEmbed(host, {
+                      task,
+                      height: 640,
+                      title: "Figranium task",
+                      autoResize: true,
+                  });
+
+                  const iframe = embed.iframe;
+                  iframe.style.width = `${100 / EMBED_SCALE}%`;
+                  iframe.style.transform = `scale(${EMBED_SCALE})`;
+                  iframe.style.transformOrigin = "top left";
+
+                  const syncHeight = () => {
+                      const iframeHeight = Number.parseFloat(iframe.style.height);
+                      if (Number.isFinite(iframeHeight)) {
+                          host.style.height = `${iframeHeight * EMBED_SCALE}px`;
+                      }
+                  };
+
+                  syncHeight();
+                  const observer = new MutationObserver(syncHeight);
+                  observer.observe(iframe, { attributes: true, attributeFilter: ["style"] });
+
+                  return () => {
+                      observer.disconnect();
+                      embed.destroy();
+                  };
+              }, [task]);
+
+              return (
+                  <div className="overflow-hidden rounded-xl border border-[#262626] bg-[#0a0a0a]">
+                      <div ref={hostRef} className="w-full overflow-hidden" />
+                  </div>
+              );
+          }
+          EOF
+      - name: Remove temporary workflow
+        run: rm .github/workflows/apply-embed-pan-fix.yml
+      - name: Commit fix
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add src/components/TaskEmbed.tsx src/vendor/figranium-embed .github/workflows/apply-embed-pan-fix.yml
+          git commit -m "Enable panning in embedded task canvas"
+          git push origin main
