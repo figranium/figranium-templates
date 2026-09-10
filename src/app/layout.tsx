@@ -3,6 +3,7 @@ import { Questrial, Space_Mono } from "next/font/google";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import "./globals.css";
+import "./declutter.css";
 
 // Navbar resolves the Neon Auth session for each request.
 export const dynamic = 'force-dynamic';
