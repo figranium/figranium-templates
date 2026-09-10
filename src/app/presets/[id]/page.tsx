@@ -9,6 +9,7 @@ import { getCurrentUser } from "@/lib/current-user";
 import { sanitizeUrl } from "@/lib/utils";
 import { MarkdownContent } from "@/components/MarkdownContent";
 import Link from "next/link";
+import TaskEmbed from "@/components/TaskEmbed";
 
 export const dynamic = 'force-dynamic';
 
@@ -43,7 +44,8 @@ function getVariableDetails(variable: any) {
 export default async function ViewPresetPage({ params, searchParams }: PageProps) {
     const { id } = await params;
     const requestedTab = (await searchParams)?.tab;
-    const activeTab = (["readme", "inputs", "steps", "output"].includes(requestedTab || "") ? requestedTab : "readme") as "readme" | "inputs" | "steps" | "output";
+    const normalizedTab = requestedTab === "steps" ? "task" : requestedTab;
+    const activeTab = (["readme", "task", "inputs", "output"].includes(normalizedTab || "") ? normalizedTab : "readme") as "readme" | "task" | "inputs" | "output";
     const preset = await getPreset(id);
 
     if (!preset) {
@@ -372,8 +374,8 @@ export default async function ViewPresetPage({ params, searchParams }: PageProps
                 <nav className="flex overflow-x-auto border-b border-[#262626]" aria-label="Preset sections">
                     {[
                         { id: "readme", label: "README", icon: "menu_book" },
+                        { id: "task", label: "Task", icon: "account_tree" },
                         { id: "inputs", label: "Inputs", icon: "data_object" },
-                        { id: "steps", label: "Steps", icon: "account_tree" },
                         { id: "output", label: "Expected Output", icon: "output" },
                     ].map((tab) => (
                         <Link
@@ -392,7 +394,7 @@ export default async function ViewPresetPage({ params, searchParams }: PageProps
                 </nav>
 
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                    {/* Main Content: Description & Steps */}
+                    {/* Main Content */}
                     <div className="lg:col-span-2 space-y-8">
                         {activeTab === "readme" && (
                             <section>
@@ -529,63 +531,9 @@ export default async function ViewPresetPage({ params, searchParams }: PageProps
                         )}
                         </>)}
 
-                        {activeTab === "steps" && (<>
-                        <section>
-                            <h2 className="text-lg font-bold mb-4 flex items-center gap-2">
-                                <MaterialIcon name="account_tree" className="text-muted-foreground" />
-                                Automation Steps
-                            </h2>
-                            <div className="space-y-4">
-                                {/* Visualize Steps */}
-                                {config.actions && Array.isArray(config.actions) && config.actions.length > 0 ? (
-                                    config.actions.map((action: any, i: number) => (
-                                        <div key={i} className="bg-[#0a0a0a] border border-[#262626] rounded-lg p-4 relative overflow-hidden group hover:border-zinc-700 transition-colors">
-                                            <div className="absolute top-0 left-0 bottom-0 w-1 bg-zinc-800 group-hover:bg-white transition-colors" />
-                                            <div className="flex items-start gap-4 pl-2">
-                                                <div className="w-6 h-6 rounded-full bg-[#171717] border border-[#262626] flex items-center justify-center text-xs font-mono text-muted-foreground shrink-0 mt-0.5">
-                                                    {i + 1}
-                                                </div>
-                                                <div className="space-y-1">
-                                                    <h3 className="font-medium text-foreground text-sm uppercase tracking-wide">
-                                                        {action.type || "Unknown Action"}
-                                                    </h3>
-                                                    {action.selector && (
-                                                        <code className="text-xs bg-[#121212] border border-[#262626] px-2 py-0.5 rounded text-blue-400 font-mono block w-fit mt-1">
-                                                            {action.selector}
-                                                        </code>
-                                                    )}
-                                                    {action.value && (
-                                                        <p className="text-sm text-muted-foreground mt-1">
-                                                            Value: <span className="text-foreground">{action.value}</span>
-                                                        </p>
-                                                    )}
-                                                </div>
-                                            </div>
-                                        </div>
-                                    ))
-                                ) : (
-                                    <div className="p-6 border border-dashed border-[#262626] rounded-lg text-center text-muted-foreground">
-                                        No explicit actions defined in configuration.
-                                    </div>
-                                )}
-                            </div>
-                        </section>
-
-                        {config.extractionScript && (
-                            <section>
-                                <h2 className="text-lg font-bold mb-4 flex items-center gap-2">
-                                    <MaterialIcon name="code" className="text-muted-foreground" />
-                                    Extraction Script
-                                </h2>
-                                <div className="bg-[#1e1e1e] border border-[#262626] rounded-lg relative group hover:border-zinc-700 transition-colors overflow-hidden">
-                                    <div className="absolute top-0 left-0 bottom-0 w-1 bg-green-500/50 group-hover:bg-green-500 transition-colors z-10" />
-                                    <div className="pl-1">
-                                        <CodeBlock code={config.extractionScript} language="javascript" />
-                                    </div>
-                                </div>
-                            </section>
+                        {activeTab === "task" && (
+                            <TaskEmbed task={config} />
                         )}
-                        </>)}
 
                         {activeTab === "output" && (
                             <section>
