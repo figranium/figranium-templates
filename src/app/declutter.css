@@ -24,6 +24,16 @@ main th {
   text-transform: none !important;
 }
 
+/* Stored template types may be uppercased; present them in normal title case. */
+.product-panel span.font-mono {
+  display: inline-block;
+  text-transform: lowercase;
+}
+
+.product-panel span.font-mono::first-letter {
+  text-transform: uppercase;
+}
+
 /* Product/section wrappers should not look like nested cards. */
 .product-panel {
   border: 0 !important;
