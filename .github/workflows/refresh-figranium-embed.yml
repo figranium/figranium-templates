@@ -1,0 +1,43 @@
+name: Refresh vendored Figranium Embed
+
+on:
+  push:
+    branches: [task-tab-figranium-embed]
+    paths:
+      - .github/workflows/refresh-figranium-embed.yml
+
+permissions:
+  contents: write
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: task-tab-figranium-embed
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 24
+      - name: Build latest Embed
+        run: |
+          git clone --depth=1 https://github.com/figranium/figranium-embed.git /tmp/figranium-embed
+          cd /tmp/figranium-embed
+          npm install
+          npm run build
+      - name: Vendor build
+        run: |
+          rm -rf src/vendor/figranium-embed
+          mkdir -p src/vendor/figranium-embed
+          cp /tmp/figranium-embed/dist/index.js src/vendor/figranium-embed/index.js
+          cp /tmp/figranium-embed/dist/react.js src/vendor/figranium-embed/react.js
+          cp /tmp/figranium-embed/dist/style.css src/vendor/figranium-embed/style.css
+      - name: Remove temporary workflow
+        run: rm .github/workflows/refresh-figranium-embed.yml
+      - name: Commit refreshed bundle
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add src/vendor/figranium-embed .github/workflows/refresh-figranium-embed.yml
+          git commit -m "Refresh Figranium Embed bundle"
+          git push origin task-tab-figranium-embed
