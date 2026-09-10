@@ -7,7 +7,7 @@ import MaterialIcon from "@/components/MaterialIcon";
 import clsx from "clsx";
 
 const categoryIcons: Record<string, string> = {
-    "All Presets": "grid_view",
+    "All Templates": "grid_view",
     "QA Testing": "science",
     "Lead Gen": "group",
     "Social Media": "share",
@@ -33,12 +33,12 @@ interface SidebarProps {
 
 export function Sidebar({ counts }: SidebarProps) {
     const searchParams = useSearchParams();
-    const currentCategory = searchParams.get("category") || "All Presets";
+    const currentCategory = searchParams.get("category") || "All Templates";
     const [showAllCategories, setShowAllCategories] = useState(false);
 
     const getCategoryHref = (categoryName: string) => {
         const params = new URLSearchParams(searchParams.toString());
-        if (categoryName === "All Presets") {
+        if (categoryName === "All Templates") {
             params.delete("category");
         } else {
             params.set("category", categoryName);
@@ -47,7 +47,7 @@ export function Sidebar({ counts }: SidebarProps) {
     };
 
     const categories = [
-        { name: "All Presets", count: counts["All Presets"] || 0, icon: categoryIcons["All Presets"] },
+        { name: "All Templates", count: counts["All Templates"] || 0, icon: categoryIcons["All Templates"] },
         { name: "QA Testing", count: counts["QA Testing"] || 0, icon: categoryIcons["QA Testing"] },
         { name: "Lead Gen", count: counts["Lead Gen"] || 0, icon: categoryIcons["Lead Gen"] },
         { name: "Social Media", count: counts["Social Media"] || 0, icon: categoryIcons["Social Media"] },
@@ -75,7 +75,7 @@ export function Sidebar({ counts }: SidebarProps) {
                     className="mb-7 flex h-10 w-full items-center justify-center gap-2 rounded-[10px] bg-white px-3 text-[10px] font-bold uppercase tracking-[0.13em] text-black transition hover:bg-white/88"
                 >
                     <MaterialIcon name="add" className="text-[18px]" />
-                    <span>Submit preset</span>
+                    <span>Submit template</span>
                 </Link>
 
                 <h3 className="mb-3 px-2 text-[9px] font-bold uppercase tracking-[0.18em] text-white/28">Filter by category</h3>

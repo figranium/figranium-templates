@@ -9,7 +9,7 @@ interface HeroProps {
     isLoggedIn: boolean;
 }
 
-const featuredCategories = ["All Presets", "Social Media", "AI", "Lead Gen", "Shopping", "SEO", "Developer Tools"];
+const featuredCategories = ["All Templates", "Social Media", "AI", "Lead Gen", "Shopping", "SEO", "Developer Tools"];
 
 export function Hero({ isLoggedIn }: HeroProps) {
     const router = useRouter();
@@ -54,12 +54,12 @@ export function Hero({ isLoggedIn }: HeroProps) {
 
     const categoryHref = (category: string) => {
         const params = new URLSearchParams(searchParams.toString());
-        if (category === "All Presets") params.delete("category");
+        if (category === "All Templates") params.delete("category");
         else params.set("category", category);
         return `/?${params.toString()}`;
     };
 
-    const currentCategory = searchParams.get("category") || "All Presets";
+    const currentCategory = searchParams.get("category") || "All Templates";
 
     return (
         <section className={`border-b border-white/[0.075] px-5 sm:px-8 lg:px-10 ${isLoggedIn ? "pb-12 pt-24 sm:pt-28 lg:pb-14 lg:pt-32" : "pb-20 pt-28 sm:pb-24 sm:pt-36 lg:pb-28 lg:pt-44"}`}>
@@ -73,7 +73,7 @@ export function Hero({ isLoggedIn }: HeroProps) {
                     </h1>
                     {!isLoggedIn && (
                         <p className="mx-auto mt-7 max-w-3xl text-[clamp(1rem,1.45vw,1.3rem)] leading-8 text-white/48">
-                            Discover community-built Figranium presets, inspect every step, and run them locally—without subscriptions, black boxes, or vendor lock-in.
+                            Discover community-built Figranium templates, inspect every step, and run them locally—without subscriptions, black boxes, or vendor lock-in.
                         </p>
                     )}
                 </div>
@@ -86,7 +86,7 @@ export function Hero({ isLoggedIn }: HeroProps) {
                         <input
                             type="text"
                             className="h-12 w-full rounded-[11px] border border-white/[0.1] bg-black/40 pl-10 pr-4 text-[13px] text-white outline-none transition placeholder:text-white/28 hover:border-white/15 focus:border-white/24"
-                            placeholder="Search presets, sites, or use cases…"
+                            placeholder="Search templates, sites, or use cases…"
                             value={query}
                             onChange={(e) => handleSearch(e.target.value)}
                         />

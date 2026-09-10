@@ -20,9 +20,9 @@ const updatePresetSchema = z.object({
 export async function GET(req: Request, { params }: { params: Promise<{ id: string }> }) {
     try {
         const { id } = await params;
-        const { rows } = await query('SELECT * FROM presets WHERE id = $1', [id]);
+        const { rows } = await query('SELECT * FROM templates WHERE id = $1', [id]);
         if (rows.length === 0) {
-            return NextResponse.json({ error: 'Preset not found' }, { status: 404 });
+            return NextResponse.json({ error: 'Template not found' }, { status: 404 });
         }
         return NextResponse.json(rows[0]);
     } catch (error) {
@@ -38,16 +38,16 @@ export async function DELETE(req: Request, { params }: { params: Promise<{ id: s
         if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
         // Check ownership
-        const { rows } = await query('SELECT user_id FROM presets WHERE id = $1', [id]);
-        if (rows.length === 0) return NextResponse.json({ error: 'Preset not found' }, { status: 404 });
+        const { rows } = await query('SELECT user_id FROM templates WHERE id = $1', [id]);
+        if (rows.length === 0) return NextResponse.json({ error: 'Template not found' }, { status: 404 });
 
         if (rows[0].user_id !== user.id) {
             return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
         }
 
-        await query('DELETE FROM presets WHERE id = $1', [id]);
+        await query('DELETE FROM templates WHERE id = $1', [id]);
 
-        return NextResponse.json({ message: 'Preset deleted' });
+        return NextResponse.json({ message: 'Template deleted' });
     } catch (error) {
         return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
     }
@@ -61,8 +61,8 @@ export async function PUT(req: Request, { params }: { params: Promise<{ id: stri
         if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
         // Check ownership
-        const { rows } = await query('SELECT user_id FROM presets WHERE id = $1', [id]);
-        if (rows.length === 0) return NextResponse.json({ error: 'Preset not found' }, { status: 404 });
+        const { rows } = await query('SELECT user_id FROM templates WHERE id = $1', [id]);
+        if (rows.length === 0) return NextResponse.json({ error: 'Template not found' }, { status: 404 });
 
         if (rows[0].user_id !== user.id) {
             return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
@@ -115,7 +115,7 @@ export async function PUT(req: Request, { params }: { params: Promise<{ id: stri
 
         await query(queryStr, values);
 
-        return NextResponse.json({ message: 'Preset updated' });
+        return NextResponse.json({ message: 'Template updated' });
 
     } catch (error) {
         console.error("Update error", error);

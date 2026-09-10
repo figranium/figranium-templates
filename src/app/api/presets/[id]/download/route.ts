@@ -29,10 +29,10 @@ function deepRedactVersions(obj: unknown) {
 export async function POST(req: Request, { params }: { params: Promise<{ id: string }> }) {
     try {
         const { id } = await params;
-        const presetResult = await query('SELECT configuration FROM presets WHERE id = $1', [id]);
+        const presetResult = await query('SELECT configuration FROM templates WHERE id = $1', [id]);
 
         if (presetResult.rows.length === 0) {
-            return NextResponse.json({ error: 'Preset not found' }, { status: 404 });
+            return NextResponse.json({ error: 'Template not found' }, { status: 404 });
         }
 
         const ip = getClientIp(req);
@@ -47,7 +47,7 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
             );
 
             if (insertResult.rows.length > 0) {
-                await query('UPDATE presets SET downloads = COALESCE(downloads, 0) + 1 WHERE id = $1', [id]);
+                await query('UPDATE templates SET downloads = COALESCE(downloads, 0) + 1 WHERE id = $1', [id]);
             }
         }
 

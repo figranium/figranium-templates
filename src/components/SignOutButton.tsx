@@ -123,11 +123,11 @@ export function SignOutButton({ username, displayName: initialDisplayName, profi
                         <div className="my-1 border-t border-white/10" />
                         <Link href="/presets/new" onClick={() => setIsOpen(false)} className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm text-white/70 transition-colors hover:bg-white/10 hover:text-white">
                             <MaterialIcon name="add_circle" className="text-base" />
-                            <span>Create preset</span>
+                            <span>Create template</span>
                         </Link>
                         <Link href="/" onClick={() => setIsOpen(false)} className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm text-white/70 transition-colors hover:bg-white/10 hover:text-white">
                             <MaterialIcon name="search" className="text-base" />
-                            <span>Browse presets</span>
+                            <span>Browse templates</span>
                         </Link>
                         {isAdmin && (
                             <Link href="/admin" onClick={() => setIsOpen(false)} className="rounded-lg px-3 py-2 text-sm text-red-400 transition-colors hover:bg-white/10 hover:text-red-300">

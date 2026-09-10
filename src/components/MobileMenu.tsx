@@ -50,7 +50,7 @@ export function MobileMenu({ isLoggedIn, isAdmin, signOutNode }: MobileMenuProps
                     </div>
 
                     <div className="flex flex-col gap-1 text-[13px]">
-                        <AppNavLink href="/" icon="explore" mobile>Preset Store</AppNavLink>
+                        <AppNavLink href="/" icon="explore" mobile>Template Store</AppNavLink>
                         <a href="https://figranium.dev/docs" target="_blank" rel="noopener noreferrer" className="flex h-11 items-center gap-3 rounded-[10px] px-3 text-white/48 hover:bg-white/[0.04] hover:text-white"><MaterialIcon name="description" className="text-[19px]" />Documentation</a>
                         <a href="https://figranium.dev/blog" target="_blank" rel="noopener noreferrer" className="flex h-11 items-center gap-3 rounded-[10px] px-3 text-white/48 hover:bg-white/[0.04] hover:text-white"><MaterialIcon name="article" className="text-[19px]" />Blog</a>
 
@@ -61,7 +61,7 @@ export function MobileMenu({ isLoggedIn, isAdmin, signOutNode }: MobileMenuProps
                                 {isAdmin && (
                                     <AppNavLink href="/admin" icon="admin_panel_settings" mobile>Administration</AppNavLink>
                                 )}
-                                <AppNavLink href="/dashboard" icon="dashboard" mobile>My presets</AppNavLink>
+                                <AppNavLink href="/dashboard" icon="dashboard" mobile>My templates</AppNavLink>
                                 <div className="pt-2">
                                     {signOutNode}
                                 </div>

@@ -127,7 +127,7 @@ export const PresetCard = memo(function PresetCard({ id, title, description, aut
     return (
         <Link
             href={`/presets/${id}`}
-            aria-label={`Open ${title} preset`}
+            aria-label={`Open ${title} template`}
             className="group relative flex h-full cursor-pointer flex-col overflow-hidden rounded-[16px] border border-transparent bg-[#080808] p-5 transition duration-200 hover:-translate-y-0.5 hover:border-white/[0.18] hover:bg-[#0b0b0b] hover:shadow-[0_20px_50px_rgba(0,0,0,.28)] focus-visible:border-white/[0.24] focus-visible:outline-none"
         >
 

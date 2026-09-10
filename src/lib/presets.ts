@@ -18,7 +18,7 @@ const getCategoryCounts = cache(async () => {
         GROUP BY COALESCE(NULLIF(category, ''), 'QA Testing')
     `);
     return result.rows;
-}, ['category-counts'], { revalidate: 3600, tags: ['preset-counts'] });
+}, ['category-counts'], { revalidate: 3600, tags: ['template-counts'] });
 
 export async function getPresets(category?: string, sort?: string, search?: string) {
     noStore(); // Disable caching for now to see updates immediately
@@ -42,7 +42,7 @@ export async function getPresets(category?: string, sort?: string, search?: stri
         let paramIndex = 1;
 
         // Filter by category
-        if (category && category !== "All Presets") {
+        if (category && category !== "All Templates") {
             conditions.push(`COALESCE(NULLIF(category, ''), 'QA Testing') = $${paramIndex}`);
             params.push(category);
             paramIndex++;
@@ -98,7 +98,7 @@ export async function getPresets(category?: string, sort?: string, search?: stri
             p.icon,
             p.target_url,
             p.category
-        FROM presets p
+        FROM templates p
         ${whereClause}
         ORDER BY ${orderBy}
     `;
@@ -112,7 +112,7 @@ export async function getPresets(category?: string, sort?: string, search?: stri
         // Process counts
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const totalPresets = countsRows.reduce((sum: number, row: any) => sum + parseInt(row.count), 0);
-        const counts: Record<string, number> = { "All Presets": totalPresets };
+        const counts: Record<string, number> = { "All Templates": totalPresets };
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         countsRows.forEach((row: any) => {
             counts[row.cat] = parseInt(row.count);
@@ -133,7 +133,7 @@ export async function getPresets(category?: string, sort?: string, search?: stri
 
         return { presets, counts };
     } catch (error) {
-        console.error("Failed to fetch presets:", error);
+        console.error("Failed to fetch templates:", error);
         return { presets: [], counts: {} };
     }
 }

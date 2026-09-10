@@ -33,7 +33,7 @@ export default function EditPresetPage() {
     const [submitting, setSubmitting] = useState(false);
     const [error, setError] = useState("");
     const [jsonError, setJsonError] = useState("");
-    const [configurationFileName, setConfigurationFileName] = useState("Current preset configuration");
+    const [configurationFileName, setConfigurationFileName] = useState("Current template configuration");
     const [iconType, setIconType] = useState<"favicon" | "upload">("upload");
 
     const presetId = params?.id as string;
@@ -71,7 +71,7 @@ export default function EditPresetPage() {
         const fetchPreset = async () => {
             try {
                 const res = await fetch(`/api/presets/${presetId}`);
-                if (!res.ok) throw new Error("Failed to load preset");
+                if (!res.ok) throw new Error("Failed to load template");
                 const data = await res.json();
 
                 setFormData({
@@ -91,7 +91,7 @@ export default function EditPresetPage() {
                     setIconType("favicon");
                 }
             } catch (err) {
-                setError("Could not load preset details.");
+                setError("Could not load template details.");
             } finally {
                 setLoading(false);
             }
@@ -155,7 +155,7 @@ export default function EditPresetPage() {
 
             if (!res.ok) {
                 const data = await res.json();
-                throw new Error(data.error || "Failed to update preset");
+                throw new Error(data.error || "Failed to update template");
             }
 
             router.push("/dashboard");
@@ -173,7 +173,7 @@ export default function EditPresetPage() {
     return (
         <div className="flex min-h-[80vh] flex-col items-center justify-center px-5 py-9 sm:px-8 lg:px-10 lg:py-11">
             <div className="product-panel w-full max-w-6xl p-6 md:p-10">
-                <p className="page-kicker mb-3">Workspace / Edit</p><h1 className="mb-2 text-3xl font-bold tracking-[-0.045em]">Edit preset</h1><p className="mb-8 text-[13px] text-white/38">Update the task configuration and its marketplace presentation.</p>
+                <p className="page-kicker mb-3">Workspace / Edit</p><h1 className="mb-2 text-3xl font-bold tracking-[-0.045em]">Edit template</h1><p className="mb-8 text-[13px] text-white/38">Update the task configuration and its marketplace presentation.</p>
 
                 {error && (
                     <div className="mb-6 p-3 bg-red-500/10 border border-red-500/20 text-red-500 text-sm rounded-lg flex items-center gap-2">

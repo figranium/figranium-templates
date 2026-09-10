@@ -20,12 +20,12 @@ interface PageProps {
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
     const { id } = await params;
-    const { rows } = await query('SELECT title FROM presets WHERE id = $1', [id]);
-    if (rows.length === 0) return { title: "Preset Not Found" };
+    const { rows } = await query('SELECT title FROM templates WHERE id = $1', [id]);
+    if (rows.length === 0) return { title: "Template Not Found" };
     return { title: rows[0].title };
 }
 async function getPreset(id: string) {
-    const { rows } = await query('SELECT * FROM presets WHERE id = $1', [id]);
+    const { rows } = await query('SELECT * FROM templates WHERE id = $1', [id]);
     if (rows.length === 0) return null;
     return rows[0];
 }
@@ -337,12 +337,12 @@ export default async function ViewPresetPage({ params, searchParams }: PageProps
                             <div className="flex h-16 w-16 items-center justify-center overflow-hidden rounded-[14px] border border-white/[0.09] bg-white/[0.03]">
                                 {preset.icon && preset.icon.startsWith("data:image/") ? (
                                     <img src={preset.icon} className="w-16 h-16 object-cover rounded-lg" alt="Icon" />
-                                ) : preset.icon && preset.icon.includes(".") ? (
-                                    <img src={`https://www.google.com/s2/favicons?domain=${preset.icon}&sz=64`} className="w-12 h-12 object-contain" alt="Icon" />
-                                ) : preset.icon ? (
+                                ) : template.icon && preset.icon.includes(".") ? (
+                                    <img src={`https://www.google.com/s2/favicons?domain=${template.icon}&sz=64`} className="w-12 h-12 object-contain" alt="Icon" />
+                                ) : template.icon ? (
                                     <MaterialIcon name={preset.icon} className="text-5xl text-foreground" />
-                                ) : preset.target_url ? (
-                                    <img src={`https://www.google.com/s2/favicons?domain=${preset.target_url}&sz=64`} className="w-12 h-12 object-contain" alt="Icon" />
+                                ) : template.target_url ? (
+                                    <img src={`https://www.google.com/s2/favicons?domain=${template.target_url}&sz=64`} className="w-12 h-12 object-contain" alt="Icon" />
                                 ) : (
                                     <MaterialIcon name="extension" className="text-5xl text-muted-foreground" />
                                 )}
@@ -371,7 +371,7 @@ export default async function ViewPresetPage({ params, searchParams }: PageProps
                     </div>
                 </div>
 
-                <nav className="flex overflow-x-auto border-b border-[#262626]" aria-label="Preset sections">
+                <nav className="flex overflow-x-auto border-b border-[#262626]" aria-label="Template sections">
                     {[
                         { id: "readme", label: "README", icon: "menu_book" },
                         { id: "task", label: "Task", icon: "account_tree" },
@@ -526,7 +526,7 @@ export default async function ViewPresetPage({ params, searchParams }: PageProps
                             config.disableRecording !== undefined || config.statelessExecution !== undefined || config.stealth
                         ) && (
                             <div className="rounded-xl border border-dashed border-[#262626] p-8 text-center text-muted-foreground">
-                                No configurable inputs were defined for this preset.
+                                No configurable inputs were defined for this template.
                             </div>
                         )}
                         </>)}
@@ -553,7 +553,7 @@ export default async function ViewPresetPage({ params, searchParams }: PageProps
                     {/* Sidebar: Metadata */}
                     <div className="space-y-6">
                         <div className="bg-[#0a0a0a] border border-[#262626] rounded-xl p-6 space-y-4">
-                            <h3 className="font-bold text-sm uppercase tracking-wide text-muted-foreground mb-2">Preset Details</h3>
+                            <h3 className="font-bold text-sm uppercase tracking-wide text-muted-foreground mb-2">Template Details</h3>
 
                             <div>
                                 <p className="text-xs text-muted-foreground mb-1">Target URL</p>

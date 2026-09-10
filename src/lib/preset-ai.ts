@@ -2,7 +2,7 @@ import { createGoogleGenerativeAI } from "@ai-sdk/google";
 import { createOpenAICompatible } from "@ai-sdk/openai-compatible";
 import { createGateway, generateText, Output } from "ai";
 import { z } from "zod";
-import { PRESET_CATEGORIES, type PresetCategory } from "./preset-import";
+import { PRESET_CATEGORIES, type PresetCategory } from "./template-import";
 import { normalizeMarkdown } from "./markdown";
 
 const generatedPresetSchema = z.object({
@@ -65,7 +65,7 @@ export async function generatePresetCopy(input: {
         model: getAiModel(),
         output: Output.object({ schema: generatedPresetSchema }),
         system: [
-            "You write accurate marketplace copy for Figranium browser automation presets.",
+            "You write accurate marketplace copy for Figranium browser automation templates.",
             "Inspect the complete task JSON carefully. Use its URLs, selectors, variables, actions, scripts, options, and their relationships to understand exactly what the automation does and where each operation occurs.",
             "Never invent capabilities, websites, outputs, setup requirements, or guarantees that are not supported by the supplied task.",
             "Write a substantial 300–500 word README in valid GitHub-flavored Markdown.",
@@ -76,7 +76,7 @@ export async function generatePresetCopy(input: {
             "Do not reproduce secrets, credentials, private values, or unnecessary internal implementation details in marketplace copy or gettingStarted.",
             `Category must be one of: ${PRESET_CATEGORIES.join(", ")}.`,
         ].join(" "),
-        prompt: `Create the authored marketplace metadata and getting-started guidance for this preset.\n\nDeterministic title: ${input.title}\nType: ${input.type}\nTarget hostname: ${targetHostname}\n\nComplete task JSON (credential-like fields are redacted):\n\`\`\`json\n${input.taskJson}\n\`\`\``,
+        prompt: `Create the authored marketplace metadata and getting-started guidance for this template.\n\nDeterministic title: ${input.title}\nType: ${input.type}\nTarget hostname: ${targetHostname}\n\nComplete task JSON (credential-like fields are redacted):\n\`\`\`json\n${input.taskJson}\n\`\`\``,
     });
 
     return { ...output, readme: normalizeMarkdown(output.readme) };

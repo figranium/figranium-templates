@@ -1,13 +1,13 @@
 import { NextResponse } from "next/server";
 import { getCurrentUser } from "@/lib/current-user";
-import { generatePresetCopy } from "@/lib/preset-ai";
+import { generatePresetCopy } from "@/lib/template-ai";
 import {
     createAiTaskContext,
     derivePresetMetadata,
     resolvePresetTask,
     sanitizePresetConfiguration,
     withGettingStartedStickyNote,
-} from "@/lib/preset-import";
+} from "@/lib/template-import";
 
 export const runtime = "nodejs";
 
@@ -48,7 +48,7 @@ export async function POST(request: Request) {
             note: taskCount > 1 ? `This export contains ${taskCount} tasks. The first task was prepared for publishing.` : null,
         });
     } catch (error) {
-        console.error("Generate preset metadata error:", error);
+        console.error("Generate template metadata error:", error);
         const message = error instanceof SyntaxError
             ? "The selected file is not valid JSON."
             : error instanceof Error && /AI_(API_KEY|MODEL|BASE_URL)|Unsupported AI_PROVIDER/.test(error.message)

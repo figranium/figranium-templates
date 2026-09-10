@@ -102,7 +102,7 @@ export function derivePresetMetadata(task: JsonObject) {
     const hostname = hostnameFrom(task.url);
     const type: PresetType = task.mode === "agent" ? "AGENT" : "SCRAPE";
     const suppliedName = typeof task.name === "string" ? task.name.trim() : "";
-    const fallbackName = hostname ? `${readableHostname(hostname)} ${type === "AGENT" ? "automation" : "scraper"}` : "Figranium preset";
+    const fallbackName = hostname ? `${readableHostname(hostname)} ${type === "AGENT" ? "automation" : "scraper"}` : "Figranium template";
 
     return {
         title: (suppliedName || fallbackName).slice(0, 100),

@@ -4,7 +4,7 @@ import { sanitizeUrl } from '@/lib/utils';
 import { z } from 'zod';
 import { getCurrentUser } from '@/lib/current-user';
 import { revalidateTag } from 'next/cache';
-import { PRESET_CATEGORIES } from '@/lib/preset-import';
+import { PRESET_CATEGORIES } from '@/lib/template-import';
 
 export const createPresetSchema = z.object({
     title: z.string().min(3),
@@ -34,10 +34,10 @@ export const createPresetSchema = z.object({
 
 export async function GET() {
     try {
-        const { rows } = await query('SELECT * FROM presets ORDER BY created_at DESC');
+        const { rows } = await query('SELECT * FROM templates ORDER BY created_at DESC');
         return NextResponse.json(rows);
     } catch (error) {
-        console.error('Fetch presets error:', error);
+        console.error('Fetch templates error:', error);
         return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
     }
 }
@@ -71,16 +71,16 @@ export async function POST(req: Request) {
         }
 
         await query(
-            `INSERT INTO presets (user_id, title, description, author_name, type, category, icon, time_estimate, configuration, target_url, expected_output, readme)
+            `INSERT INTO templates (user_id, title, description, author_name, type, category, icon, time_estimate, configuration, target_url, expected_output, readme)
        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)`,
             [user.id, title, description, user.username || user.email, type, category, icon, time_estimate, configuration, targetUrl, expected_output, readme]
         );
 
-        revalidateTag('preset-counts', { expire: 0 });
+        revalidateTag('template-counts', { expire: 0 });
 
-        return NextResponse.json({ message: 'Preset created' });
+        return NextResponse.json({ message: 'Template created' });
     } catch (error: unknown) {
-        console.error('Create preset error:', error);
+        console.error('Create template error:', error);
         return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
     }
 }

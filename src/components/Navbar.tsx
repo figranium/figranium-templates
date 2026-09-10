@@ -38,9 +38,9 @@ export async function Navbar() {
                 <nav className="flex-1 overflow-x-hidden overflow-y-auto px-3 py-5">
                     <p className="h-0 overflow-hidden whitespace-nowrap px-3 text-[9px] font-bold uppercase tracking-[0.18em] text-white/28 opacity-0 transition-all duration-200 group-hover/sidebar:h-5 group-hover/sidebar:opacity-100">Workspace</p>
                     <div className="space-y-0.5">
-                        <AppNavLink href="/" icon="explore">Preset Store</AppNavLink>
-                        {isLoggedIn && <AppNavLink href="/dashboard" icon="dashboard">My presets</AppNavLink>}
-                        {isLoggedIn && <AppNavLink href="/presets/new" icon="add_box">Create preset</AppNavLink>}
+                        <AppNavLink href="/" icon="explore">Template Store</AppNavLink>
+                        {isLoggedIn && <AppNavLink href="/dashboard" icon="dashboard">My templates</AppNavLink>}
+                        {isLoggedIn && <AppNavLink href="/presets/new" icon="add_box">Create template</AppNavLink>}
                         {isAdmin && <AppNavLink href="/admin" icon="admin_panel_settings">Administration</AppNavLink>}
                     </div>
 

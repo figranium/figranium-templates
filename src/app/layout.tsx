@@ -23,10 +23,10 @@ const spaceMono = Space_Mono({
 
 export const metadata: Metadata = {
   title: {
-    default: "Figranium Templates — Community Automation Presets",
+    default: "Figranium Templates — Community Automation Templates",
     template: "%s | Figranium Templates",
   },
-  description: "Download presets for free, then run them on your own local, open-source Figranium instance—no vendor lock-in, no subscription required.",
+  description: "Download templates for free, then run them on your own local, open-source Figranium instance—no vendor lock-in, no subscription required.",
 };
 
 const themeAwareFaviconScript = `

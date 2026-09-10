@@ -32,25 +32,25 @@ export default function DashboardPage() {
                 router.push("/auth/signin");
                 return;
             }
-            if (!res.ok) throw new Error("Failed to fetch presets");
+            if (!res.ok) throw new Error("Failed to fetch templates");
             const data = await res.json();
             setPresets(data);
         } catch (err) {
-            setError("Could not load your presets.");
+            setError("Could not load your templates.");
         } finally {
             setLoading(false);
         }
     };
 
     const handleDelete = async (id: string) => {
-        if (!confirm("Are you sure you want to delete this preset?")) return;
+        if (!confirm("Are you sure you want to delete this template?")) return;
 
         try {
             const res = await fetch(`/api/presets/${id}`, { method: "DELETE" });
             if (!res.ok) throw new Error("Failed to delete");
             setPresets(presets.filter(p => p.id !== id));
         } catch (err) {
-            alert("Error deleting preset");
+            alert("Error deleting template");
         }
     };
 
@@ -60,11 +60,11 @@ export default function DashboardPage() {
         <div className="px-5 py-9 sm:px-8 lg:px-10 lg:py-11">
             <div className="mx-auto max-w-[1320px]">
                 <div className="mb-8 flex items-end justify-between gap-5">
-                    <div><p className="page-kicker mb-3">Workspace / My presets</p><h1 className="text-3xl font-bold tracking-[-0.045em]">Creator dashboard</h1><p className="mt-2 text-[13px] text-white/38">Manage, review, and publish your community automations.</p></div>
+                    <div><p className="page-kicker mb-3">Workspace / My templates</p><h1 className="text-3xl font-bold tracking-[-0.045em]">Creator dashboard</h1><p className="mt-2 text-[13px] text-white/38">Manage, review, and publish your community automations.</p></div>
                     <Link href="/presets/new">
                         <button className="primary-action flex items-center gap-2 px-4 transition hover:bg-white/88">
                             <MaterialIcon name="add" className="text-lg" />
-                            New Preset
+                            New Template
                         </button>
                     </Link>
                 </div>
@@ -86,23 +86,23 @@ export default function DashboardPage() {
                             {presets.length === 0 ? (
                                 <tr>
                                     <td colSpan={5} className="p-8 text-center text-muted-foreground">
-                                        You haven't created any presets yet.
+                                        You haven't created any templates yet.
                                     </td>
                                 </tr>
                             ) : (
-                                presets.map(preset => (
+                                templates.map(template => (
                                     <tr key={preset.id} className="border-b border-[#262626] last:border-0 hover:bg-[#0f0f0f] transition-colors group">
                                         <td className="p-4">
                                             <div className="flex items-center gap-3">
                                                 <div className="w-8 h-8 rounded bg-[#171717] flex items-center justify-center overflow-hidden border border-[#262626]">
                                                     {preset.icon?.startsWith("data:image/") ? (
                                                         <img src={preset.icon} className="w-8 h-8 object-cover" alt="" />
-                                                    ) : preset.icon && preset.icon.includes(".") ? (
-                                                        <img src={`https://www.google.com/s2/favicons?domain=${preset.icon}&sz=32`} className="w-5 h-5 object-contain" alt="" />
-                                                    ) : preset.icon ? (
+                                                    ) : template.icon && preset.icon.includes(".") ? (
+                                                        <img src={`https://www.google.com/s2/favicons?domain=${template.icon}&sz=32`} className="w-5 h-5 object-contain" alt="" />
+                                                    ) : template.icon ? (
                                                         <MaterialIcon name={preset.icon} className="text-lg text-foreground" />
-                                                    ) : preset.target_url ? (
-                                                        <img src={`https://www.google.com/s2/favicons?domain=${preset.target_url}&sz=32`} className="w-5 h-5 object-contain" alt="" />
+                                                    ) : template.target_url ? (
+                                                        <img src={`https://www.google.com/s2/favicons?domain=${template.target_url}&sz=32`} className="w-5 h-5 object-contain" alt="" />
                                                     ) : (
                                                         <MaterialIcon name="extension" className="text-lg text-muted-foreground" />
                                                     )}
@@ -129,7 +129,7 @@ export default function DashboardPage() {
                                                     </button>
                                                 </Link>
                                                 <button
-                                                    onClick={() => handleDelete(preset.id)}
+                                                    onClick={() => handleDelete(template.id)}
                                                     className="p-2 hover:bg-red-900/20 rounded text-muted-foreground hover:text-red-500 transition-colors"
                                                     title="Delete"
                                                 >

@@ -11,14 +11,14 @@ export async function GET(req: Request) {
         // Fetch all presets, including author details directly from users table using JOIN
         const { rows } = await query(`
             SELECT p.*, u.username as author_username 
-            FROM presets p
+            FROM templates p
             LEFT JOIN users u ON p.user_id = u.id
             ORDER BY p.created_at DESC
         `);
 
         return NextResponse.json(rows);
     } catch (error) {
-        console.error('Fetch all presets error:', error);
+        console.error('Fetch all templates error:', error);
         return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
     }
 }
