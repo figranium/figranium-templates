@@ -16,8 +16,14 @@ export default function TaskEmbed({ task }: TaskEmbedProps) {
         const host = hostRef.current;
         if (!host) return;
 
+        // Templates may store either a bare task or a full Figranium export.
+        // Embed expects a single task, so unwrap export-shaped configs here.
+        const embedTask = Array.isArray(task?.tasks) && task.tasks.length > 0
+            ? task.tasks[0]
+            : task;
+
         const embed = mountFigraniumEmbed(host, {
-            task,
+            task: embedTask,
             height: 640,
             title: "Figranium task",
             autoResize: true,
