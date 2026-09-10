@@ -3474,17 +3474,14 @@ function sr({
   height: l = 560,
   ariaLabel: i = "Figranium task preview"
 }) {
-  return /* @__PURE__ */ a(
+  return /* @__PURE__ */ t(
     "div",
     {
       className: `figranium-embed ${r}`.trim(),
       style: { height: l },
       "aria-label": i,
       role: "img",
-      children: [
-        /* @__PURE__ */ t("div", { className: "figranium-embed__surface", "aria-hidden": "true", children: /* @__PURE__ */ t(ar, { task: e }) }),
-        /* @__PURE__ */ t("div", { className: "figranium-embed__interaction-shield", "aria-hidden": "true" })
-      ]
+      children: /* @__PURE__ */ t("div", { className: "figranium-embed__surface", "aria-hidden": "true", children: /* @__PURE__ */ t(ar, { task: e }) })
     }
   );
 }
