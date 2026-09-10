@@ -30,6 +30,10 @@ export default function TaskEmbed({ task }: TaskEmbedProps) {
         });
 
         const iframe = embed.iframe;
+        // The embed document is fully self-contained: its generated bundle has no
+        // imports. Classic scripts reliably execute in a sandboxed srcdoc, while
+        // the module form can be left inert by browsers in an opaque sandbox.
+        iframe.srcdoc = iframe.srcdoc.replace('<script type="module">', '<script>');
         iframe.style.width = `${100 / EMBED_SCALE}%`;
         iframe.style.transform = `scale(${EMBED_SCALE})`;
         iframe.style.transformOrigin = "top left";
