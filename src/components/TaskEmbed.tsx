@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import { mountFigraniumEmbed } from "@figranium/embed";
+import { mountFigraniumEmbed } from "@/vendor/figranium-embed/index.js";
 
 interface TaskEmbedProps {
     task: any;
