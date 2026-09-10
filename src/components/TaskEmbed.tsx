@@ -7,7 +7,7 @@ interface TaskEmbedProps {
     task: any;
 }
 
-const EMBED_SCALE = 0.78;
+const EMBED_SCALE = 0.62;
 
 export default function TaskEmbed({ task }: TaskEmbedProps) {
     const hostRef = useRef<HTMLDivElement>(null);
