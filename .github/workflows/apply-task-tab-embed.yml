@@ -1,0 +1,69 @@
+name: Apply Task tab embed integration
+
+on:
+  push:
+    branches: [task-tab-figranium-embed]
+    paths:
+      - .github/workflows/apply-task-tab-embed.yml
+
+permissions:
+  contents: write
+
+jobs:
+  apply:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: task-tab-figranium-embed
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 24
+          cache: pnpm
+      - name: Update Task tab
+        run: |
+          python <<'PY'
+          from pathlib import Path
+
+          path = Path('src/app/presets/[id]/page.tsx')
+          text = path.read_text()
+
+          text = text.replace(
+              'import Link from "next/link";\n',
+              'import Link from "next/link";\nimport TaskEmbed from "@/components/TaskEmbed";\n',
+              1,
+          )
+
+          text = text.replace(
+              '    const requestedTab = (await searchParams)?.tab;\n    const activeTab = (["readme", "inputs", "steps", "output"].includes(requestedTab || "") ? requestedTab : "readme") as "readme" | "inputs" | "steps" | "output";',
+              '    const requestedTab = (await searchParams)?.tab;\n    const normalizedTab = requestedTab === "steps" ? "task" : requestedTab;\n    const activeTab = (["readme", "task", "inputs", "output"].includes(normalizedTab || "") ? normalizedTab : "readme") as "readme" | "task" | "inputs" | "output";',
+              1,
+          )
+
+          text = text.replace(
+              '                        { id: "readme", label: "README", icon: "menu_book" },\n                        { id: "inputs", label: "Inputs", icon: "data_object" },\n                        { id: "steps", label: "Steps", icon: "account_tree" },\n                        { id: "output", label: "Expected Output", icon: "output" },',
+              '                        { id: "readme", label: "README", icon: "menu_book" },\n                        { id: "task", label: "Task", icon: "account_tree" },\n                        { id: "inputs", label: "Inputs", icon: "data_object" },\n                        { id: "output", label: "Expected Output", icon: "output" },',
+              1,
+          )
+
+          start = text.index('                        {activeTab === "steps" && (<>')
+          end = text.index('                        {activeTab === "output" && (', start)
+          text = text[:start] + '                        {activeTab === "task" && (\n                            <TaskEmbed task={config} />\n                        )}\n\n' + text[end:]
+          text = text.replace('{/* Main Content: Description & Steps */}', '{/* Main Content */}', 1)
+
+          path.write_text(text)
+          PY
+      - name: Refresh lockfile
+        run: pnpm install --lockfile-only
+      - name: Remove temporary workflow
+        run: rm .github/workflows/apply-task-tab-embed.yml
+      - name: Commit generated changes
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add src/app/presets/[id]/page.tsx pnpm-lock.yaml .github/workflows/apply-task-tab-embed.yml
+          git commit -m "Replace Steps tab with Figranium Embed"
+          git push origin task-tab-figranium-embed
