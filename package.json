@@ -17,6 +17,7 @@
   "dependencies": {
     "@ai-sdk/google": "^4.0.58",
     "@ai-sdk/openai-compatible": "^3.0.41",
+    "@figranium/embed": "^0.1.0",
     "@neondatabase/auth": "^0.5.0-beta",
     "@neondatabase/auth-ui": "^0.3.0-beta",
     "@types/bcrypt": "^6.0.0",
