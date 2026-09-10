@@ -1,0 +1,54 @@
+/* Reduce decorative chrome: use normal casing and reserve boxes for real controls/data. */
+.uppercase,
+.page-kicker,
+.primary-action,
+main label[class*="uppercase"],
+main thead[class*="uppercase"] {
+  text-transform: none !important;
+  letter-spacing: normal !important;
+}
+
+.page-kicker {
+  font-size: 11px;
+  font-weight: 500;
+}
+
+.primary-action {
+  font-size: 12px;
+  letter-spacing: normal;
+}
+
+main th {
+  font-size: 11px !important;
+  letter-spacing: normal !important;
+  text-transform: none !important;
+}
+
+/* Product/section wrappers should not look like nested cards. */
+.product-panel {
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+/* Back navigation is navigation, not a boxed action. */
+a[aria-label^="Back"],
+button[aria-label^="Back"] {
+  border-color: transparent !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+a[aria-label^="Back"]:hover,
+button[aria-label^="Back"]:hover {
+  border-color: transparent !important;
+  background: rgba(255,255,255,.04) !important;
+}
+
+/* README prose belongs directly on the page. Keep semantic code/table surfaces intact. */
+.markdown-content {
+  border: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
