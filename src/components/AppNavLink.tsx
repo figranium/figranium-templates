@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import clsx from "clsx";
-import MaterialIcon from "@/components/MaterialIcon";
+import TablerIcon from "@/components/TablerIcon";
 
 interface AppNavLinkProps {
     href: string;
@@ -29,7 +29,7 @@ export function AppNavLink({ href, icon, children, mobile = false }: AppNavLinkP
                 isActive ? "bg-white/[0.07] text-white" : "text-white/58",
             )}
         >
-            <MaterialIcon name={icon} className="text-[19px]" aria-hidden="true" />
+            <TablerIcon name={icon} className="text-[19px]" />
             {mobile ? children : (
                 <span className="max-w-0 translate-x-1 overflow-hidden whitespace-nowrap opacity-0 transition-all duration-200 group-hover/sidebar:max-w-[170px] group-hover/sidebar:translate-x-0 group-hover/sidebar:opacity-100">
                     {children}

@@ -3,6 +3,7 @@ import { SignOutButton } from "./SignOutButton";
 import { MobileMenu } from "./MobileMenu";
 import { getCurrentUser } from "@/lib/current-user";
 import { AppNavLink } from "@/components/AppNavLink";
+import TablerIcon from "@/components/TablerIcon";
 
 export async function Navbar() {
     const user = await getCurrentUser();
@@ -30,7 +31,7 @@ export async function Navbar() {
                         <SignOutButton username={username} displayName={displayName} profilePicture={profilePicture} isAdmin={isAdmin} sidebar />
                     ) : (
                         <Link href="/auth/signin" className="flex min-h-10 w-full items-center justify-center gap-0 rounded-[10px] bg-white px-0 text-[11px] font-bold uppercase tracking-[0.13em] text-black transition-all hover:bg-white/88 group-hover/sidebar:gap-2 group-hover/sidebar:px-4" title="Sign in">
-                            <span className="material-symbols-outlined text-[18px]" aria-hidden="true">login</span><span className={navLabel}>Sign in</span>
+                            <TablerIcon name="login" className="text-[18px]" /><span className={navLabel}>Sign in</span>
                         </Link>
                     )}
                 </div>
@@ -46,9 +47,9 @@ export async function Navbar() {
 
                     <p className="mt-3 h-0 overflow-hidden whitespace-nowrap px-3 text-[9px] font-bold uppercase tracking-[0.18em] text-white/28 opacity-0 transition-all duration-200 group-hover/sidebar:mt-7 group-hover/sidebar:h-5 group-hover/sidebar:opacity-100">Resources</p>
                     <div className="space-y-0.5">
-                        <a href="https://figranium.dev/docs" target="_blank" rel="noopener noreferrer" className={navItem} title="Documentation"><span className="material-symbols-outlined text-[19px]" aria-hidden="true">description</span><span className={navLabel}>Documentation</span></a>
-                        <a href="https://figranium.dev/blog" target="_blank" rel="noopener noreferrer" className={navItem} title="Blog"><span className="material-symbols-outlined text-[19px]" aria-hidden="true">article</span><span className={navLabel}>Blog</span></a>
-                        <a href="https://figranium.dev/releases" target="_blank" rel="noopener noreferrer" className={navItem} title="Releases"><span className="material-symbols-outlined text-[19px]" aria-hidden="true">rocket_launch</span><span className={navLabel}>Releases</span></a>
+                        <a href="https://figranium.dev/docs" target="_blank" rel="noopener noreferrer" className={navItem} title="Documentation"><TablerIcon name="description" className="text-[19px]" /><span className={navLabel}>Documentation</span></a>
+                        <a href="https://figranium.dev/blog" target="_blank" rel="noopener noreferrer" className={navItem} title="Blog"><TablerIcon name="article" className="text-[19px]" /><span className={navLabel}>Blog</span></a>
+                        <a href="https://figranium.dev/releases" target="_blank" rel="noopener noreferrer" className={navItem} title="Releases"><TablerIcon name="rocket_launch" className="text-[19px]" /><span className={navLabel}>Releases</span></a>
                     </div>
                 </nav>
 

@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { useState } from "react";
-import MaterialIcon from "@/components/MaterialIcon";
+import TablerIcon from "@/components/TablerIcon";
 import clsx from "clsx";
 
 const categoryIcons: Record<string, string> = {
@@ -74,7 +74,7 @@ export function Sidebar({ counts }: SidebarProps) {
                     href="/presets/new"
                     className="mb-7 flex h-10 w-full items-center justify-center gap-2 rounded-[10px] bg-white px-3 text-[10px] font-bold uppercase tracking-[0.13em] text-black transition hover:bg-white/88"
                 >
-                    <MaterialIcon name="add" className="text-[18px]" />
+                    <TablerIcon name="add" className="text-[18px]" />
                     <span>Submit template</span>
                 </Link>
 
@@ -95,7 +95,7 @@ export function Sidebar({ counts }: SidebarProps) {
                                 )}
                             >
                                 <div className="flex items-center gap-3">
-                                    <MaterialIcon name={category.icon} className="text-base" aria-hidden="true" />
+                                    <TablerIcon name={category.icon} className="text-base" aria-hidden="true" />
                                     <span>{category.name}</span>
                                 </div>
                                 <span className="rounded-[6px] bg-black/30 px-1.5 py-0.5 font-mono text-[9px] text-white/28">{category.count}</span>
@@ -108,7 +108,7 @@ export function Sidebar({ counts }: SidebarProps) {
                             className="mt-2 flex w-full items-center justify-center px-3 py-2 text-[10px] font-bold uppercase tracking-[0.12em] text-white/32 transition hover:text-white"
                         >
                             {showAllCategories ? "Show Less" : "Show More"}
-                            <MaterialIcon name={showAllCategories ? "expand_less" : "expand_more"} className="text-base ml-1" aria-hidden="true" />
+                            <TablerIcon name={showAllCategories ? "expand_less" : "expand_more"} className="text-base ml-1" aria-hidden="true" />
                         </button>
                     )}
                 </div>

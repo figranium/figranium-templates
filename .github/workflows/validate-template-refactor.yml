@@ -1,0 +1,34 @@
+name: Validate templates refactor
+
+on:
+  push:
+    branches:
+      - rename-presets-tabler-icons
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - name: Audit icon migration
+        run: |
+          ! grep -RniE 'MaterialIcon|material-symbols|Material Symbols' src README.md
+      - name: Audit user-facing preset copy
+        run: |
+          ! grep -RniE '>[[:space:]]*[^<]*(Preset|Presets)|"[^"/]*(Preset|Presets)[^"/]*"' src --include='*.tsx' --include='*.ts' || {
+            echo 'Found possible user-facing Preset copy. Internal identifiers/routes may need manual review.'
+            exit 1
+          }
+      - run: pnpm lint
+      - run: pnpm exec tsc --noEmit
