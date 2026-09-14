@@ -1,34 +1,34 @@
 # Figranium Templates
 
-The community-powered automation presets hub for [Figranium](https://figranium.dev) — browse, share, and download pre-built automation workflows.
+The community-powered automation templates hub for [Figranium](https://figranium.dev) — browse, share, and download pre-built automation workflows.
 
 🌐 **[templates.figranium.dev](https://templates.figranium.dev)**
 
 ## What is this?
 
-Figranium Templates is an open marketplace where users can share and discover automation presets. Each preset is a ready-to-use configuration that can be imported directly into Figranium to automate tasks like web scraping, QA testing, lead generation, and more.
+Figranium Templates is an open marketplace where users can share and discover automation templates. Each template is a ready-to-use configuration that can be imported directly into Figranium to automate tasks like web scraping, QA testing, lead generation, and more.
 
 ## Features
 
-- **Browse Presets** — Search and filter community-submitted automation workflows by category
-- **Download Configs** — Download or copy preset configurations as JSON, ready to import
+- **Browse Templates** — Search and filter community-submitted automation workflows by category
+- **Download Configs** — Download or copy template configurations as JSON, ready to import
 - **AI-assisted publishing** — Upload a Figranium JSON export; deterministic metadata is extracted and AI generates the marketplace copy and README
-- **Creator Dashboard** — Manage your submitted presets and track downloads
+- **Creator Dashboard** — Manage your submitted templates and track downloads
 
 ## How It Works
 
 Figranium Templates simplifies the sharing of automation configurations.
 
-1. **Browse**: Users explore categories like "Lead Gen" or "QA Testing" to find relevant presets.
-2. **Download**: Each preset includes a JSON configuration file. Clicking "Download" saves this file locally, or users can copy the JSON directly.
-3. **Import**: The downloaded JSON file is imported into the **Figranium** desktop application, instantly configuring the tool with the selected workflow.
+1. **Browse**: Users explore categories like "Lead Gen" or "QA Testing" to find relevant templates.
+2. **Download**: Each template includes a JSON configuration file. Clicking "Download" saves this file locally, or users can copy the JSON directly.
+3. **Import**: The downloaded JSON file is imported into **Figranium**, instantly configuring it with the selected workflow.
 
 ## Architecture & Tech Stack
 
 The platform is built as a modern, full-stack web application designed for performance and simplicity.
 
 ### Core Stack
-- **Framework**: [Next.js 15](https://nextjs.org/) (App Router)
+- **Framework**: [Next.js](https://nextjs.org/) (App Router)
 - **Language**: [TypeScript](https://www.typescriptlang.org/)
 - **Database**: [PostgreSQL](https://www.postgresql.org/)
 - **Styling**: [Tailwind CSS](https://tailwindcss.com/)
@@ -38,11 +38,11 @@ The platform is built as a modern, full-stack web application designed for perfo
 - **Database Access**: `pg` (node-postgres) for direct SQL queries.
 - **Validation**: `zod` for schema validation.
 - **AI generation**: Vercel AI SDK with AI Gateway, Gemini, and OpenAI-compatible provider support.
-- **UI Components**: Custom components using Material Symbols for functional icons.
+- **UI icons**: Tabler Icons throughout the application.
 
 ### AI provider configuration
 
-Preset publishing uses a provider-neutral environment configuration. Copy `.env.example` and set:
+Template publishing uses a provider-neutral environment configuration. Copy `.env.example` and set:
 
 ```env
 AI_PROVIDER=gateway
@@ -54,7 +54,7 @@ Use `AI_PROVIDER=gemini` with a Gemini model ID for the direct Google API. Use `
 
 ### Legacy account transition
 
-Existing accounts are not matched to Neon Auth by email alone. That would allow a person who registers a matching email address to claim another user’s presets and downloads.
+Existing accounts are not matched to Neon Auth by email alone. That would allow a person who registers a matching email address to claim another user’s templates and downloads.
 
 Until automatic failed-login detection is added, an existing user must open:
 
@@ -69,9 +69,9 @@ The mapping is stored in `public.users.neon_auth_user_id`, created by `db/migrat
 ## Under the Hood
 
 ### Database Schema
-The application uses a relational database model centered around users and presets.
+The application uses a relational database model centered around users and templates.
 - **Users**: Stores account information, including email, hashed passwords, and verification status.
-- **Presets**: The core entity, containing the automation configuration (JSON), metadata (title, description, author), and performance metrics (downloads).
+- **Templates**: The core entity, containing the automation configuration (JSON), metadata (title, description, author), and performance metrics (downloads).
 - **Verification Tokens**: Handles secure email verification flows.
 
 ### Performance
@@ -90,7 +90,7 @@ The application uses a relational database model centered around users and prese
 
 ## Open Source & Self-Hosting
 
-This repository contains the source code for **[templates.figranium.dev](https://templates.figranium.dev)**, the official community marketplace for Figranium automation presets.
+This repository contains the source code for **[templates.figranium.dev](https://templates.figranium.dev)**, the official community marketplace for Figranium automation templates.
 
 ### Why Open Source?
 We believe in transparency. By open-sourcing the platform code, we allow the community to:
@@ -108,14 +108,14 @@ The code is licensed under the [GNU Affero General Public License v3.0 (AGPL-3.0
 
 **However, please note:**
 1. **This project is not designed for self-hosting.** We do not provide installation guides, Docker containers, or support for running your own instance.
-2. **The value is in the network.** The official site connects thousands of Figranium users. A self-hosted instance will be isolated from the main community repository.
+2. **The value is in the network.** The official site connects Figranium users. A self-hosted instance will be isolated from the main community repository.
 3. **No Support.** We cannot assist with setup, configuration, or debugging of self-hosted instances.
 
 You are welcome to explore, learn from, and adapt this code, but we recommend using the official [templates.figranium.dev](https://templates.figranium.dev) for the best experience.
 
 ## Contributing
 
-Submit presets directly through the platform at [templates.figranium.dev](https://templates.figranium.dev), or open a pull request.
+Submit templates directly through the platform at [templates.figranium.dev](https://templates.figranium.dev), or open a pull request.
 
 ## License
 
