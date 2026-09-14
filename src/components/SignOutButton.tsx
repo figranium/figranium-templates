@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import MaterialIcon from "./MaterialIcon";
+import TablerIcon from "./TablerIcon";
 import { authClient } from "@/lib/auth-client";
 
 interface AccountSettingsState {
@@ -113,20 +113,20 @@ export function SignOutButton({ username, displayName: initialDisplayName, profi
 
                     <div className="flex flex-col">
                         <Link href="/dashboard" onClick={() => setIsOpen(false)} className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm text-white/70 transition-colors hover:bg-white/10 hover:text-white">
-                            <MaterialIcon name="dashboard" className="text-base" />
+                            <TablerIcon name="dashboard" className="text-base" />
                             <span>Dashboard</span>
                         </Link>
                         <Link href="/account/settings" onClick={() => setIsOpen(false)} className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm text-white/70 transition-colors hover:bg-white/10 hover:text-white">
-                            <MaterialIcon name="settings" className="text-base" />
+                            <TablerIcon name="settings" className="text-base" />
                             <span>Account settings</span>
                         </Link>
                         <div className="my-1 border-t border-white/10" />
                         <Link href="/presets/new" onClick={() => setIsOpen(false)} className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm text-white/70 transition-colors hover:bg-white/10 hover:text-white">
-                            <MaterialIcon name="add_circle" className="text-base" />
+                            <TablerIcon name="add_circle" className="text-base" />
                             <span>Create template</span>
                         </Link>
                         <Link href="/" onClick={() => setIsOpen(false)} className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm text-white/70 transition-colors hover:bg-white/10 hover:text-white">
-                            <MaterialIcon name="search" className="text-base" />
+                            <TablerIcon name="search" className="text-base" />
                             <span>Browse templates</span>
                         </Link>
                         {isAdmin && (
@@ -141,7 +141,7 @@ export function SignOutButton({ username, displayName: initialDisplayName, profi
                             onClick={handleSignOut}
                             className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm text-white/70 transition-colors hover:bg-white/10 hover:text-white"
                         >
-                            <MaterialIcon name="logout" className="text-base" />
+                            <TablerIcon name="logout" className="text-base" />
                             <span>Log out</span>
                         </button>
                     </div>
