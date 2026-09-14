@@ -4,7 +4,7 @@ import { sanitizeUrl } from '@/lib/utils';
 import { z } from 'zod';
 import { getCurrentUser } from '@/lib/current-user';
 import { revalidateTag } from 'next/cache';
-import { PRESET_CATEGORIES } from '@/lib/template-import';
+import { PRESET_CATEGORIES } from '@/lib/preset-import';
 
 export const createPresetSchema = z.object({
     title: z.string().min(3),
@@ -60,14 +60,12 @@ export async function POST(req: Request) {
 
         const { title, description, type, category, icon, time_estimate, configuration, expected_output, readme } = result.data;
 
-        // Extract URL from configuration
         let targetUrl = "";
         try {
             const config = JSON.parse(configuration);
             const task = Array.isArray(config?.tasks) && config.tasks.length > 0 ? config.tasks[0] : config;
             targetUrl = sanitizeUrl(task?.url) || "";
         } catch {
-            // Should be caught by Zod refine, but safe fallback
         }
 
         await query(
