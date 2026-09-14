@@ -29,7 +29,9 @@ const icons: Record<string, IconDefinition> = {
   download: <><path d="M12 3v12" /><path d="M7 10l5 5l5 -5" /><path d="M5 21h14" /></>,
   search_off: <><circle cx="11" cy="11" r="7" /><path d="M20 20l-4 -4m-12 -12l16 16" /></>,
   expand_more: <path d="M6 9l6 6l6 -6" />,
+  expand_less: <path d="M6 15l6 -6l6 6" />,
   chevron_left: <path d="M15 6l-6 6l6 6" />,
+  arrow_forward: <><path d="M5 12h14" /><path d="M15 8l4 4l-4 4" /></>,
   badge_check: <><path d="M12 3l2 2l3 -.5l.5 3l2 2l-2 2l.5 3l-3 .5l-2 2l-2 -2l-3 .5l-.5 -3l-2 -2l2 -2l-.5 -3l3 -.5z" /><path d="M9 12l2 2l4 -4" /></>,
   alert_circle: <><circle cx="12" cy="12" r="9" /><path d="M12 8v4m0 4h.01" /></>,
   file_upload: <><path d="M14 3v4a1 1 0 0 0 1 1h4" /><path d="M5 3h9l5 5v13h-14z" /><path d="M12 17v-6m-3 3l3 -3l3 3" /></>,
@@ -52,62 +54,38 @@ const icons: Record<string, IconDefinition> = {
   external_link: <><path d="M10 6h-5v13h13v-5" /><path d="M13 5h6v6m0 -6l-9 9" /></>,
   lock: <><rect x="5" y="10" width="14" height="11" rx="2" /><path d="M8 10v-3a4 4 0 0 1 8 0v3" /></>,
   user: <><circle cx="12" cy="8" r="4" /><path d="M6 21v-2a6 6 0 0 1 12 0v2" /></>,
+  flask: <><path d="M9 3h6m-5 0v6l-5 9a2 2 0 0 0 2 3h10a2 2 0 0 0 2 -3l-5 -9v-6" /><path d="M7 16h10" /></>,
+  users: <><circle cx="9" cy="8" r="3" /><path d="M3 20v-2a6 6 0 0 1 12 0v2" /><path d="M16 4a3 3 0 0 1 0 6m2 10v-2a5 5 0 0 0 -3 -4.6" /></>,
+  share: <><circle cx="18" cy="5" r="2" /><circle cx="6" cy="12" r="2" /><circle cx="18" cy="19" r="2" /><path d="M8 11l8 -5m-8 7l8 5" /></>,
+  shopping_cart: <><circle cx="9" cy="20" r="1" /><circle cx="18" cy="20" r="1" /><path d="M3 4h2l2.4 10.4a2 2 0 0 0 2 1.6h7.7a2 2 0 0 0 2 -1.6l1.4 -6.4h-13.5" /></>,
+  chart: <><path d="M4 19v-6m5 6v-10m5 10v-4m5 4v-14" /></>,
+  briefcase: <><rect x="3" y="7" width="18" height="13" rx="2" /><path d="M8 7v-3h8v3m-13 5h18" /></>,
+  player_play: <><circle cx="12" cy="12" r="9" /><path d="M10 8l6 4l-6 4z" /></>,
+  message: <><path d="M4 5h16v12h-5l-3 3l-3 -3h-5z" /><path d="M8 9h8m-8 4h5" /></>,
+  home: <><path d="M3 11l9 -8l9 8" /><path d="M5 10v10h14v-10m-9 10v-6h4v6" /></>,
+  plane: <><path d="M10 14l-7 -2v-2l7 1l3 -8h2l-1 8l6 2v2l-6 -1l-3 7h-2z" /></>,
+  dots: <><path d="M5 12h.01m7 0h.01m7 0h.01" /></>,
 };
 
 const aliases: Record<string, string> = {
-  compass: "explore",
-  layout_dashboard: "dashboard",
-  square_plus: "add_box",
-  shield_check: "admin_panel_settings",
-  file_description: "description",
-  file_text: "article",
-  rocket: "rocket_launch",
-  x: "close",
-  circle_plus: "add_circle",
-  plus: "add",
-  loader: "progress_activity",
-  puzzle: "extension",
-  pencil: "edit",
-  trash: "delete",
-  world: "public",
-  language: "public",
-  chevron_down: "expand_more",
-  error: "alert_circle",
-  upload_file: "file_upload",
-  publish: "send",
-  image: "photo",
-  output: "terminal_2",
-  menu_book: "book",
-  account_tree: "hierarchy",
-  data_object: "braces",
-  my_location: "target",
-  table_chart: "braces",
-  monitor: "device_desktop",
-  smart_toy: "robot",
-  bug_report: "bug",
-  content_copy: "copy",
-  open_in_new: "external_link",
+  compass: "explore", layout_dashboard: "dashboard", square_plus: "add_box", shield_check: "admin_panel_settings",
+  file_description: "description", file_text: "article", rocket: "rocket_launch", x: "close", circle_plus: "add_circle",
+  plus: "add", loader: "progress_activity", puzzle: "extension", pencil: "edit", trash: "delete", world: "public",
+  language: "public", chevron_down: "expand_more", error: "alert_circle", upload_file: "file_upload", publish: "send",
+  image: "photo", output: "terminal_2", menu_book: "book", account_tree: "hierarchy", data_object: "braces",
+  my_location: "target", table_chart: "braces", monitor: "device_desktop", smart_toy: "robot", bug_report: "bug",
+  content_copy: "copy", open_in_new: "external_link", sync: "progress_activity", grid_view: "dashboard", science: "flask",
+  group: "users", insights: "chart", work: "briefcase", play_circle: "player_play", rate_review: "message", code: "terminal_2",
+  real_estate_agent: "home", flight: "plane", more_horiz: "dots",
 };
 
-interface TablerIconProps extends SVGProps<SVGSVGElement> {
-  name: string;
-}
+interface TablerIconProps extends SVGProps<SVGSVGElement> { name: string; }
 
 export default function TablerIcon({ name, className, ...props }: TablerIconProps) {
   const key = aliases[name] || name;
   const content = icons[key] || icons.extension;
   return (
-    <svg
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="1.8"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      className={clsx("inline-block h-[1em] w-[1em] shrink-0", className)}
-      aria-hidden="true"
-      {...props}
-    >
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" className={clsx("inline-block h-[1em] w-[1em] shrink-0", className)} aria-hidden="true" {...props}>
       {content}
     </svg>
   );
