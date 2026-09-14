@@ -339,7 +339,7 @@ export default async function ViewPresetPage({ params, searchParams }: PageProps
                                     <img src={preset.icon} className="w-16 h-16 object-cover rounded-lg" alt="Icon" />
                                 ) : preset.icon && preset.icon.includes(".") ? (
                                     <img src={`https://www.google.com/s2/favicons?domain=${preset.icon}&sz=64`} className="w-12 h-12 object-contain" alt="Icon" />
-                                ) : template.icon ? (
+                                ) : preset.icon ? (
                                     <TablerIcon name={preset.icon} className="text-5xl text-foreground" />
                                 ) : preset.target_url ? (
                                     <img src={`https://www.google.com/s2/favicons?domain=${preset.target_url}&sz=64`} className="w-12 h-12 object-contain" alt="Icon" />
