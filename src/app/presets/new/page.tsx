@@ -2,10 +2,10 @@
 
 import { useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import MaterialIcon from "@/components/MaterialIcon";
+import TablerIcon from "@/components/TablerIcon";
 import { MarkdownContent } from "@/components/MarkdownContent";
 
-type PresetDraft = {
+type TemplateDraft = {
     title: string;
     description: string;
     type: "AGENT" | "SCRAPE";
@@ -18,11 +18,11 @@ type PresetDraft = {
     readme: string;
 };
 
-export default function NewPresetPage() {
+export default function NewTemplatePage() {
     const router = useRouter();
     const inputRef = useRef<HTMLInputElement>(null);
     const iconInputRef = useRef<HTMLInputElement>(null);
-    const [draft, setDraft] = useState<PresetDraft | null>(null);
+    const [draft, setDraft] = useState<TemplateDraft | null>(null);
     const [fileName, setFileName] = useState("");
     const [note, setNote] = useState("");
     const [error, setError] = useState("");
@@ -136,138 +136,55 @@ export default function NewPresetPage() {
             <div className="w-full max-w-[960px]">
                 <p className="page-kicker mb-3">Workspace / Publish</p>
                 <h1 className="text-3xl font-bold tracking-[-0.045em] sm:text-4xl">Publish from JSON</h1>
-                <p className="mt-3 max-w-2xl text-[14px] leading-6 text-white/42">
-                    Upload one Figranium task. The app extracts everything it can reliably determine, then AI writes the description, category, and README. You can optionally add an expected-output example before publishing.
-                </p>
+                <p className="mt-3 max-w-2xl text-[14px] leading-6 text-white/42">Upload one Figranium task. The app extracts everything it can reliably determine, then AI writes the description, category, and README. You can optionally add an expected-output example before publishing.</p>
 
-                {error && (
-                    <div className="mt-7 flex items-center gap-2 rounded-[11px] border border-red-500/25 bg-red-500/10 p-3 text-sm text-red-300">
-                        <MaterialIcon name="error" className="text-lg" /> {error}
-                    </div>
-                )}
+                {error && <div className="mt-7 flex items-center gap-2 rounded-[11px] border border-red-500/25 bg-red-500/10 p-3 text-sm text-red-300"><TablerIcon name="alert_circle" className="text-lg" /> {error}</div>}
 
                 <div className="product-panel mt-8 p-5 sm:p-7">
-                    <button
-                        type="button"
-                        disabled={generating || publishing}
-                        onClick={() => inputRef.current?.click()}
-                        onDragOver={event => event.preventDefault()}
-                        onDrop={event => {
-                            event.preventDefault();
-                            const file = event.dataTransfer.files[0];
-                            if (file) void generateFromFile(file);
-                        }}
-                        className="flex min-h-56 w-full flex-col items-center justify-center rounded-[14px] border border-dashed border-white/[0.14] bg-white/[0.018] px-6 text-center transition hover:border-white/30 hover:bg-white/[0.035] disabled:cursor-wait disabled:opacity-60"
-                    >
-                        <span className="mb-5 flex h-12 w-12 items-center justify-center rounded-[12px] border border-white/[0.1] bg-white/[0.04]">
-                            <MaterialIcon name={generating ? "progress_activity" : "upload_file"} className={`text-2xl ${generating ? "animate-spin" : ""}`} />
-                        </span>
+                    <button type="button" disabled={generating || publishing} onClick={() => inputRef.current?.click()} onDragOver={event => event.preventDefault()} onDrop={event => { event.preventDefault(); const file = event.dataTransfer.files[0]; if (file) void generateFromFile(file); }} className="flex min-h-56 w-full flex-col items-center justify-center rounded-[14px] border border-dashed border-white/[0.14] bg-white/[0.018] px-6 text-center transition hover:border-white/30 hover:bg-white/[0.035] disabled:cursor-wait disabled:opacity-60">
+                        <span className="mb-5 flex h-12 w-12 items-center justify-center rounded-[12px] border border-white/[0.1] bg-white/[0.04]"><TablerIcon name={generating ? "progress_activity" : "file_upload"} className={`text-2xl ${generating ? "animate-spin" : ""}`} /></span>
                         <span className="text-[15px] font-semibold">{generating ? "Reading the task and writing its page…" : "Drop your template JSON here"}</span>
                         <span className="mt-2 text-xs text-white/35">{fileName && generating ? fileName : "or click to choose a file · 2 MB max"}</span>
                     </button>
-                    <input
-                        ref={inputRef}
-                        type="file"
-                        accept=".json,application/json"
-                        className="hidden"
-                        onChange={event => {
-                            const file = event.target.files?.[0];
-                            if (file) void generateFromFile(file);
-                        }}
-                    />
+                    <input ref={inputRef} type="file" accept=".json,application/json" className="hidden" onChange={event => { const file = event.target.files?.[0]; if (file) void generateFromFile(file); }} />
                 </div>
 
                 {draft && (
                     <div className="mt-8 space-y-6">
                         <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
-                            <div>
-                                <p className="page-kicker mb-2">Ready to publish</p>
-                                <h2 className="text-2xl font-bold tracking-[-0.035em]">Generated marketplace page</h2>
-                                <p className="mt-2 text-xs text-emerald-300/75">{note}</p>
-                            </div>
-                            <button
-                                type="button"
-                                onClick={() => void publish()}
-                                disabled={publishing}
-                                className="inline-flex h-11 items-center justify-center gap-2 rounded-[10px] bg-white px-5 text-[13px] font-semibold text-black transition hover:bg-white/85 disabled:cursor-wait disabled:opacity-60"
-                            >
-                                <MaterialIcon name={publishing ? "progress_activity" : "publish"} className={publishing ? "animate-spin" : ""} />
-                                {publishing ? "Publishing…" : "Publish template"}
-                            </button>
+                            <div><p className="page-kicker mb-2">Ready to publish</p><h2 className="text-2xl font-bold tracking-[-0.035em]">Generated marketplace page</h2><p className="mt-2 text-xs text-emerald-300/75">{note}</p></div>
+                            <button type="button" onClick={() => void publish()} disabled={publishing} className="inline-flex h-11 items-center justify-center gap-2 rounded-[10px] bg-white px-5 text-[13px] font-semibold text-black transition hover:bg-white/85 disabled:cursor-wait disabled:opacity-60"><TablerIcon name={publishing ? "progress_activity" : "send"} className={publishing ? "animate-spin" : ""} />{publishing ? "Publishing…" : "Publish template"}</button>
                         </div>
 
                         <div className="product-panel p-6 sm:p-8">
                             <div className="flex flex-col gap-5 sm:flex-row sm:items-start">
                                 <div className="flex h-14 w-14 shrink-0 items-center justify-center overflow-hidden rounded-[12px] border border-white/[0.09] bg-white/[0.03]">
-                                    {draft.icon.startsWith("data:image/") ? <img src={draft.icon} className="h-full w-full object-cover" alt="Template icon" /> : draft.icon.includes(".") ? <img src={`https://www.google.com/s2/favicons?domain=${draft.icon}&sz=64`} className="h-9 w-9 object-contain" alt="" /> : <MaterialIcon name="image" className="text-3xl text-white/30" />}
+                                    {draft.icon.startsWith("data:image/") ? <img src={draft.icon} className="h-full w-full object-cover" alt="Template icon" /> : draft.icon.includes(".") ? <img src={`https://www.google.com/s2/favicons?domain=${draft.icon}&sz=64`} className="h-9 w-9 object-contain" alt="" /> : <TablerIcon name="photo" className="text-3xl text-white/30" />}
                                 </div>
                                 <div className="min-w-0 flex-1">
-                                    <div className="flex flex-wrap items-center gap-2">
-                                        <h3 className="text-xl font-bold tracking-[-0.025em]">{draft.title}</h3>
-                                        <span className="rounded border border-white/[0.09] bg-white/[0.03] px-2 py-0.5 text-[10px] text-white/55">{draft.type}</span>
-                                        <span className="rounded border border-white/[0.09] bg-white/[0.03] px-2 py-0.5 text-[10px] text-white/55">{draft.category}</span>
-                                    </div>
+                                    <div className="flex flex-wrap items-center gap-2"><h3 className="text-xl font-bold tracking-[-0.025em]">{draft.title}</h3><span className="rounded border border-white/[0.09] bg-white/[0.03] px-2 py-0.5 text-[10px] text-white/55">{draft.type}</span><span className="rounded border border-white/[0.09] bg-white/[0.03] px-2 py-0.5 text-[10px] text-white/55">{draft.category}</span></div>
                                     <p className="mt-3 text-[14px] leading-6 text-white/52">{draft.description}</p>
-                                    <div className="mt-4 flex flex-wrap gap-x-5 gap-y-2 text-xs text-white/34">
-                                        <span>{draft.target_url || "No target URL"}</span><span>{fileName}</span>
-                                    </div>
+                                    <div className="mt-4 flex flex-wrap gap-x-5 gap-y-2 text-xs text-white/34"><span>{draft.target_url || "No target URL"}</span><span>{fileName}</span></div>
                                 </div>
                             </div>
 
                             <div className="mt-6 border-t border-white/[0.08] pt-6">
-                                <div className="mb-3 flex items-center justify-between">
-                                    <p className="text-[10px] font-bold uppercase tracking-[0.14em] text-white/38">Template icon</p>
-                                    <span className="text-[10px] uppercase tracking-[0.12em] text-white/25">Required</span>
-                                </div>
+                                <div className="mb-3 flex items-center justify-between"><p className="text-[10px] font-bold uppercase tracking-[0.14em] text-white/38">Template icon</p><span className="text-[10px] uppercase tracking-[0.12em] text-white/25">Required</span></div>
                                 <div className="grid gap-3 sm:grid-cols-2">
-                                    <button
-                                        type="button"
-                                        onClick={() => iconInputRef.current?.click()}
-                                        className={`flex min-h-11 items-center justify-center gap-2 rounded-[10px] border px-4 text-xs transition ${iconMode === "upload" ? "border-white/25 bg-white/[0.07] text-white" : "border-white/[0.09] text-white/45 hover:text-white"}`}
-                                    >
-                                        <MaterialIcon name="upload" className="text-lg" /> Upload image
-                                    </button>
-                                    <button
-                                        type="button"
-                                        onClick={useFavicon}
-                                        className={`flex min-h-11 items-center justify-center gap-2 rounded-[10px] border px-4 text-xs transition ${iconMode === "favicon" ? "border-white/25 bg-white/[0.07] text-white" : "border-white/[0.09] text-white/45 hover:text-white"}`}
-                                    >
-                                        <MaterialIcon name="language" className="text-lg" /> Use site favicon
-                                    </button>
+                                    <button type="button" onClick={() => iconInputRef.current?.click()} className={`flex min-h-11 items-center justify-center gap-2 rounded-[10px] border px-4 text-xs transition ${iconMode === "upload" ? "border-white/25 bg-white/[0.07] text-white" : "border-white/[0.09] text-white/45 hover:text-white"}`}><TablerIcon name="upload" className="text-lg" /> Upload image</button>
+                                    <button type="button" onClick={useFavicon} className={`flex min-h-11 items-center justify-center gap-2 rounded-[10px] border px-4 text-xs transition ${iconMode === "favicon" ? "border-white/25 bg-white/[0.07] text-white" : "border-white/[0.09] text-white/45 hover:text-white"}`}><TablerIcon name="world" className="text-lg" /> Use site favicon</button>
                                 </div>
-                                <input
-                                    ref={iconInputRef}
-                                    type="file"
-                                    accept="image/*"
-                                    className="hidden"
-                                    onChange={event => {
-                                        const file = event.target.files?.[0];
-                                        if (file) uploadIcon(file);
-                                        event.target.value = "";
-                                    }}
-                                />
+                                <input ref={iconInputRef} type="file" accept="image/*" className="hidden" onChange={event => { const file = event.target.files?.[0]; if (file) uploadIcon(file); event.target.value = ""; }} />
                                 <p className="mt-3 text-[11px] text-white/28">Uploaded images are cropped to a 96×96 square. Favicon uses the task’s target domain.</p>
                             </div>
                         </div>
 
                         <div className="grid gap-6 lg:grid-cols-2">
                             <section className="product-panel p-6">
-                                <div className="mb-4 flex items-center justify-between gap-3">
-                                    <h3 className="flex items-center gap-2 text-sm font-semibold uppercase tracking-[0.08em] text-white/60"><MaterialIcon name="output" className="text-lg" /> Expected output</h3>
-                                    <span className="text-[10px] uppercase tracking-[0.12em] text-white/25">Optional</span>
-                                </div>
-                                <textarea
-                                    rows={9}
-                                    value={draft.expected_output}
-                                    onChange={event => setDraft({ ...draft, expected_output: event.target.value })}
-                                    placeholder="Paste an example of what this template produces…"
-                                    className="w-full resize-y rounded-[10px] border border-white/[0.09] bg-black/40 px-3 py-2 font-mono text-xs leading-6 text-white outline-none transition placeholder:text-white/25 focus:border-white/25"
-                                />
+                                <div className="mb-4 flex items-center justify-between gap-3"><h3 className="flex items-center gap-2 text-sm font-semibold uppercase tracking-[0.08em] text-white/60"><TablerIcon name="terminal_2" className="text-lg" /> Expected output</h3><span className="text-[10px] uppercase tracking-[0.12em] text-white/25">Optional</span></div>
+                                <textarea rows={9} value={draft.expected_output} onChange={event => setDraft({ ...draft, expected_output: event.target.value })} placeholder="Paste an example of what this template produces…" className="w-full resize-y rounded-[10px] border border-white/[0.09] bg-black/40 px-3 py-2 font-mono text-xs leading-6 text-white outline-none transition placeholder:text-white/25 focus:border-white/25" />
                             </section>
-                            <section className="product-panel p-6">
-                                <h3 className="mb-4 flex items-center gap-2 text-sm font-semibold uppercase tracking-[0.08em] text-white/60"><MaterialIcon name="description" className="text-lg" /> README</h3>
-                                <MarkdownContent className="max-h-[420px] overflow-auto">{draft.readme}</MarkdownContent>
-                            </section>
+                            <section className="product-panel p-6"><h3 className="mb-4 flex items-center gap-2 text-sm font-semibold uppercase tracking-[0.08em] text-white/60"><TablerIcon name="description" className="text-lg" /> README</h3><MarkdownContent className="max-h-[420px] overflow-auto">{draft.readme}</MarkdownContent></section>
                         </div>
                     </div>
                 )}
