@@ -1,6 +1,6 @@
 import { query } from "@/lib/db";
 import { notFound } from "next/navigation";
-import MaterialIcon from "@/components/MaterialIcon";
+import TablerIcon from "@/components/TablerIcon";
 import DownloadButton from "@/components/DownloadButton";
 import type { Metadata } from "next";
 import CodeBlock from "@/components/CodeBlock";
@@ -327,7 +327,7 @@ export default async function ViewPresetPage({ params, searchParams }: PageProps
                     title="Back to templates"
                     className="flex h-10 w-10 items-center justify-center rounded-lg border border-white/[0.09] bg-white/[0.025] text-muted-foreground transition-colors hover:border-white/[0.16] hover:bg-white/[0.055] hover:text-white"
                 >
-                    <MaterialIcon name="arrow_back" className="text-[20px]" />
+                    <TablerIcon name="arrow_back" className="text-[20px]" />
                 </Link>
 
                 {/* Header Section */}
@@ -337,18 +337,18 @@ export default async function ViewPresetPage({ params, searchParams }: PageProps
                             <div className="flex h-16 w-16 items-center justify-center overflow-hidden rounded-[14px] border border-white/[0.09] bg-white/[0.03]">
                                 {preset.icon && preset.icon.startsWith("data:image/") ? (
                                     <img src={preset.icon} className="w-16 h-16 object-cover rounded-lg" alt="Icon" />
-                                ) : template.icon && preset.icon.includes(".") ? (
-                                    <img src={`https://www.google.com/s2/favicons?domain=${template.icon}&sz=64`} className="w-12 h-12 object-contain" alt="Icon" />
+                                ) : preset.icon && preset.icon.includes(".") ? (
+                                    <img src={`https://www.google.com/s2/favicons?domain=${preset.icon}&sz=64`} className="w-12 h-12 object-contain" alt="Icon" />
                                 ) : template.icon ? (
-                                    <MaterialIcon name={preset.icon} className="text-5xl text-foreground" />
-                                ) : template.target_url ? (
-                                    <img src={`https://www.google.com/s2/favicons?domain=${template.target_url}&sz=64`} className="w-12 h-12 object-contain" alt="Icon" />
+                                    <TablerIcon name={preset.icon} className="text-5xl text-foreground" />
+                                ) : preset.target_url ? (
+                                    <img src={`https://www.google.com/s2/favicons?domain=${preset.target_url}&sz=64`} className="w-12 h-12 object-contain" alt="Icon" />
                                 ) : (
-                                    <MaterialIcon name="extension" className="text-5xl text-muted-foreground" />
+                                    <TablerIcon name="extension" className="text-5xl text-muted-foreground" />
                                 )}
                             </div>
                             <div>
-                                <p className="page-kicker mb-2">Preset / {preset.category || "General"}</p><h1 className="text-3xl font-bold tracking-[-0.045em] text-white">{preset.title}</h1>
+                                <p className="page-kicker mb-2">Template / {preset.category || "General"}</p><h1 className="text-3xl font-bold tracking-[-0.045em] text-white">{preset.title}</h1>
                                 <PresetAuthor username={preset.author_name || "Unknown"} adminUsername={process.env.ADMIN_USERNAME} />
                             </div>
                         </div>
@@ -386,7 +386,7 @@ export default async function ViewPresetPage({ params, searchParams }: PageProps
                                 activeTab === tab.id ? "text-white" : "text-muted-foreground hover:text-white"
                             }`}
                         >
-                            <MaterialIcon name={tab.icon} className="text-[18px]" />
+                            <TablerIcon name={tab.icon} className="text-[18px]" />
                             {tab.label}
                             {activeTab === tab.id && <span className="absolute inset-x-0 bottom-0 h-0.5 bg-white" />}
                         </Link>
@@ -415,7 +415,7 @@ export default async function ViewPresetPage({ params, searchParams }: PageProps
                         {config.variables && Object.keys(config.variables).length > 0 && (
                             <section>
                                 <h2 className="text-lg font-bold mb-4 flex items-center gap-2">
-                                    <MaterialIcon name="data_object" className="text-muted-foreground" />
+                                    <TablerIcon name="data_object" className="text-muted-foreground" />
                                     Variables
                                 </h2>
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -443,7 +443,7 @@ export default async function ViewPresetPage({ params, searchParams }: PageProps
                         {config.selector && (
                             <section>
                                 <h2 className="text-lg font-bold mb-4 flex items-center gap-2">
-                                    <MaterialIcon name="my_location" className="text-muted-foreground" />
+                                    <TablerIcon name="my_location" className="text-muted-foreground" />
                                     Target Selector
                                 </h2>
                                 <div className="bg-[#0a0a0a] border border-[#262626] rounded-lg p-4 relative group hover:border-zinc-700 transition-colors">
@@ -471,7 +471,7 @@ export default async function ViewPresetPage({ params, searchParams }: PageProps
                         ) && (
                                 <section>
                                     <h2 className="text-lg font-bold mb-4 flex items-center gap-2">
-                                        <MaterialIcon name="settings" className="text-muted-foreground" />
+                                        <TablerIcon name="settings" className="text-muted-foreground" />
                                         Behavior & Action Config
                                     </h2>
                                     <div className="bg-[#0a0a0a] border border-[#262626] rounded-xl p-6 relative overflow-hidden">
@@ -538,7 +538,7 @@ export default async function ViewPresetPage({ params, searchParams }: PageProps
                         {activeTab === "output" && (
                             <section>
                                 <h2 className="text-lg font-bold mb-4 flex items-center gap-2">
-                                    <MaterialIcon name="output" className="text-muted-foreground" />
+                                    <TablerIcon name="output" className="text-muted-foreground" />
                                     Expected Output
                                 </h2>
                                 {preset.expected_output ? renderExpectedOutput(preset.expected_output) : (

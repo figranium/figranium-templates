@@ -1,5 +1,5 @@
 import Link from "next/link";
-import MaterialIcon from "@/components/MaterialIcon";
+import TablerIcon from "@/components/TablerIcon";
 
 export function CTASection() {
     return (
@@ -15,7 +15,7 @@ export function CTASection() {
                     className="flex h-11 items-center gap-2 rounded-[10px] bg-white px-5 text-[10px] font-bold uppercase tracking-[0.12em] text-black transition hover:bg-white/88"
                 >
                     Read Documentation
-                    <MaterialIcon name="arrow_forward" className="text-sm" />
+                    <TablerIcon name="arrow_forward" className="text-sm" />
                 </Link>
             </div>
         </section>

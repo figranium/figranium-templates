@@ -41,7 +41,7 @@ export default function CodeBlock({ code, language = 'javascript' }: CodeBlockPr
                         : "bg-[#171717]/80 backdrop-blur-sm border-[#262626] text-muted-foreground opacity-0 group-hover:opacity-100 focus:opacity-100 hover:text-foreground hover:border-zinc-700 hover:bg-[#171717]"
                     }`}
             >
-                <MaterialIcon name={copied ? "check" : "content_copy"} className="text-base" aria-hidden="true" />
+                <TablerIcon name={copied ? "check" : "content_copy"} className="text-base" aria-hidden="true" />
             </button>
             <SyntaxHighlighter
                 language={language}

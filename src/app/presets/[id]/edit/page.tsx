@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from "react";
 import { useRouter, useParams } from "next/navigation";
-import MaterialIcon from "@/components/MaterialIcon";
+import TablerIcon from "@/components/TablerIcon";
 
 const ICONS = ["extension", "search", "public", "table_chart", "monitor", "webhook", "smart_toy", "bug_report"];
 const CATEGORIES = ["QA Testing", "Lead Gen", "Social Media", "Shopping", "Monitoring", "AI", "Jobs", "News", "Videos", "Reviews", "Developer Tools", "SEO", "Real Estate", "Travel", "Other"];
@@ -15,7 +15,7 @@ function getDomainFromUrl(url: string) {
     }
 }
 
-export default function EditPresetPage() {
+export default function EditTemplatePage() {
     const params = useParams();
     const router = useRouter();
     const configurationInputRef = useRef<HTMLInputElement>(null);
@@ -36,7 +36,7 @@ export default function EditPresetPage() {
     const [configurationFileName, setConfigurationFileName] = useState("Current template configuration");
     const [iconType, setIconType] = useState<"favicon" | "upload">("upload");
 
-    const presetId = params?.id as string;
+    const templateId = params?.id as string;
 
     const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
@@ -65,12 +65,12 @@ export default function EditPresetPage() {
     };
 
     useEffect(() => {
-        if (!presetId) return;
+        if (!templateId) return;
 
         // Fetch preset details
-        const fetchPreset = async () => {
+        const fetchTemplate = async () => {
             try {
-                const res = await fetch(`/api/presets/${presetId}`);
+                const res = await fetch(`/api/presets/${templateId}`);
                 if (!res.ok) throw new Error("Failed to load template");
                 const data = await res.json();
 
@@ -96,8 +96,8 @@ export default function EditPresetPage() {
                 setLoading(false);
             }
         };
-        fetchPreset();
-    }, [presetId]);
+        fetchTemplate();
+    }, [templateId]);
 
     const handleConfigurationUpload = async (file: File) => {
         setJsonError("");
@@ -147,7 +147,7 @@ export default function EditPresetPage() {
         try {
             JSON.parse(formData.configuration); // Validate JSON
 
-            const res = await fetch(`/api/presets/${presetId}`, {
+            const res = await fetch(`/api/presets/${templateId}`, {
                 method: "PUT",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(formData),
@@ -177,7 +177,7 @@ export default function EditPresetPage() {
 
                 {error && (
                     <div className="mb-6 p-3 bg-red-500/10 border border-red-500/20 text-red-500 text-sm rounded-lg flex items-center gap-2">
-                        <MaterialIcon name="error" className="text-sm" />
+                        <TablerIcon name="error" className="text-sm" />
                         {error}
                     </div>
                 )}
@@ -202,7 +202,7 @@ export default function EditPresetPage() {
                                     className={`flex min-h-56 w-full flex-col items-center justify-center rounded-[14px] border border-dashed bg-white/[0.018] px-6 text-center transition hover:bg-white/[0.035] ${jsonError ? "border-red-500/50" : "border-white/[0.14] hover:border-white/30"}`}
                                 >
                                     <span className="mb-5 flex h-12 w-12 items-center justify-center rounded-[12px] border border-white/[0.1] bg-white/[0.04]">
-                                        <MaterialIcon name="upload_file" className="text-2xl" />
+                                        <TablerIcon name="upload_file" className="text-2xl" />
                                     </span>
                                     <span className="text-[15px] font-semibold">Replace task JSON</span>
                                     <span className="mt-2 max-w-full truncate text-xs text-white/35">{configurationFileName} · click or drop a file · 2 MB max</span>
@@ -298,7 +298,7 @@ export default function EditPresetPage() {
                                                     {formData.icon && formData.icon.startsWith("data:image/") ? (
                                                         <img src={formData.icon} alt="Preview" className="w-full h-full object-cover" />
                                                     ) : (
-                                                        <MaterialIcon name="image" className="text-muted-foreground" />
+                                                        <TablerIcon name="image" className="text-muted-foreground" />
                                                     )}
                                                 </div>
                                                 <label className="flex-1 cursor-pointer bg-[#171717] border border-[#262626] border-dashed hover:bg-[#262626] rounded-lg px-3 py-2 text-xs font-medium text-center transition-colors text-muted-foreground hover:text-foreground">
@@ -313,7 +313,7 @@ export default function EditPresetPage() {
                                             {formData.icon && formData.icon.includes(".") ? (
                                                 <img src={`https://www.google.com/s2/favicons?domain=${formData.icon}&sz=32`} className="w-5 h-5 object-contain" alt="" />
                                             ) : (
-                                                <MaterialIcon name="language" className="text-xl text-muted-foreground" />
+                                                <TablerIcon name="language" className="text-xl text-muted-foreground" />
                                             )}
                                             <input
                                                 type="text"

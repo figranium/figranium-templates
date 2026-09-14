@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useRef } from "react";
-import MaterialIcon from "@/components/MaterialIcon";
+import TablerIcon from "@/components/TablerIcon";
 
 interface DownloadButtonProps {
     presetId: string;
@@ -97,7 +97,7 @@ export default function DownloadButton({ presetId, presetTitle, configJson }: Do
                     : "bg-[#171717] hover:bg-[#262626] text-foreground border-[#262626]"
                     }`}
             >
-                <MaterialIcon name={downloaded ? "check" : "download"} className="text-lg" aria-hidden="true" />
+                <TablerIcon name={downloaded ? "check" : "download"} className="text-lg" aria-hidden="true" />
                 {downloaded ? "Downloaded!" : "Download"}
             </button>
             <button
@@ -108,7 +108,7 @@ export default function DownloadButton({ presetId, presetTitle, configJson }: Do
                     : "bg-[#171717] hover:bg-[#262626] text-foreground border-[#262626]"
                     }`}
             >
-                <MaterialIcon name={copied ? "check" : "content_copy"} className="text-lg" aria-hidden="true" />
+                <TablerIcon name={copied ? "check" : "content_copy"} className="text-lg" aria-hidden="true" />
                 {copied ? "Copied!" : "Copy JSON"}
             </button>
         </div>
