@@ -4,7 +4,7 @@ import { sanitizeUrl } from '@/lib/utils';
 import { z } from 'zod';
 import { getCurrentUser } from '@/lib/current-user';
 import { revalidateTag } from 'next/cache';
-import { PRESET_CATEGORIES } from '@/lib/template-import';
+import { PRESET_CATEGORIES } from '@/lib/preset-import';
 
 export const createPresetSchema = z.object({
     title: z.string().min(3),
