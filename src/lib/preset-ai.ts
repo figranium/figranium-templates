@@ -2,7 +2,7 @@ import { createGoogleGenerativeAI } from "@ai-sdk/google";
 import { createOpenAICompatible } from "@ai-sdk/openai-compatible";
 import { createGateway, generateText, Output } from "ai";
 import { z } from "zod";
-import { PRESET_CATEGORIES, type PresetCategory } from "./template-import";
+import { PRESET_CATEGORIES, type PresetCategory } from "./preset-import";
 import { normalizeMarkdown } from "./markdown";
 
 const generatedPresetSchema = z.object({
