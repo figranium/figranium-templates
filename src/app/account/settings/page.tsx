@@ -128,9 +128,7 @@ export default function AccountSettingsPage() {
                         <div className="mb-3 font-medium text-white">GitHub connection</div>
                         <p className="mb-4">Connect GitHub to this Neon Auth account. If the GitHub account is already linked elsewhere, nothing in your Figranium profile changes.</p>
                         <button type="button" onClick={connectGitHub} disabled={githubLoading} className="inline-flex items-center gap-2 rounded-lg border border-white/15 px-3 py-2 text-sm text-white hover:bg-white/10 disabled:opacity-50">
-                            <svg viewBox="0 0 24 24" aria-hidden="true" className="h-4 w-4 fill-current">
-                                <path d="M12 2C6.477 2 2 6.586 2 12.246c0 4.528 2.865 8.37 6.839 9.727.5.096.683-.223.683-.494 0-.243-.009-.888-.014-1.744-2.782.62-3.369-1.369-3.369-1.369-.455-1.185-1.11-1.5-1.11-1.5-.908-.638.069-.625.069-.625 1.004.072 1.532 1.057 1.532 1.057.892 1.565 2.341 1.113 2.91.851.091-.667.349-1.113.635-1.369-2.221-.259-4.555-1.139-4.555-5.07 0-1.12.39-2.036 1.03-2.753-.104-.259-.447-1.303.098-2.715 0 0 .84-.276 2.75 1.052A9.38 9.38 0 0 1 12 6.932a9.37 9.37 0 0 1 2.504.348c1.909-1.328 2.748-1.052 2.748-1.052.546 1.412.203 2.456.1 2.715.64.717 1.028 1.633 1.028 2.753 0 3.94-2.338 4.808-4.566 5.062.359.32.678.951.678 1.917 0 1.384-.012 2.5-.012 2.84 0 .274.18.595.688.493C19.139 20.612 22 16.773 22 12.246 22 6.586 17.523 2 12 2Z" />
-                            </svg>
+                            <TablerIcon name="external_link" className="h-4 w-4" />
                             {githubLoading ? "Connecting…" : "Connect GitHub"}
                         </button>
                     </div>
