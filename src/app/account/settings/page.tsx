@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import MaterialIcon from "@/components/MaterialIcon";
+import TablerIcon from "@/components/TablerIcon";
 import { authClient } from "@/lib/auth-client";
 
 interface AccountSettings {
@@ -60,7 +60,6 @@ export default function AccountSettingsPage() {
         const trimmedDisplayName = displayName.trim();
         const trimmedProfilePicture = profilePicture.trim();
 
-        // Save to database
         try {
             const response = profileMapped ? await fetch("/api/auth/profile", {
                 method: "PUT",
@@ -70,13 +69,9 @@ export default function AccountSettingsPage() {
                 method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ username: trimmedDisplayName }),
             });
 
-            if (!response.ok) {
-                throw new Error("Failed to save");
-            }
-
+            if (!response.ok) throw new Error("Failed to save");
             if (!profileMapped) setProfileMapped(true);
 
-            // Also keep localStorage for backward compatibility and instant UI updates
             const nextSettings: AccountSettings = {
                 displayName: trimmedDisplayName,
                 profilePicture: trimmedProfilePicture,
@@ -100,7 +95,7 @@ export default function AccountSettingsPage() {
     };
 
     if (loading) {
-        return <div className="flex min-h-[60vh] items-center justify-center gap-3 text-xs text-white/35"><MaterialIcon name="progress_activity" className="animate-spin text-[20px]" />Loading settings…</div>;
+        return <div className="flex min-h-[60vh] items-center justify-center gap-3 text-xs text-white/35"><TablerIcon name="progress_activity" className="animate-spin text-[20px]" />Loading settings…</div>;
     }
 
     const previewInitial = (displayName || username || "U").trim().charAt(0).toUpperCase();
@@ -110,11 +105,7 @@ export default function AccountSettingsPage() {
             <div className="product-panel mx-auto flex max-w-4xl flex-col gap-8 p-7 sm:p-10 lg:p-12">
                 <div className="flex items-center gap-3">
                     <div className="flex h-12 w-12 items-center justify-center rounded-full border border-white/10 bg-white/10 text-xl font-semibold">
-                        {profilePicture ? (
-                            <img src={profilePicture} alt="Profile preview" className="h-12 w-12 rounded-full object-cover" />
-                        ) : (
-                            previewInitial
-                        )}
+                        {profilePicture ? <img src={profilePicture} alt="Profile preview" className="h-12 w-12 rounded-full object-cover" /> : previewInitial}
                     </div>
                     <div>
                         <p className="page-kicker">Account / Profile</p>
@@ -125,22 +116,12 @@ export default function AccountSettingsPage() {
                 <form onSubmit={handleSave} className="flex flex-col gap-6">
                     <label className="flex flex-col gap-3 rounded-2xl border border-white/10 bg-[#121212] p-4 text-sm text-white/70">
                         <span className="font-medium text-white">{profileMapped ? "Display name" : "Username"}</span>
-                        <input
-                            value={displayName}
-                            onChange={(event) => setDisplayName(event.target.value)}
-                            placeholder={profileMapped ? "How you want to appear" : "Choose a username"}
-                            className="rounded-xl border border-white/10 bg-black/40 px-4 py-3 text-sm text-white outline-none transition focus:border-white/30"
-                        />
+                        <input value={displayName} onChange={(event) => setDisplayName(event.target.value)} placeholder={profileMapped ? "How you want to appear" : "Choose a username"} className="rounded-xl border border-white/10 bg-black/40 px-4 py-3 text-sm text-white outline-none transition focus:border-white/30" />
                     </label>
 
                     {profileMapped && <label className="flex flex-col gap-3 rounded-2xl border border-white/10 bg-[#121212] p-4 text-sm text-white/70">
                         <span className="font-medium text-white">Profile picture URL</span>
-                        <input
-                            value={profilePicture}
-                            onChange={(event) => setProfilePicture(event.target.value)}
-                            placeholder="https://example.com/avatar.jpg"
-                            className="rounded-xl border border-white/10 bg-black/40 px-4 py-3 text-sm text-white outline-none transition focus:border-white/30"
-                        />
+                        <input value={profilePicture} onChange={(event) => setProfilePicture(event.target.value)} placeholder="https://example.com/avatar.jpg" className="rounded-xl border border-white/10 bg-black/40 px-4 py-3 text-sm text-white outline-none transition focus:border-white/30" />
                     </label>}
 
                     <div className="rounded-2xl border border-white/10 bg-[#121212] p-5 text-sm text-white/60">
@@ -154,18 +135,10 @@ export default function AccountSettingsPage() {
                         </button>
                     </div>
 
-                    <div className="rounded-2xl border border-white/10 bg-[#121212] p-5 text-sm leading-6 text-white/60">
-                        Your display name and profile picture appear in the account dropdown and around the app once saved.
-                    </div>
+                    <div className="rounded-2xl border border-white/10 bg-[#121212] p-5 text-sm leading-6 text-white/60">Your display name and profile picture appear in the account dropdown and around the app once saved.</div>
 
                     <div className="flex items-center gap-3">
-                        <button
-                            type="submit"
-                            className="primary-action flex items-center gap-2 px-4 transition hover:bg-white/88"
-                        >
-                            <MaterialIcon name="save" className="text-base" />
-                            Save changes
-                        </button>
+                        <button type="submit" className="primary-action flex items-center gap-2 px-4 transition hover:bg-white/88"><TablerIcon name="save" className="text-base" />Save changes</button>
                         {saved && <span className="text-sm text-emerald-400">Saved successfully</span>}
                     </div>
                 </form>
