@@ -1,13 +1,13 @@
 import { NextResponse } from "next/server";
 import { getCurrentUser } from "@/lib/current-user";
-import { generatePresetCopy } from "@/lib/template-ai";
+import { generatePresetCopy } from "@/lib/preset-ai";
 import {
     createAiTaskContext,
     derivePresetMetadata,
     resolvePresetTask,
     sanitizePresetConfiguration,
     withGettingStartedStickyNote,
-} from "@/lib/template-import";
+} from "@/lib/preset-import";
 
 export const runtime = "nodejs";
 
