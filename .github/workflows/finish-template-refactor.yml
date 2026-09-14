@@ -1,0 +1,79 @@
+name: Finish templates refactor
+
+on:
+  push:
+    branches:
+      - rename-presets-tabler-icons
+
+permissions:
+  contents: write
+
+jobs:
+  refactor:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: rename-presets-tabler-icons
+
+      - name: Finish terminology and icon migration
+        shell: python
+        run: |
+          from pathlib import Path
+
+          root = Path('.')
+
+          # Every remaining legacy MaterialIcon caller now imports TablerIcon directly.
+          for path in root.glob('src/**/*.tsx'):
+              if path.name in {'MaterialIcon.tsx', 'TablerIcon.tsx'}:
+                  continue
+              text = path.read_text()
+              original = text
+              text = text.replace('import MaterialIcon from "@/components/MaterialIcon";', 'import TablerIcon from "@/components/TablerIcon";')
+              text = text.replace('import MaterialIcon from "./MaterialIcon";', 'import TablerIcon from "./TablerIcon";')
+              text = text.replace('<MaterialIcon', '<TablerIcon')
+              if text != original:
+                  path.write_text(text)
+
+          # Fix legacy half-renames and the last user-facing Preset label on the detail page.
+          detail = Path('src/app/presets/[id]/page.tsx')
+          text = detail.read_text()
+          text = text.replace('template.icon && preset.icon.includes(".")', 'preset.icon && preset.icon.includes(".")')
+          text = text.replace('domain=${template.icon}', 'domain=${preset.icon}')
+          text = text.replace('template.target_url', 'preset.target_url')
+          text = text.replace('>Preset / {preset.category', '>Template / {preset.category')
+          detail.write_text(text)
+
+          # Use template terminology for ordinary page/component identifiers while keeping
+          # route paths and API contracts untouched.
+          edit = Path('src/app/presets/[id]/edit/page.tsx')
+          text = edit.read_text()
+          text = text.replace('EditPresetPage', 'EditTemplatePage')
+          text = text.replace('presetId', 'templateId')
+          text = text.replace('fetchPreset', 'fetchTemplate')
+          edit.write_text(text)
+
+          # The Material Symbols adapter is no longer needed once all callers use TablerIcon.
+          legacy = Path('src/components/MaterialIcon.tsx')
+          if legacy.exists():
+              legacy.unlink()
+
+          # Remove stale Material Symbols CSS hooks if any remain.
+          for path in [Path('src/app/globals.css'), Path('src/app/declutter.css')]:
+              if path.exists():
+                  text = path.read_text()
+                  text = text.replace('.material-symbols-outlined {\n  font-family: \'Material Symbols Outlined\';\n}\n', '')
+                  path.write_text(text)
+
+          # Self-delete: this workflow only exists to make this one repository-wide refactor.
+          Path('.github/workflows/finish-template-refactor.yml').unlink()
+
+      - name: Commit refactor
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git diff --cached --quiet && exit 0
+          git commit -m "Complete templates terminology and Tabler icon migration"
+          git push origin HEAD:rename-presets-tabler-icons
