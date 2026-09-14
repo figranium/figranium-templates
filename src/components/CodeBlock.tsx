@@ -6,7 +6,7 @@ import tsx from 'react-syntax-highlighter/dist/esm/languages/prism/tsx';
 import typescript from 'react-syntax-highlighter/dist/esm/languages/prism/typescript';
 import javascript from 'react-syntax-highlighter/dist/esm/languages/prism/javascript';
 import { vscDarkPlus } from 'react-syntax-highlighter/dist/esm/styles/prism';
-import MaterialIcon from '@/components/MaterialIcon';
+import TablerIcon from '@/components/TablerIcon';
 
 SyntaxHighlighter.registerLanguage('tsx', tsx);
 SyntaxHighlighter.registerLanguage('typescript', typescript);
