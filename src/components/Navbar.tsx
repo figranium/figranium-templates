@@ -49,7 +49,7 @@ export async function Navbar() {
                     <div className="space-y-0.5">
                         <a href="https://figranium.dev/docs" target="_blank" rel="noopener noreferrer" className={navItem} title="Documentation"><TablerIcon name="description" className="text-[19px]" /><span className={navLabel}>Documentation</span></a>
                         <a href="https://figranium.dev/blog" target="_blank" rel="noopener noreferrer" className={navItem} title="Blog"><TablerIcon name="article" className="text-[19px]" /><span className={navLabel}>Blog</span></a>
-                        <a href="https://figranium.dev/releases" target="_blank" rel="noopener noreferrer" className={navItem} title="Releases"><TablerIcon name="rocket_launch" className="text-[19px]" /><span className={navLabel}>Releases</span></a>
+                        <a href="https://figranium.dev/releases" target="_blank" rel="noopener noreferrer" className={navItem} title="Releases"><TablerIcon name="download" className="text-[19px]" /><span className={navLabel}>Releases</span></a>
                     </div>
                 </nav>
 
