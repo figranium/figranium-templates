@@ -98,7 +98,7 @@ export async function getPresets(category?: string, sort?: string, search?: stri
             p.icon,
             p.target_url,
             p.category
-        FROM templates p
+        FROM presets p
         ${whereClause}
         ORDER BY ${orderBy}
     `;
