@@ -6,7 +6,6 @@ import type { Metadata } from "next";
 import CodeBlock from "@/components/CodeBlock";
 import { PresetAuthor } from "@/components/PresetAuthor";
 import { getCurrentUser } from "@/lib/current-user";
-import { sanitizeUrl } from "@/lib/utils";
 import { MarkdownContent } from "@/components/MarkdownContent";
 import Link from "next/link";
 import TaskEmbed from "@/components/TaskEmbed";
@@ -39,6 +38,17 @@ function getVariableDetails(variable: any) {
     const type = variable === null ? 'string' : typeof variable;
     const value = variable !== undefined && variable !== null ? String(variable) : 'No default value';
     return { type, value };
+}
+
+function renderTemplatedUrl(url: string | null | undefined) {
+    const value = url || "N/A";
+    return value.split(/(\{\$[\w.]+\})/g).map((part, index) =>
+        /^\{\$[\w.]+\}$/.test(part) ? (
+            <span key={index} className="rounded-[3px] bg-blue-400/15 px-0.5 font-mono font-medium text-[#60a5fa]">
+                {part}
+            </span>
+        ) : part
+    );
 }
 
 export default async function ViewPresetPage({ params, searchParams }: PageProps) {
@@ -557,9 +567,9 @@ export default async function ViewPresetPage({ params, searchParams }: PageProps
 
                             <div>
                                 <p className="text-xs text-muted-foreground mb-1">Target URL</p>
-                                <a href={sanitizeUrl(preset.target_url)} target="_blank" rel="noopener noreferrer" className="text-sm text-blue-400 hover:underline break-all block">
-                                    {preset.target_url || "N/A"}
-                                </a>
+                                <p className="block break-all text-sm leading-relaxed text-white/70">
+                                    {renderTemplatedUrl(preset.target_url)}
+                                </p>
                             </div>
 
                             <div>
