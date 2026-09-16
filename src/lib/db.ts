@@ -1,7 +1,16 @@
 import { Pool } from 'pg';
 
+function getConnectionString(databaseUrl = process.env.DATABASE_URL) {
+    if (!databaseUrl) return undefined;
+
+    const url = new URL(databaseUrl);
+    url.searchParams.delete('sslmode');
+    url.searchParams.delete('channel_binding');
+    return url.toString();
+}
+
 const pool = new Pool({
-    connectionString: process.env.DATABASE_URL?.replace('?sslmode=require', ''),
+    connectionString: getConnectionString(),
     ssl: {
         rejectUnauthorized: false
     }
