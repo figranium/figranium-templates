@@ -20,7 +20,7 @@ const updatePresetSchema = z.object({
 export async function GET(req: Request, { params }: { params: Promise<{ id: string }> }) {
     try {
         const { id } = await params;
-        const { rows } = await query('SELECT * FROM templates WHERE id = $1', [id]);
+        const { rows } = await query('SELECT * FROM presets WHERE id = $1', [id]);
         if (rows.length === 0) {
             return NextResponse.json({ error: 'Template not found' }, { status: 404 });
         }
@@ -38,14 +38,14 @@ export async function DELETE(req: Request, { params }: { params: Promise<{ id: s
         if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
         // Check ownership
-        const { rows } = await query('SELECT user_id FROM templates WHERE id = $1', [id]);
+        const { rows } = await query('SELECT user_id FROM presets WHERE id = $1', [id]);
         if (rows.length === 0) return NextResponse.json({ error: 'Template not found' }, { status: 404 });
 
         if (rows[0].user_id !== user.id) {
             return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
         }
 
-        await query('DELETE FROM templates WHERE id = $1', [id]);
+        await query('DELETE FROM presets WHERE id = $1', [id]);
 
         return NextResponse.json({ message: 'Template deleted' });
     } catch (error) {
@@ -61,7 +61,7 @@ export async function PUT(req: Request, { params }: { params: Promise<{ id: stri
         if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
         // Check ownership
-        const { rows } = await query('SELECT user_id FROM templates WHERE id = $1', [id]);
+        const { rows } = await query('SELECT user_id FROM presets WHERE id = $1', [id]);
         if (rows.length === 0) return NextResponse.json({ error: 'Template not found' }, { status: 404 });
 
         if (rows[0].user_id !== user.id) {

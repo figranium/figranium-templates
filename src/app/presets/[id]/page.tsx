@@ -20,12 +20,12 @@ interface PageProps {
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
     const { id } = await params;
-    const { rows } = await query('SELECT title FROM templates WHERE id = $1', [id]);
+    const { rows } = await query('SELECT title FROM presets WHERE id = $1', [id]);
     if (rows.length === 0) return { title: "Template Not Found" };
     return { title: rows[0].title };
 }
 async function getPreset(id: string) {
-    const { rows } = await query('SELECT * FROM templates WHERE id = $1', [id]);
+    const { rows } = await query('SELECT * FROM presets WHERE id = $1', [id]);
     if (rows.length === 0) return null;
     return rows[0];
 }
@@ -323,8 +323,8 @@ export default async function ViewPresetPage({ params, searchParams }: PageProps
             <div className="w-full max-w-[1180px] space-y-8">
                 <Link
                     href="/"
-                    aria-label="Back to templates"
-                    title="Back to templates"
+                    aria-label="Back to presets"
+                    title="Back to presets"
                     className="flex h-10 w-10 items-center justify-center rounded-lg border border-white/[0.09] bg-white/[0.025] text-muted-foreground transition-colors hover:border-white/[0.16] hover:bg-white/[0.055] hover:text-white"
                 >
                     <TablerIcon name="arrow_back" className="text-[20px]" />

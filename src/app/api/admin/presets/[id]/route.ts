@@ -9,7 +9,7 @@ export async function DELETE(req: Request, { params }: { params: Promise<{ id: s
             return NextResponse.json({ error: error instanceof Error && error.message === 'UNAUTHORIZED' ? 'Unauthorized' : 'Forbidden' }, { status: error instanceof Error && error.message === 'UNAUTHORIZED' ? 401 : 403 });
         }
 
-        const result = await query('DELETE FROM templates WHERE id = $1', [id]);
+        const result = await query('DELETE FROM presets WHERE id = $1', [id]);
 
         if (result.rowCount === 0) {
             return NextResponse.json({ error: 'Template not found' }, { status: 404 });
