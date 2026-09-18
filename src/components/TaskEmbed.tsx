@@ -30,10 +30,14 @@ export default function TaskEmbed({ task }: TaskEmbedProps) {
         });
 
         const iframe = embed.iframe;
-        // The embed document is fully self-contained: its generated bundle has no
-        // imports. Classic scripts reliably execute in a sandboxed srcdoc, while
-        // the module form can be left inert by browsers in an opaque sandbox.
+        // mountFigraniumEmbed appends the iframe immediately. On Safari, changing
+        // srcdoc after that can race the first navigation and leave the module
+        // script inert in the opaque sandbox, producing a completely black embed.
+        // Detach first, rewrite the self-contained bundle to a classic script, then
+        // append it once so the browser only ever navigates to the working document.
+        iframe.remove();
         iframe.srcdoc = iframe.srcdoc.replace('<script type="module">', '<script>');
+        host.appendChild(iframe);
         iframe.style.width = `${100 / EMBED_SCALE}%`;
         iframe.style.transform = `scale(${EMBED_SCALE})`;
         iframe.style.transformOrigin = "top left";
