@@ -30,14 +30,11 @@ export default function TaskEmbed({ task }: TaskEmbedProps) {
         });
 
         const iframe = embed.iframe;
-        // mountFigraniumEmbed appends the iframe immediately. On Safari, changing
-        // srcdoc after that can race the first navigation and leave the module
-        // script inert in the opaque sandbox, producing a completely black embed.
-        // Detach first, rewrite the self-contained bundle to a classic script, then
-        // append it once so the browser only ever navigates to the working document.
-        iframe.remove();
-        iframe.srcdoc = iframe.srcdoc.replace('<script type="module">', '<script>');
-        host.appendChild(iframe);
+        // The bundled embed is already self-contained and is emitted as a module.
+        // Do not mutate srcdoc after mount: re-navigating the iframe loses the
+        // contentWindow that mountFigraniumEmbed's message listener is bound to,
+        // so the ready/set-task handshake never completes and the empty black
+        // placeholder remains forever.
         iframe.style.width = `${100 / EMBED_SCALE}%`;
         iframe.style.transform = `scale(${EMBED_SCALE})`;
         iframe.style.transformOrigin = "top left";
