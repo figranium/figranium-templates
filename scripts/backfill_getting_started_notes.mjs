@@ -91,10 +91,21 @@ function hasManagedNote(task) {
     return !!getManagedNote(task);
 }
 
-function managedNoteNeedsLayoutUpdate(task) {
+function normalizeGettingStartedContent(content) {
+    let normalized = content.replace(/\r\n?/g, "\n");
+    if (normalized.includes("\\n")) normalized = normalized.replace(/\\n/g, "\n");
+    if (!normalized.includes("\n") && /(?:^|:\s*)1\.\s+[\s\S]*\s2\.\s+/.test(normalized)) {
+        normalized = normalized.replace(/:\s+(?=1\.\s)/, ":\n");
+        normalized = normalized.replace(/\s+(?=(?:[2-9]\d*)\.\s)/g, "\n");
+    }
+    return normalized.trim();
+}
+
+function managedNoteNeedsUpdate(task) {
     const note = getManagedNote(task);
     if (!note) return false;
-    return note.x !== NOTE_LAYOUT.x || note.y !== NOTE_LAYOUT.y || note.width !== NOTE_LAYOUT.width || note.height !== NOTE_LAYOUT.height;
+    const malformedContent = typeof note.content === "string" && normalizeGettingStartedContent(note.content) !== note.content;
+    return malformedContent || note.x !== NOTE_LAYOUT.x || note.y !== NOTE_LAYOUT.y || note.width !== NOTE_LAYOUT.width || note.height !== NOTE_LAYOUT.height;
 }
 
 function withManagedNote(task, content) {
@@ -105,7 +116,7 @@ function withManagedNote(task, content) {
         ...task,
         stickyNotes: [
             ...existingNotes,
-            { id: NOTE_ID, ...NOTE_LAYOUT, content: content.trim(), color: "default" },
+            { id: NOTE_ID, ...NOTE_LAYOUT, content: normalizeGettingStartedContent(content), color: "default" },
         ],
     };
 }
@@ -133,7 +144,7 @@ async function main() {
     const { rows } = await pool.query("SELECT id, title, configuration FROM presets ORDER BY created_at ASC");
     const eligible = rows
         .map(row => ({ ...row, task: resolveTask(typeof row.configuration === "string" ? JSON.parse(row.configuration) : row.configuration) }))
-        .filter(row => force || !hasManagedNote(row.task) || managedNoteNeedsLayoutUpdate(row.task))
+        .filter(row => force || !hasManagedNote(row.task) || managedNoteNeedsUpdate(row.task))
         .slice(offset, limit && Number.isFinite(limit) && limit > 0 ? offset + Math.floor(limit) : undefined);
 
     console.log(`${eligible.length} preset${eligible.length === 1 ? "" : "s"} ready for getting-started note backfill/normalization.`);
