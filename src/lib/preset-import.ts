@@ -23,6 +23,47 @@ function isObject(value: unknown): value is JsonObject {
     return !!value && typeof value === "object" && !Array.isArray(value);
 }
 
+export function normalizeGettingStartedContent(content: string): string {
+    let normalized = content.replace(/\r\n?/g, "\n");
+
+    // Some generated notes were stored with escaped newlines, while older
+    // generated numbered instructions were stored as one long sentence.
+    if (normalized.includes("\\n")) normalized = normalized.replace(/\\n/g, "\n");
+    if (!normalized.includes("\n") && /(?:^|:\s*)1\.\s+[\s\S]*\s2\.\s+/.test(normalized)) {
+        normalized = normalized.replace(/:\s+(?=1\.\s)/, ":\n");
+        normalized = normalized.replace(/\s+(?=(?:[2-9]\d*)\.\s)/g, "\n");
+    }
+
+    return normalized.trim();
+}
+
+function getGettingStartedNote(task: JsonObject): JsonObject | undefined {
+    return Array.isArray(task.stickyNotes)
+        ? task.stickyNotes.find(note => isObject(note) && note.id === GETTING_STARTED_NOTE_ID)
+        : undefined;
+}
+
+export function preserveGettingStartedStickyNote(existingTask: JsonObject, incomingTask: JsonObject): JsonObject {
+    const existingNote = getGettingStartedNote(existingTask);
+    const incomingNotes = Array.isArray(incomingTask.stickyNotes) ? incomingTask.stickyNotes : [];
+    const incomingNote = getGettingStartedNote(incomingTask);
+    const noteToKeep = incomingNote || existingNote;
+
+    if (!noteToKeep) return incomingTask;
+
+    const content = typeof noteToKeep.content === "string"
+        ? normalizeGettingStartedContent(noteToKeep.content)
+        : noteToKeep.content;
+
+    return {
+        ...incomingTask,
+        stickyNotes: [
+            ...incomingNotes.filter(note => !isObject(note) || note.id !== GETTING_STARTED_NOTE_ID),
+            { ...noteToKeep, content },
+        ],
+    };
+}
+
 export function resolvePresetTask(input: unknown): { task: JsonObject; taskCount: number } {
     if (!isObject(input)) throw new Error("The JSON must contain a Figranium task object.");
 
@@ -51,7 +92,7 @@ export function withGettingStartedStickyNote(task: JsonObject, content: string):
             {
                 id: GETTING_STARTED_NOTE_ID,
                 ...GETTING_STARTED_NOTE_LAYOUT,
-                content: content.trim(),
+                content: normalizeGettingStartedContent(content),
                 color: "default",
             },
         ],
