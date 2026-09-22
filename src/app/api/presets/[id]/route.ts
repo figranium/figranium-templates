@@ -3,6 +3,7 @@ import { query } from '@/lib/db';
 import { sanitizeUrl } from '@/lib/utils';
 import { z } from 'zod';
 import { getCurrentUser } from '@/lib/current-user';
+import { preserveGettingStartedStickyNote, resolvePresetTask } from '@/lib/preset-import';
 
 const updatePresetSchema = z.object({
     title: z.string().min(3).optional(),
@@ -61,7 +62,7 @@ export async function PUT(req: Request, { params }: { params: Promise<{ id: stri
         if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
         // Check ownership
-        const { rows } = await query('SELECT user_id FROM presets WHERE id = $1', [id]);
+        const { rows } = await query('SELECT user_id, configuration FROM presets WHERE id = $1', [id]);
         if (rows.length === 0) return NextResponse.json({ error: 'Template not found' }, { status: 404 });
 
         if (rows[0].user_id !== user.id) {
@@ -95,17 +96,26 @@ export async function PUT(req: Request, { params }: { params: Promise<{ id: stri
         // Handle config URL extraction if config changed
         if (configuration) {
             fields.push(`configuration = $${idx++}`);
-            values.push(configuration);
+            let configurationToSave = configuration;
+            let parsedTask: Record<string, unknown> | undefined;
 
             try {
                 const config = JSON.parse(configuration);
-                const task = Array.isArray(config?.tasks) && config.tasks.length > 0 ? config.tasks[0] : config;
-                const safeUrl = sanitizeUrl(task?.url);
-                if (safeUrl) {
-                    fields.push(`target_url = $${idx++}`);
-                    values.push(safeUrl);
-                }
+                const { task } = resolvePresetTask(config);
+                parsedTask = task;
+                const storedConfig = typeof rows[0].configuration === 'string'
+                    ? JSON.parse(rows[0].configuration)
+                    : rows[0].configuration;
+                const { task: existingTask } = resolvePresetTask(storedConfig);
+                configurationToSave = JSON.stringify(preserveGettingStartedStickyNote(existingTask, task));
             } catch { }
+
+            values.push(configurationToSave);
+            const safeUrl = typeof parsedTask?.url === 'string' ? sanitizeUrl(parsedTask.url) : null;
+            if (safeUrl) {
+                fields.push(`target_url = $${idx++}`);
+                values.push(safeUrl);
+            }
         }
 
         if (fields.length === 0) return NextResponse.json({ message: 'No changes' });
