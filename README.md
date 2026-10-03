@@ -14,6 +14,7 @@ Figranium Templates is an open marketplace where users can share and discover au
 - **Download Configs** — Download or copy template configurations as JSON, ready to import
 - **AI-assisted publishing** — Upload a Figranium JSON export; deterministic metadata is extracted and AI generates the marketplace copy and README
 - **Creator Dashboard** — Manage your submitted templates and track downloads
+- **Embedded import tracking** — Successful imports from Figranium count as downloads, at most once per template and persistent installation, without limiting repeat imports.
 
 ## How It Works
 
@@ -65,6 +66,10 @@ Until automatic failed-login detection is added, an existing user must open:
 The page verifies the old bcrypt password, creates a new Neon Auth credential through the supported SDK, and then maps that Neon identity to the existing `public.users` row. It does not import password hashes, create application-managed session cookies, or write directly to `neon_auth`.
 
 The mapping is stored in `public.users.neon_auth_user_id`, created by `db/migrations/20260901_add_neon_auth_mapping.sql`. The current standard Neon Auth sign-in page does **not** yet automatically redirect a failed legacy-password login to this transition page.
+
+### Embedded import tracking deployment
+
+Set `TEMPLATE_IMPORT_HASH_SECRET` to a stable, random server-side secret in the Templates deployment. Apply `db/migrations/20261003_preset_import_instances.sql` to existing databases before enabling the import endpoint. Keep the secret unchanged so previously counted installations remain deduplicated. The hub stores only an HMAC of each installation ID, never the raw ID. The Figranium server stores its own independent ID in its persistent `data/template-instance-id` file; it does not depend on optional telemetry. Successful in-app imports increment the same `presets.downloads` metric as website downloads, once per template and installation. This is installation-based deduplication, not a guarantee against deliberate ID spoofing or reinstalling without preserving data.
 
 ## Under the Hood
 
