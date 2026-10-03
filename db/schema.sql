@@ -73,3 +73,12 @@ CREATE INDEX IF NOT EXISTS idx_users_username ON users(username);
 CREATE INDEX IF NOT EXISTS idx_presets_downloads ON presets(downloads DESC);
 CREATE INDEX IF NOT EXISTS idx_presets_created_at ON presets(created_at DESC);
 CREATE INDEX IF NOT EXISTS idx_presets_category ON presets(category);
+
+-- One counted in-app import per template and persistent Figranium installation.
+-- The installation identifier is HMAC-hashed before it is stored.
+CREATE TABLE IF NOT EXISTS preset_import_instances (
+    preset_id UUID NOT NULL REFERENCES presets(id) ON DELETE CASCADE,
+    instance_hash TEXT NOT NULL,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (preset_id, instance_hash)
+);
