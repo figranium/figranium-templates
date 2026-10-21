@@ -121,12 +121,13 @@ export const PresetCard = memo(function PresetCard({ id, title, description, aut
     if (targetUrl) {
         try { host = new URL(targetUrl.startsWith("http") ? targetUrl : `https://${targetUrl}`).hostname; } catch { host = targetUrl; }
     }
+    const hostParts = host.split(/(\\{\\$[\\w.^-]+\\})/g);
     return (
         <Link href={`/presets/${id}`} aria-label={`Open ${title} template`} className="catalog-card">
             <div className="catalog-card-top"><div className="catalog-card-icon"><PresetIcon icon={icon} /></div><span className="catalog-category">{category || "Other"}</span></div>
             <h2>{title}</h2>
             <p className="catalog-description">{description || "A community automation template."}</p>
-            <div className="catalog-meta"><span><TablerIcon name="public" /> {host}</span>{actionCount != null && <span><TablerIcon name="format_list_numbered" /> {actionCount} steps</span>}</div>
+            <div className="catalog-meta"><span><TablerIcon name="public" /> {hostParts.map((part, index) => /^\\{\\$[\\w.^-]+\\}$/.test(part) ? <code key={index} className="catalog-variable">{part}</code> : <span key={index}>{part}</span>)}</span>{actionCount != null && <span><TablerIcon name="format_list_numbered" /> {actionCount} steps</span>}</div>
             <div className="catalog-card-footer"><AuthorCell username={author} isAdmin={isAdmin} /><span className="card-action">View template <TablerIcon name="arrow_forward" /></span></div>
         </Link>
     );
