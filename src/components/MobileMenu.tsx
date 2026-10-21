@@ -18,7 +18,7 @@ export function MobileMenu({ isLoggedIn, isAdmin, signOutNode }: MobileMenuProps
         <div className="lg:hidden">
             <button
                 onClick={() => setIsOpen(true)}
-                className="flex h-10 w-10 items-center justify-center text-white/55 transition hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/50"
+                className="flex h-10 w-10 items-center justify-center text-slate-600 transition hover:text-slate-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
                 aria-label="Open Mobile Menu"
                 aria-expanded={isOpen}
             >
@@ -27,13 +27,13 @@ export function MobileMenu({ isLoggedIn, isAdmin, signOutNode }: MobileMenuProps
 
             {isOpen && (
                 <div
-                    className="fixed inset-0 z-40 h-dvh w-screen bg-black/70 backdrop-blur-sm"
+                    className="fixed inset-0 z-40 h-dvh w-screen bg-slate-900/40 backdrop-blur-sm"
                     onClick={() => setIsOpen(false)}
                 />
             )}
 
-            <div
-                className={`fixed right-0 top-0 z-50 h-dvh w-[min(88vw,320px)] transform border-l border-white/[0.09] bg-[#050505] transition-transform duration-300 ease-in-out ${isOpen ? "translate-x-0" : "translate-x-full"}`}
+            {isOpen && <div
+                className={`fixed right-0 top-0 z-50 h-dvh w-[min(88vw,320px)] transform border-l border-slate-200 bg-[#ffffff] transition-transform duration-300 ease-in-out ${isOpen ? "translate-x-0" : "translate-x-full"}`}
             >
                 <div className="flex h-full flex-col p-5">
                     <div className="flex justify-between items-center mb-8">
@@ -49,10 +49,11 @@ export function MobileMenu({ isLoggedIn, isAdmin, signOutNode }: MobileMenuProps
 
                     <div className="flex flex-col gap-1 text-[13px]">
                         <AppNavLink href="/" icon="explore" mobile>Template Store</AppNavLink>
-                        <a href="https://figranium.dev/docs" target="_blank" rel="noopener noreferrer" className="flex h-11 items-center gap-3 rounded-[10px] px-3 text-white/48 hover:bg-white/[0.04] hover:text-white"><TablerIcon name="description" className="text-[19px]" />Documentation</a>
-                        <a href="https://figranium.dev/blog" target="_blank" rel="noopener noreferrer" className="flex h-11 items-center gap-3 rounded-[10px] px-3 text-white/48 hover:bg-white/[0.04] hover:text-white"><TablerIcon name="article" className="text-[19px]" />Blog</a>
+                        <a href="https://figranium.dev/docs" target="_blank" rel="noopener noreferrer" className="flex h-11 items-center gap-3 rounded-[10px] px-3 text-slate-600 hover:bg-slate-100 hover:text-slate-900"><TablerIcon name="description" className="text-[19px]" />Documentation</a>
+                        <a href="https://community.figranium.dev" className="flex h-11 items-center gap-3 rounded-[10px] px-3 text-slate-600 hover:bg-slate-100 hover:text-slate-900"><TablerIcon name="groups" className="text-[19px]" />Community</a>
+                        <a href="https://figranium.dev/blog" target="_blank" rel="noopener noreferrer" className="flex h-11 items-center gap-3 rounded-[10px] px-3 text-slate-600 hover:bg-slate-100 hover:text-slate-900"><TablerIcon name="article" className="text-[19px]" />Blog</a>
 
-                        <div className="my-3 h-px w-full bg-white/[0.08]" />
+                        <div className="my-3 h-px w-full bg-slate-100" />
 
                         {isLoggedIn ? (
                             <>
@@ -60,6 +61,7 @@ export function MobileMenu({ isLoggedIn, isAdmin, signOutNode }: MobileMenuProps
                                     <AppNavLink href="/admin" icon="admin_panel_settings" mobile>Administration</AppNavLink>
                                 )}
                                 <AppNavLink href="/dashboard" icon="dashboard" mobile>My templates</AppNavLink>
+                                <AppNavLink href="/presets/new" icon="add_box" mobile>Share a template</AppNavLink>
                                 <div className="pt-2">
                                     {signOutNode}
                                 </div>
@@ -67,14 +69,14 @@ export function MobileMenu({ isLoggedIn, isAdmin, signOutNode }: MobileMenuProps
                         ) : (
                             <Link
                                 href="/auth/signin"
-                                className="flex h-11 items-center justify-center gap-2 rounded-[10px] bg-white px-4 text-[10px] font-bold uppercase tracking-[0.13em] text-black"
+                                className="flex h-11 items-center justify-center gap-2 rounded-[10px] bg-[#227bf4] px-4 text-[10px] font-bold text-white"
                             >
                                 Sign In
                             </Link>
                         )}
                     </div>
                 </div>
-            </div>
+            </div>}
         </div>
     );
 }

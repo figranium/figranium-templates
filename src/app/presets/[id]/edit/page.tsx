@@ -173,7 +173,7 @@ export default function EditTemplatePage() {
     return (
         <div className="flex min-h-[80vh] flex-col items-center justify-center px-5 py-9 sm:px-8 lg:px-10 lg:py-11">
             <div className="product-panel w-full max-w-6xl p-6 md:p-10">
-                <p className="page-kicker mb-3">Workspace / Edit</p><h1 className="mb-2 text-3xl font-bold tracking-[-0.045em]">Edit template</h1><p className="mb-8 text-[13px] text-white/38">Update the task configuration and its marketplace presentation.</p>
+                <h1 className="mb-2 text-3xl font-bold">Edit template</h1><p className="mb-8 text-[13px] text-slate-600">Update the task configuration and its marketplace presentation.</p>
 
                 {error && (
                     <div className="mb-6 p-3 bg-red-500/10 border border-red-500/20 text-red-500 text-sm rounded-lg flex items-center gap-2">
@@ -187,7 +187,7 @@ export default function EditTemplatePage() {
                         {/* Left Column: Configuration */}
                         <div className="space-y-4">
                             <div>
-                                <label className="block text-xs font-medium text-muted-foreground mb-1.5 uppercase tracking-wide">
+                                <label className="block text-xs font-medium text-muted-foreground mb-1.5">
                                     Task Configuration (JSON)
                                 </label>
                                 <button
@@ -199,13 +199,13 @@ export default function EditTemplatePage() {
                                         const file = event.dataTransfer.files[0];
                                         if (file) void handleConfigurationUpload(file);
                                     }}
-                                    className={`flex min-h-56 w-full flex-col items-center justify-center rounded-[14px] border border-dashed bg-white/[0.018] px-6 text-center transition hover:bg-white/[0.035] ${jsonError ? "border-red-500/50" : "border-white/[0.14] hover:border-white/30"}`}
+                                    className={`flex min-h-56 w-full flex-col items-center justify-center rounded-[14px] border border-dashed bg-slate-100 px-6 text-center transition hover:bg-slate-100 ${jsonError ? "border-red-500/50" : "border-slate-200 hover:border-slate-200"}`}
                                 >
-                                    <span className="mb-5 flex h-12 w-12 items-center justify-center rounded-[12px] border border-white/[0.1] bg-white/[0.04]">
+                                    <span className="mb-5 flex h-12 w-12 items-center justify-center rounded-[12px] border border-slate-200 bg-slate-100">
                                         <TablerIcon name="upload_file" className="text-2xl" />
                                     </span>
                                     <span className="text-[15px] font-semibold">Replace task JSON</span>
-                                    <span className="mt-2 max-w-full truncate text-xs text-white/35">{configurationFileName} · click or drop a file · 2 MB max</span>
+                                    <span className="mt-2 max-w-full truncate text-xs text-slate-600">{configurationFileName} · click or drop a file · 2 MB max</span>
                                 </button>
                                 <input
                                     ref={configurationInputRef}
@@ -227,24 +227,24 @@ export default function EditTemplatePage() {
                         <div className="space-y-6">
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 <div>
-                                    <label className="block text-xs font-medium text-muted-foreground mb-1.5 uppercase tracking-wide">
+                                    <label className="block text-xs font-medium text-muted-foreground mb-1.5">
                                         Title
                                     </label>
                                     <input
                                         type="text"
                                         required
-                                        className="w-full bg-[#121212] border border-[#262626] rounded-lg px-3 py-2 text-foreground focus:outline-none focus:border-zinc-700 transition-colors"
+                                        className="w-full bg-[#f4f6f9] border border-[#dce3ed] rounded-lg px-3 py-2 text-foreground focus:outline-none focus:border-zinc-700 transition-colors"
                                         value={formData.title}
                                         onChange={(e) => setFormData({ ...formData, title: e.target.value })}
                                     />
                                 </div>
 
                                 <div>
-                                    <label className="block text-xs font-medium text-muted-foreground mb-1.5 uppercase tracking-wide">
+                                    <label className="block text-xs font-medium text-muted-foreground mb-1.5">
                                         Type
                                     </label>
                                     <select
-                                        className="w-full bg-[#121212] border border-[#262626] rounded-lg px-3 py-2 text-foreground focus:outline-none focus:border-zinc-700 transition-colors opacity-50 cursor-not-allowed"
+                                        className="w-full bg-[#f4f6f9] border border-[#dce3ed] rounded-lg px-3 py-2 text-foreground focus:outline-none focus:border-zinc-700 transition-colors opacity-50 cursor-not-allowed"
                                         value={formData.type}
                                         disabled
                                     >
@@ -255,18 +255,18 @@ export default function EditTemplatePage() {
                             </div>
 
                             <div>
-                                <label className="block text-xs font-medium text-muted-foreground mb-1.5 uppercase tracking-wide">
+                                <label className="block text-xs font-medium text-muted-foreground mb-1.5">
                                     Icon
                                 </label>
                                 <div className="space-y-3">
-                                    <div className="flex bg-[#121212] p-1 rounded-lg border border-[#262626]">
+                                    <div className="flex bg-[#f4f6f9] p-1 rounded-lg border border-[#dce3ed]">
                                         <button
                                             type="button"
                                             onClick={() => {
                                                 setIconType("upload");
                                                 setFormData({ ...formData, icon: "" });
                                             }}
-                                            className={`flex-1 text-xs py-1.5 rounded-md transition-colors ${iconType === "upload" ? "bg-[#262626] text-white" : "text-muted-foreground hover:text-white"}`}
+                                            className={`flex-1 text-xs py-1.5 rounded-md transition-colors ${iconType === "upload" ? "bg-[#dce3ed] text-slate-900" : "text-muted-foreground hover:text-slate-900"}`}
                                         >
                                             Upload Image
                                         </button>
@@ -285,7 +285,7 @@ export default function EditTemplatePage() {
                                                     }
                                                 } catch { }
                                             }}
-                                            className={`flex-1 text-xs py-1.5 rounded-md transition-colors ${iconType === "favicon" ? "bg-[#262626] text-white" : "text-muted-foreground hover:text-white"}`}
+                                            className={`flex-1 text-xs py-1.5 rounded-md transition-colors ${iconType === "favicon" ? "bg-[#dce3ed] text-slate-900" : "text-muted-foreground hover:text-slate-900"}`}
                                         >
                                             Site Favicon
                                         </button>
@@ -294,14 +294,14 @@ export default function EditTemplatePage() {
                                     {iconType === "upload" ? (
                                         <div className="flex flex-col gap-2">
                                             <div className="flex items-center gap-3">
-                                                <div className="w-12 h-12 rounded-lg bg-[#121212] border border-[#262626] flex items-center justify-center overflow-hidden shrink-0">
+                                                <div className="w-12 h-12 rounded-lg bg-[#f4f6f9] border border-[#dce3ed] flex items-center justify-center overflow-hidden shrink-0">
                                                     {formData.icon && formData.icon.startsWith("data:image/") ? (
                                                         <img src={formData.icon} alt="Preview" className="w-full h-full object-cover" />
                                                     ) : (
                                                         <TablerIcon name="image" className="text-muted-foreground" />
                                                     )}
                                                 </div>
-                                                <label className="flex-1 cursor-pointer bg-[#171717] border border-[#262626] border-dashed hover:bg-[#262626] rounded-lg px-3 py-2 text-xs font-medium text-center transition-colors text-muted-foreground hover:text-foreground">
+                                                <label className="flex-1 cursor-pointer bg-[#edf1f7] border border-[#dce3ed] border-dashed hover:bg-[#dce3ed] rounded-lg px-3 py-2 text-xs font-medium text-center transition-colors text-muted-foreground hover:text-foreground">
                                                     Choose Image...
                                                     <input type="file" accept="image/*" className="hidden" onChange={handleImageUpload} />
                                                 </label>
@@ -309,7 +309,7 @@ export default function EditTemplatePage() {
                                             <p className="text-[10px] text-muted-foreground">Image will be cropped to 96x96 pixels</p>
                                         </div>
                                     ) : (
-                                        <div className="bg-[#121212] border border-[#262626] rounded-lg px-3 py-2 text-foreground focus-within:border-zinc-700 transition-colors flex items-center gap-2">
+                                        <div className="bg-[#f4f6f9] border border-[#dce3ed] rounded-lg px-3 py-2 text-foreground focus-within:border-zinc-700 transition-colors flex items-center gap-2">
                                             {formData.icon && formData.icon.includes(".") ? (
                                                 <img src={`https://www.google.com/s2/favicons?domain=${formData.icon}&sz=32`} className="w-5 h-5 object-contain" alt="" />
                                             ) : (
@@ -328,11 +328,11 @@ export default function EditTemplatePage() {
                             </div>
 
                             <div>
-                                <label className="block text-xs font-medium text-muted-foreground mb-1.5 uppercase tracking-wide">
+                                <label className="block text-xs font-medium text-muted-foreground mb-1.5">
                                     Category
                                 </label>
                                 <select
-                                    className="w-full bg-[#121212] border border-[#262626] rounded-lg px-3 py-2 text-foreground focus:outline-none focus:border-zinc-700 transition-colors"
+                                    className="w-full bg-[#f4f6f9] border border-[#dce3ed] rounded-lg px-3 py-2 text-foreground focus:outline-none focus:border-zinc-700 transition-colors"
                                     value={formData.category}
                                     onChange={(e) => setFormData({ ...formData, category: e.target.value })}
                                 >
@@ -343,27 +343,27 @@ export default function EditTemplatePage() {
                             </div>
 
                             <div>
-                                <label className="block text-xs font-medium text-muted-foreground mb-1.5 uppercase tracking-wide">
+                                <label className="block text-xs font-medium text-muted-foreground mb-1.5">
                                     Description
                                 </label>
                                 <textarea
                                     required
                                     rows={4}
-                                    className="w-full bg-[#121212] border border-[#262626] rounded-lg px-3 py-2 text-foreground focus:outline-none focus:border-zinc-700 transition-colors resize-none"
+                                    className="w-full bg-[#f4f6f9] border border-[#dce3ed] rounded-lg px-3 py-2 text-foreground focus:outline-none focus:border-zinc-700 transition-colors resize-none"
                                     value={formData.description}
                                     onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                                 />
                             </div>
 
                             <div>
-                                <label className="flex text-xs font-medium text-muted-foreground mb-1.5 uppercase tracking-wide justify-between">
+                                <label className="flex text-xs font-medium text-muted-foreground mb-1.5 justify-between">
                                     <span>Expected Output</span>
                                     <span className="text-zinc-500 font-normal normal-case">Optional</span>
                                 </label>
                                 <textarea
                                     rows={4}
                                     placeholder="Paste expected JSON, HTML, or CSV output here..."
-                                    className="w-full bg-[#121212] border border-[#262626] rounded-lg px-3 py-2 text-foreground font-mono text-xs focus:outline-none focus:border-zinc-700 transition-colors resize-none"
+                                    className="w-full bg-[#f4f6f9] border border-[#dce3ed] rounded-lg px-3 py-2 text-foreground font-mono text-xs focus:outline-none focus:border-zinc-700 transition-colors resize-none"
                                     value={formData.expected_output}
                                     onChange={(e) => setFormData({ ...formData, expected_output: e.target.value })}
                                 />
@@ -373,14 +373,14 @@ export default function EditTemplatePage() {
                                 <button
                                     type="button"
                                     onClick={() => router.back()}
-                                    className="w-full bg-transparent border border-[#262626] text-muted-foreground font-medium py-2.5 rounded-lg hover:bg-[#171717] hover:text-foreground transition-colors"
+                                    className="w-full bg-transparent border border-[#dce3ed] text-muted-foreground font-medium py-2.5 rounded-lg hover:bg-[#edf1f7] hover:text-foreground transition-colors"
                                 >
                                     Cancel
                                 </button>
                                 <button
                                     type="submit"
                                     disabled={submitting}
-                                    className="primary-action w-full transition hover:bg-white/88 disabled:opacity-50"
+                                    className="primary-action w-full transition hover:bg-blue-700 disabled:opacity-50"
                                 >
                                     {submitting ? "Saving..." : "Save Changes"}
                                 </button>

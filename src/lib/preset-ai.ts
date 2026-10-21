@@ -10,7 +10,7 @@ const generatedPresetSchema = z.object({
     category: z.enum(PRESET_CATEGORIES),
     description: z.string().min(20).max(600),
     readme: z.string().min(600).max(8000).describe("A substantial 300–500 word Markdown README with section headings and useful bullet lists."),
-    gettingStarted: z.string().min(80).max(900).describe("A concise plain-text in-canvas getting-started note with practical first-run instructions for this task."),
+    gettingStarted: z.string().min(80).max(1200).describe("An 80–140 word Markdown in-canvas getting-started note with a heading, a practical list, and inline emphasis or code."),
 });
 
 function getAiModel() {
@@ -71,7 +71,8 @@ export async function generatePresetCopy(input: {
             "Write a substantial 300–500 word README in valid GitHub-flavored Markdown.",
             "The README must use these exact second-level headings: ## Overview, ## What it does, ## Inputs, ## Output, ## How to use, and ## Notes.",
             "Use bullet lists where they improve scanning. Put identifiers in inline code. Do not return an unformatted wall of text.",
-            "Also write a concise gettingStarted note for the task canvas. It must begin with 'Getting started', use plain text with short numbered steps or bullets, and focus only on what the user should configure before the first run, how to run it, and what output to expect.",
+            "Also write a concise gettingStarted note for the task canvas in valid GitHub-flavored Markdown. It must begin with the exact second-level heading `## Getting started`, followed by three to five short list items covering setup, configuration, running the task, and expected output.",
+            "Use bold lead-ins to make the gettingStarted list scannable and inline code for task variables, selectors, actions, or literal values when the task provides them.",
             "Keep gettingStarted compact enough for a sticky note, ideally 80–140 words. Mention the actual task variables or important prerequisites when relevant. Do not mention the Templates Hub, previews, marketplace metadata, or the existence of the sticky note itself.",
             "Do not reproduce secrets, credentials, private values, or unnecessary internal implementation details in marketplace copy or gettingStarted.",
             `Category must be one of: ${PRESET_CATEGORIES.join(", ")}.`,

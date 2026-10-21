@@ -92,9 +92,9 @@ export default function DownloadButton({ presetId, presetTitle, configJson }: Do
             <button
                 onClick={() => void handleAction("download")}
                 aria-label={downloaded ? "Download complete" : `Download ${presetTitle} configuration`}
-                className={`flex min-h-10 flex-1 items-center justify-center gap-2 rounded-[10px] border px-3 text-[10px] font-bold uppercase tracking-[0.1em] transition ${downloaded
+                className={`flex min-h-10 flex-1 items-center justify-center gap-2 rounded-[10px] border px-3 text-[10px] font-bold transition ${downloaded
                     ? "bg-green-500/10 border-green-500/30 text-green-400"
-                    : "bg-[#171717] hover:bg-[#262626] text-foreground border-[#262626]"
+                    : "bg-[#edf1f7] hover:bg-[#dce3ed] text-foreground border-[#dce3ed]"
                     }`}
             >
                 <TablerIcon name={downloaded ? "check" : "download"} className="text-lg" aria-hidden="true" />
@@ -103,9 +103,9 @@ export default function DownloadButton({ presetId, presetTitle, configJson }: Do
             <button
                 onClick={() => void handleAction("copy")}
                 aria-label={copied ? "Copied to clipboard" : `Copy ${presetTitle} configuration to clipboard`}
-                className={`flex min-h-10 flex-1 items-center justify-center gap-2 rounded-[10px] border px-3 text-[10px] font-bold uppercase tracking-[0.1em] transition ${copied
+                className={`flex min-h-10 flex-1 items-center justify-center gap-2 rounded-[10px] border px-3 text-[10px] font-bold transition ${copied
                     ? "bg-green-500/10 border-green-500/30 text-green-400"
-                    : "bg-[#171717] hover:bg-[#262626] text-foreground border-[#262626]"
+                    : "bg-[#edf1f7] hover:bg-[#dce3ed] text-foreground border-[#dce3ed]"
                     }`}
             >
                 <TablerIcon name={copied ? "check" : "content_copy"} className="text-lg" aria-hidden="true" />

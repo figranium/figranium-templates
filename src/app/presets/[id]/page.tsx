@@ -1,3 +1,4 @@
+import { formatTemplateType } from "@/lib/utils";
 import { query } from "@/lib/db";
 import { notFound } from "next/navigation";
 import TablerIcon from "@/components/TablerIcon";
@@ -38,6 +39,10 @@ function getVariableDetails(variable: any) {
     const type = variable === null ? 'string' : typeof variable;
     const value = variable !== undefined && variable !== null ? String(variable) : 'No default value';
     return { type, value };
+}
+
+function formatSettingName(name: string) {
+    return name.replace(/([a-z0-9])([A-Z])/g, '$1 $2').replace(/^./, (letter) => letter.toUpperCase());
 }
 
 function renderTemplatedUrl(url: string | null | undefined) {
@@ -105,12 +110,12 @@ export default async function ViewPresetPage({ params, searchParams }: PageProps
                     const rows = parsed.slice(1);
                     
                     return (
-                        <div className="mt-2 overflow-x-auto border border-[#262626] rounded-lg">
+                        <div className="mt-2 overflow-x-auto border border-[#dce3ed] rounded-lg">
                             <table className="w-full text-left text-xs text-muted-foreground min-w-max wrap-break-word">
-                                <thead className="bg-[#121212] text-foreground uppercase border-b border-[#262626]">
+                                <thead className="bg-[#f4f6f9] text-foreground border-b border-[#dce3ed]">
                                     <tr>
                                         {headers.map((h: any, i: number) => (
-                                            <th key={i} className="px-4 py-3 font-medium border-r border-[#262626]/50 last:border-0 min-w-[150px] max-w-[300px] whitespace-normal">
+                                            <th key={i} className="px-4 py-3 font-medium border-r border-[#dce3ed]/50 last:border-0 min-w-[150px] max-w-[300px] whitespace-normal">
                                                 {String(h)}
                                             </th>
                                         ))}
@@ -118,9 +123,9 @@ export default async function ViewPresetPage({ params, searchParams }: PageProps
                                 </thead>
                                 <tbody>
                                     {rows.map((row: any, i: number) => (
-                                        <tr key={i} className="border-b border-[#262626] last:border-0 hover:bg-[#121212]/50 transition-colors">
+                                        <tr key={i} className="border-b border-[#dce3ed] last:border-0 hover:bg-[#f4f6f9]/50 transition-colors">
                                             {row.map((cell: any, j: number) => (
-                                                <td key={j} className="px-4 py-3 border-r border-[#262626]/50 last:border-0 align-top min-w-[150px] max-w-[300px] whitespace-normal break-words">
+                                                <td key={j} className="px-4 py-3 border-r border-[#dce3ed]/50 last:border-0 align-top min-w-[150px] max-w-[300px] whitespace-normal break-words">
                                                     <div className="line-clamp-3" title={String(cell)}>
                                                         {String(cell)}
                                                     </div>
@@ -140,12 +145,12 @@ export default async function ViewPresetPage({ params, searchParams }: PageProps
                     const rows = parsed;
                     
                     return (
-                        <div className="mt-2 overflow-x-auto border border-[#262626] rounded-lg">
+                        <div className="mt-2 overflow-x-auto border border-[#dce3ed] rounded-lg">
                             <table className="w-full text-left text-xs text-muted-foreground min-w-max wrap-break-word">
-                                <thead className="bg-[#121212] text-foreground uppercase border-b border-[#262626]">
+                                <thead className="bg-[#f4f6f9] text-foreground border-b border-[#dce3ed]">
                                     <tr>
                                         {headers.map((h, i) => (
-                                            <th key={i} className="px-4 py-3 font-medium border-r border-[#262626]/50 last:border-0 min-w-[150px] max-w-[300px] whitespace-normal">
+                                            <th key={i} className="px-4 py-3 font-medium border-r border-[#dce3ed]/50 last:border-0 min-w-[150px] max-w-[300px] whitespace-normal">
                                                 {h}
                                             </th>
                                         ))}
@@ -153,9 +158,9 @@ export default async function ViewPresetPage({ params, searchParams }: PageProps
                                 </thead>
                                 <tbody>
                                     {rows.map((row: any, i: number) => (
-                                        <tr key={i} className="border-b border-[#262626] last:border-0 hover:bg-[#121212]/50 transition-colors">
+                                        <tr key={i} className="border-b border-[#dce3ed] last:border-0 hover:bg-[#f4f6f9]/50 transition-colors">
                                             {headers.map((header, j) => (
-                                                <td key={j} className="px-4 py-3 border-r border-[#262626]/50 last:border-0 align-top min-w-[150px] max-w-[300px] whitespace-normal break-words">
+                                                <td key={j} className="px-4 py-3 border-r border-[#dce3ed]/50 last:border-0 align-top min-w-[150px] max-w-[300px] whitespace-normal break-words">
                                                     <div className="line-clamp-3" title={String(row[header])}>
                                                         {String(row[header] ?? '')}
                                                     </div>
@@ -176,7 +181,7 @@ export default async function ViewPresetPage({ params, searchParams }: PageProps
         // If not tabular JSON, render as code block
         if (trimmed.startsWith('{') || trimmed.startsWith('[')) {
             return (
-                <div className="bg-[#1e1e1e] border border-[#262626] rounded-lg relative group overflow-hidden mt-2">
+                <div className="bg-[#1e1e1e] border border-[#dce3ed] rounded-lg relative group overflow-hidden mt-2">
                     <div className="pl-1">
                         <CodeBlock code={trimmed} language="json" />
                     </div>
@@ -184,7 +189,7 @@ export default async function ViewPresetPage({ params, searchParams }: PageProps
             );
         } else if (trimmed.startsWith('<') && trimmed.includes('>')) {
             return (
-                <div className="bg-[#1e1e1e] border border-[#262626] rounded-lg relative group overflow-hidden mt-2">
+                <div className="bg-[#1e1e1e] border border-[#dce3ed] rounded-lg relative group overflow-hidden mt-2">
                     <div className="pl-1">
                         <CodeBlock code={trimmed} language="html" />
                     </div>
@@ -295,12 +300,12 @@ export default async function ViewPresetPage({ params, searchParams }: PageProps
                 });
 
                 return (
-                    <div className="mt-2 overflow-x-auto border border-[#262626] rounded-lg">
+                    <div className="mt-2 overflow-x-auto border border-[#dce3ed] rounded-lg">
                         <table className="w-full text-left text-xs text-muted-foreground min-w-max wrap-break-word">
-                            <thead className="bg-[#121212] text-foreground uppercase border-b border-[#262626]">
+                            <thead className="bg-[#f4f6f9] text-foreground border-b border-[#dce3ed]">
                                 <tr>
                                     {headers.map((h, i) => (
-                                        <th key={i} className="px-4 py-3 font-medium border-r border-[#262626]/50 last:border-0 min-w-[150px] max-w-[300px] whitespace-normal">
+                                        <th key={i} className="px-4 py-3 font-medium border-r border-[#dce3ed]/50 last:border-0 min-w-[150px] max-w-[300px] whitespace-normal">
                                             {h}
                                         </th>
                                     ))}
@@ -308,9 +313,9 @@ export default async function ViewPresetPage({ params, searchParams }: PageProps
                             </thead>
                             <tbody>
                                 {dataRows.map((row, i) => (
-                                    <tr key={i} className="border-b border-[#262626] last:border-0 hover:bg-[#121212]/50 transition-colors">
+                                    <tr key={i} className="border-b border-[#dce3ed] last:border-0 hover:bg-[#f4f6f9]/50 transition-colors">
                                         {row.map((cell, j) => (
-                                            <td key={j} className="px-4 py-3 border-r border-[#262626]/50 last:border-0 align-top min-w-[150px] max-w-[300px] whitespace-normal break-words">
+                                            <td key={j} className="px-4 py-3 border-r border-[#dce3ed]/50 last:border-0 align-top min-w-[150px] max-w-[300px] whitespace-normal break-words">
                                                 <div className="line-clamp-3" title={cell}>
                                                     {cell}
                                                 </div>
@@ -325,26 +330,17 @@ export default async function ViewPresetPage({ params, searchParams }: PageProps
             }
         }
 
-        return <p className="text-muted-foreground mt-2 whitespace-pre-wrap font-mono text-sm bg-[#121212] p-4 rounded-lg border border-[#262626]">{trimmed}</p>;
+        return <p className="text-muted-foreground mt-2 whitespace-pre-wrap font-mono text-sm bg-[#f4f6f9] p-4 rounded-lg border border-[#dce3ed]">{trimmed}</p>;
     };
 
     return (
         <div className="flex flex-col items-center px-5 py-9 sm:px-8 lg:px-10 lg:py-11">
             <div className="w-full max-w-[1180px] space-y-8">
-                <Link
-                    href="/"
-                    aria-label="Back to presets"
-                    title="Back to presets"
-                    className="flex h-10 w-10 items-center justify-center rounded-lg border border-white/[0.09] bg-white/[0.025] text-muted-foreground transition-colors hover:border-white/[0.16] hover:bg-white/[0.055] hover:text-white"
-                >
-                    <TablerIcon name="arrow_back" className="text-[20px]" />
-                </Link>
-
                 {/* Header Section */}
                 <div className="product-panel flex flex-col items-start justify-between gap-6 p-6 md:flex-row md:items-center md:p-8">
                     <div className="space-y-4">
                         <div className="flex items-center gap-4">
-                            <div className="flex h-16 w-16 items-center justify-center overflow-hidden rounded-[14px] border border-white/[0.09] bg-white/[0.03]">
+                            <div className="flex h-16 w-16 items-center justify-center overflow-hidden rounded-[14px] border border-slate-200 bg-slate-100">
                                 {preset.icon && preset.icon.startsWith("data:image/") ? (
                                     <img src={preset.icon} className="w-16 h-16 object-cover rounded-lg" alt="Icon" />
                                 ) : preset.icon && preset.icon.includes(".") ? (
@@ -358,30 +354,23 @@ export default async function ViewPresetPage({ params, searchParams }: PageProps
                                 )}
                             </div>
                             <div>
-                                <p className="page-kicker mb-2">Template / {preset.category || "General"}</p><h1 className="text-3xl font-bold tracking-[-0.045em] text-white">{preset.title}</h1>
+                                <h1 className="text-3xl font-bold text-slate-900">{preset.title}</h1>
                                 <PresetAuthor username={preset.author_name || "Unknown"} adminUsername={process.env.ADMIN_USERNAME} />
                             </div>
                         </div>
                         <div className="flex items-center gap-3">
-                            <span className="px-2.5 py-1 rounded text-xs font-mono border border-[#262626] bg-[#121212] text-foreground">
-                                {preset.type}
+                            <span className="px-2.5 py-1 rounded text-xs border border-[#dce3ed] bg-[#f4f6f9] text-foreground">
+                                {formatTemplateType(preset.type)}
                             </span>
-                            <span className="px-2.5 py-1 rounded text-xs border border-[#262626] bg-[#121212] text-muted-foreground">
+                            <span className="px-2.5 py-1 rounded text-xs border border-[#dce3ed] bg-[#f4f6f9] text-muted-foreground">
                                 {preset.category || "General"}
                             </span>
                         </div>
                     </div>
 
-                    <div className="flex items-center gap-4">
-                        <div className="text-right hidden md:block">
-                            <p className="text-xl font-mono font-bold">{preset.downloads || 0}</p>
-                            <p className="text-xs text-muted-foreground uppercase tracking-wider">Downloads</p>
-                        </div>
-
-                    </div>
                 </div>
 
-                <nav className="flex overflow-x-auto border-b border-[#262626]" aria-label="Template sections">
+                <nav className="flex overflow-x-auto border-b border-[#dce3ed]" aria-label="Template sections">
                     {[
                         { id: "readme", label: "README", icon: "menu_book" },
                         { id: "task", label: "Task", icon: "account_tree" },
@@ -393,12 +382,12 @@ export default async function ViewPresetPage({ params, searchParams }: PageProps
                             href={`/presets/${id}?tab=${tab.id}`}
                             aria-current={activeTab === tab.id ? "page" : undefined}
                             className={`relative flex shrink-0 items-center gap-2 px-4 py-3 text-sm font-medium transition-colors ${
-                                activeTab === tab.id ? "text-white" : "text-muted-foreground hover:text-white"
+                                activeTab === tab.id ? "text-blue-700" : "text-muted-foreground hover:text-slate-900"
                             }`}
                         >
                             <TablerIcon name={tab.icon} className="text-[18px]" />
                             {tab.label}
-                            {activeTab === tab.id && <span className="absolute inset-x-0 bottom-0 h-0.5 bg-white" />}
+                            {activeTab === tab.id && <span className="absolute inset-x-0 bottom-0 h-0.5 bg-blue-600" />}
                         </Link>
                     ))}
                 </nav>
@@ -408,7 +397,7 @@ export default async function ViewPresetPage({ params, searchParams }: PageProps
                     <div className="lg:col-span-2 space-y-8">
                         {activeTab === "readme" && (
                             <section>
-                                <div className="rounded-xl border border-[#262626] bg-[#0a0a0a] p-6">
+                                <div className="rounded-xl border border-[#dce3ed] bg-[#ffffff] p-6">
                                     {preset.readme ? (
                                         <MarkdownContent>{preset.readme}</MarkdownContent>
                                     ) : (
@@ -424,25 +413,22 @@ export default async function ViewPresetPage({ params, searchParams }: PageProps
                         {activeTab === "inputs" && (<>
                         {config.variables && Object.keys(config.variables).length > 0 && (
                             <section>
-                                <h2 className="text-lg font-bold mb-4 flex items-center gap-2">
+                                <h2 className="text-lg font-bold mb-4 flex items-center gap-2 text-slate-900">
                                     <TablerIcon name="data_object" className="text-muted-foreground" />
                                     Variables
                                 </h2>
+                                <p className="-mt-2 mb-4 text-sm text-muted-foreground">Values used when this template runs.</p>
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                     {Object.entries(config.variables).map(([key, variable]: [string, any]) => {
                                         const { type, value } = getVariableDetails(variable);
                                         return (
-                                            <div key={key} className="bg-[#0a0a0a] border border-[#262626] rounded-lg p-4 relative group hover:border-zinc-700 transition-colors">
-                                                <div className="absolute top-0 left-0 bottom-0 w-1 bg-blue-500/50 group-hover:bg-blue-500 transition-colors" />
-                                                <div className="pl-2">
-                                                    <div className="flex items-center justify-between mb-2">
-                                                        <span className="font-mono text-sm font-bold text-foreground">{key}</span>
-                                                        <span className="text-xs bg-[#121212] border border-[#262626] px-2 py-0.5 rounded text-muted-foreground uppercase">{type}</span>
-                                                    </div>
-                                                    <p className="text-sm text-muted-foreground break-all bg-[#121212] px-3 py-2 rounded border border-[#262626]">
-                                                        {value}
-                                                    </p>
+                                            <div key={key} className="min-w-0 rounded-xl border border-border bg-white p-5">
+                                                <div className="flex items-center justify-between gap-3">
+                                                    <h3 className="min-w-0 break-all text-sm font-bold text-foreground">{key}</h3>
+                                                    <span className="shrink-0 rounded-md bg-secondary px-2.5 py-1 text-xs text-muted-foreground capitalize">{type}</span>
                                                 </div>
+                                                <p className="mt-4 text-xs text-muted-foreground">Default value</p>
+                                                <p className="mt-1 break-words text-sm leading-relaxed text-foreground">{value}</p>
                                             </div>
                                         );
                                     })}
@@ -456,13 +442,10 @@ export default async function ViewPresetPage({ params, searchParams }: PageProps
                                     <TablerIcon name="my_location" className="text-muted-foreground" />
                                     Target Selector
                                 </h2>
-                                <div className="bg-[#0a0a0a] border border-[#262626] rounded-lg p-4 relative group hover:border-zinc-700 transition-colors">
-                                    <div className="absolute top-0 left-0 bottom-0 w-1 bg-pink-500/50 group-hover:bg-pink-500 transition-colors" />
-                                    <div className="pl-2">
-                                        <code className="text-sm text-pink-400 font-mono">
+                                <div className="rounded-xl border border-border bg-white p-5">
+                                        <code className="break-all text-sm text-foreground font-mono">
                                             {config.selector}
                                         </code>
-                                    </div>
                                 </div>
                             </section>
                         )}
@@ -482,28 +465,27 @@ export default async function ViewPresetPage({ params, searchParams }: PageProps
                                 <section>
                                     <h2 className="text-lg font-bold mb-4 flex items-center gap-2">
                                         <TablerIcon name="settings" className="text-muted-foreground" />
-                                        Behavior & Action Config
+                                        Behavior & action settings
                                     </h2>
-                                    <div className="bg-[#0a0a0a] border border-[#262626] rounded-xl p-6 relative overflow-hidden">
-                                        <div className="grid grid-cols-2 md:grid-cols-3 gap-y-4 gap-x-6 text-sm">
+                                    <div className="rounded-xl border border-border bg-white p-5 sm:p-6">
+                                        <div className="grid grid-cols-1 gap-x-8 sm:grid-cols-2">
                                             {[
-                                                { key: 'wait', label: 'Wait Time (ms)' },
-                                                { key: 'rotateUserAgents', label: 'Rotate UA' },
-                                                { key: 'rotateProxies', label: 'Rotate Proxies' },
-                                                { key: 'rotateViewport', label: 'Rotate Viewport' },
-                                                { key: 'humanTyping', label: 'Human Typing' },
+                                                { key: 'wait', label: 'Wait time (ms)' },
+                                                { key: 'rotateUserAgents', label: 'Rotate user agents' },
+                                                { key: 'rotateProxies', label: 'Rotate proxies' },
+                                                { key: 'rotateViewport', label: 'Rotate viewport' },
+                                                { key: 'humanTyping', label: 'Human typing' },
                                                 { key: 'includeShadowDom', label: 'Shadow DOM' },
-                                                { key: 'disableRecording', label: 'Disable Recording' },
-                                                { key: 'statelessExecution', label: 'Stateless Exec' }
+                                                { key: 'disableRecording', label: 'Disable recording' },
+                                                { key: 'statelessExecution', label: 'Stateless execution' }
                                             ].map((cfg) => {
                                                 if (config[cfg.key] === undefined) return null;
                                                 const val = config[cfg.key];
-                                                const isTrue = val === true;
                                                 return (
-                                                    <div key={cfg.key} className="flex flex-col gap-1">
-                                                        <span className="text-xs text-muted-foreground tracking-wide font-medium">{cfg.label}</span>
-                                                        <span className={`inline-flex w-fit items-center px-2 py-0.5 rounded text-xs font-mono font-medium border ${isTrue ? 'bg-green-500/10 text-green-400 border-green-500/20' : 'bg-red-500/10 text-red-400 border-red-500/20'}`}>
-                                                            {String(val)}
+                                                    <div key={cfg.key} className="flex min-w-0 items-center justify-between gap-4 border-b border-border py-3 text-sm">
+                                                        <span className="text-muted-foreground">{cfg.label}</span>
+                                                        <span className={`shrink-0 rounded-md px-2.5 py-1 text-xs font-medium ${val === true ? 'bg-accent text-accent-foreground' : 'bg-secondary text-muted-foreground'}`}>
+                                                            {typeof val === 'boolean' ? (val ? 'Enabled' : 'Disabled') : String(val)}
                                                         </span>
                                                     </div>
                                                 );
@@ -511,15 +493,15 @@ export default async function ViewPresetPage({ params, searchParams }: PageProps
                                         </div>
 
                                         {config.stealth && Object.keys(config.stealth).length > 0 && (
-                                            <div className="mt-6 pt-6 border-t border-[#262626]">
-                                                <h3 className="text-sm font-semibold text-foreground mb-4">Stealth Features</h3>
+                                            <div className="mt-6 pt-6 border-t border-[#dce3ed]">
+                                                <h3 className="text-sm font-semibold text-foreground mb-4">Stealth features</h3>
                                                 <div className="flex flex-wrap gap-2">
                                                     {Object.entries(config.stealth).map(([key, value]) => {
                                                         const isTrue = value === true;
                                                         return (
-                                                            <div key={key} className={`flex items-center gap-1.5 px-2.5 py-1 rounded-md border text-xs font-medium ${isTrue ? 'bg-indigo-500/10 border-indigo-500/20 text-indigo-400' : 'bg-[#121212] border-[#262626] text-muted-foreground'}`}>
-                                                                {isTrue && <div className="w-1.5 h-1.5 rounded-full bg-indigo-500" />}
-                                                                {key}
+                                                            <div key={key} className={`flex items-center gap-2 rounded-md px-3 py-1.5 text-xs ${isTrue ? 'bg-accent text-accent-foreground' : 'bg-secondary text-muted-foreground'}`}>
+                                                                <span>{formatSettingName(key)}</span>
+                                                                <span className="font-semibold">{typeof value === 'boolean' ? (isTrue ? 'On' : 'Off') : String(value)}</span>
                                                             </div>
                                                         );
                                                     })}
@@ -535,7 +517,7 @@ export default async function ViewPresetPage({ params, searchParams }: PageProps
                             config.rotateViewport !== undefined || config.humanTyping !== undefined || config.includeShadowDom !== undefined ||
                             config.disableRecording !== undefined || config.statelessExecution !== undefined || config.stealth
                         ) && (
-                            <div className="rounded-xl border border-dashed border-[#262626] p-8 text-center text-muted-foreground">
+                            <div className="rounded-xl border border-dashed border-[#dce3ed] p-8 text-center text-muted-foreground">
                                 No configurable inputs were defined for this template.
                             </div>
                         )}
@@ -552,7 +534,7 @@ export default async function ViewPresetPage({ params, searchParams }: PageProps
                                     Expected Output
                                 </h2>
                                 {preset.expected_output ? renderExpectedOutput(preset.expected_output) : (
-                                    <div className="rounded-xl border border-dashed border-[#262626] p-8 text-center text-muted-foreground">
+                                    <div className="rounded-xl border border-dashed border-[#dce3ed] p-8 text-center text-muted-foreground">
                                         No expected output example was provided.
                                     </div>
                                 )}
@@ -562,12 +544,12 @@ export default async function ViewPresetPage({ params, searchParams }: PageProps
 
                     {/* Sidebar: Metadata */}
                     <div className="space-y-6">
-                        <div className="bg-[#0a0a0a] border border-[#262626] rounded-xl p-6 space-y-4">
-                            <h3 className="font-bold text-sm uppercase tracking-wide text-muted-foreground mb-2">Template Details</h3>
+                        <div className="bg-[#ffffff] border border-[#dce3ed] rounded-xl p-6 space-y-4">
+                            <h3 className="font-bold text-sm text-muted-foreground mb-2">Template Details</h3>
 
                             <div>
                                 <p className="text-xs text-muted-foreground mb-1">Target URL</p>
-                                <p className="block break-all text-sm leading-relaxed text-white/70">
+                                <p className="block break-all text-sm leading-relaxed text-slate-600">
                                     {renderTemplatedUrl(preset.target_url)}
                                 </p>
                             </div>
@@ -578,8 +560,8 @@ export default async function ViewPresetPage({ params, searchParams }: PageProps
                             </div>
                         </div>
 
-                        <div className="bg-[#0a0a0a] border border-[#262626] rounded-xl p-6">
-                            <h3 className="font-bold text-sm uppercase tracking-wide text-muted-foreground mb-4">Configuration</h3>
+                        <div className="bg-[#ffffff] border border-[#dce3ed] rounded-xl p-6">
+                            <h3 className="font-bold text-sm text-muted-foreground mb-4">Configuration</h3>
                             <DownloadButton
                                 presetId={id}
                                 presetTitle={preset.title}

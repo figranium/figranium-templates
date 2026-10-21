@@ -1,5 +1,7 @@
 "use client";
 
+import { formatTemplateType } from "@/lib/utils";
+
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -72,13 +74,13 @@ export default function AdminDashboardPage() {
         }
     };
 
-    if (loading) return <div className="flex min-h-[60vh] items-center justify-center gap-3 text-xs text-white/35"><TablerIcon name="progress_activity" className="animate-spin text-[20px]" />Loading administration…</div>;
+    if (loading) return <div className="flex min-h-[60vh] items-center justify-center gap-3 text-xs text-slate-600"><TablerIcon name="progress_activity" className="animate-spin text-[20px]" />Loading administration…</div>;
 
     return (
         <div className="px-5 py-9 sm:px-8 lg:px-10 lg:py-11">
             <div className="mx-auto max-w-[1320px]">
                 <div className="mb-8 flex items-end justify-between">
-                    <div><p className="page-kicker mb-3">Workspace / Administration</p><h1 className="flex items-center gap-3 text-3xl font-bold tracking-[-0.045em] text-white"><TablerIcon name="admin_panel_settings" className="text-[28px] text-red-400" />Template administration</h1><p className="mt-2 text-[13px] text-white/38">Review and moderate every template in the ecosystem.</p></div>
+                    <div><h1 className="flex items-center gap-3 text-3xl font-bold text-slate-900"><TablerIcon name="admin_panel_settings" className="text-[28px] text-red-700" />Template administration</h1><p className="mt-2 text-[13px] text-slate-600">Review and moderate every template in the ecosystem.</p></div>
                 </div>
 
                 {error && <div className="text-red-500 mb-4">{error}</div>}
@@ -86,25 +88,24 @@ export default function AdminDashboardPage() {
                 <div className="product-panel overflow-x-auto">
                     <table className="w-full text-left border-collapse">
                         <thead>
-                            <tr className="bg-[#121212] border-b border-[#262626] text-xs uppercase text-muted-foreground">
+                            <tr className="bg-[#f4f6f9] border-b border-[#dce3ed] text-xs text-muted-foreground">
                                 <th className="p-4 font-medium">Author</th>
                                 <th className="p-4 font-medium">Title & Icon</th>
                                 <th className="p-4 font-medium">Type</th>
-                                <th className="p-4 font-medium">Stats</th>
                                 <th className="p-4 font-medium">Created</th>
                                 <th className="p-4 font-medium text-right">Actions</th>
                             </tr>
                         </thead>
                         <tbody>
                             {templates.length === 0 ? (
-                                <tr><td colSpan={6} className="p-8 text-center text-muted-foreground">No templates found on the entire platform.</td></tr>
+                                <tr><td colSpan={5} className="p-8 text-center text-muted-foreground">No templates found on the entire platform.</td></tr>
                             ) : (
                                 templates.map(template => (
-                                    <tr key={template.id} className="border-b border-[#262626] last:border-0 hover:bg-[#0f0f0f] transition-colors group">
-                                        <td className="p-4"><span className="text-sm font-medium text-blue-400">@{template.author_username || "Unknown"}</span></td>
+                                    <tr key={template.id} className="border-b border-[#dce3ed] last:border-0 hover:bg-[#ffffff] transition-colors group">
+                                        <td className="p-4"><span className="text-sm font-medium text-blue-700">@{template.author_username || "Unknown"}</span></td>
                                         <td className="p-4">
                                             <div className="flex items-center gap-3">
-                                                <div className="w-8 h-8 rounded bg-[#171717] flex items-center justify-center overflow-hidden border border-[#262626]">
+                                                <div className="w-8 h-8 rounded bg-[#edf1f7] flex items-center justify-center overflow-hidden border border-[#dce3ed]">
                                                     {template.icon?.startsWith("data:image/") ? (
                                                         <img src={template.icon} className="w-8 h-8 object-cover" alt="" />
                                                     ) : template.icon && template.icon.includes(".") ? (
@@ -120,12 +121,11 @@ export default function AdminDashboardPage() {
                                                 <span className="font-medium truncate max-w-[200px]" title={template.title}>{template.title}</span>
                                             </div>
                                         </td>
-                                        <td className="p-4"><span className="text-xs px-2 py-1 rounded bg-[#171717] border border-[#262626] font-mono">{template.type}</span></td>
-                                        <td className="p-4 text-sm text-muted-foreground">{template.downloads || 0}</td>
+                                        <td className="p-4"><span className="text-xs px-2 py-1 rounded bg-[#edf1f7] border border-[#dce3ed]">{formatTemplateType(template.type)}</span></td>
                                         <td className="p-4 text-sm text-muted-foreground">{new Date(template.created_at).toLocaleDateString()}</td>
                                         <td className="p-4 text-right">
                                             <div className="flex justify-end gap-2">
-                                                <Link href={`/presets/${template.id}/edit`}><button className="p-2 hover:bg-[#262626] rounded text-muted-foreground hover:text-foreground transition-colors" title="Edit globally"><TablerIcon name="edit" className="text-lg" /></button></Link>
+                                                <Link href={`/presets/${template.id}/edit`}><button className="p-2 hover:bg-[#dce3ed] rounded text-muted-foreground hover:text-foreground transition-colors" title="Edit globally"><TablerIcon name="edit" className="text-lg" /></button></Link>
                                                 <button onClick={() => handleDelete(template.id)} className="p-2 hover:bg-red-900/20 rounded text-muted-foreground hover:text-red-500 transition-colors" title="Delete globally"><TablerIcon name="delete" className="text-lg" /></button>
                                             </div>
                                         </td>

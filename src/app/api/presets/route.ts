@@ -6,7 +6,7 @@ import { getCurrentUser } from '@/lib/current-user';
 import { revalidateTag } from 'next/cache';
 import { PRESET_CATEGORIES } from '@/lib/preset-import';
 
-export const createPresetSchema = z.object({
+const createPresetSchema = z.object({
     title: z.string().min(3),
     description: z.string().min(10),
     type: z.enum(['AGENT', 'SCRAPE']),

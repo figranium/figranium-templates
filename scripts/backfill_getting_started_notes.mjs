@@ -48,7 +48,7 @@ const pool = new Pool({
 });
 
 const schema = z.object({
-    gettingStarted: z.string().min(80).max(900),
+    gettingStarted: z.string().min(80).max(1200).describe("An 80–140 word Markdown getting-started note with a heading, a practical list, and inline emphasis or code."),
 });
 
 const isObject = value => !!value && typeof value === "object" && !Array.isArray(value);
@@ -101,6 +101,29 @@ function normalizeGettingStartedContent(content) {
     return normalized.trim();
 }
 
+function inspectMarkdown(content) {
+    const normalized = normalizeGettingStartedContent(content);
+    const words = normalized ? normalized.split(/\s+/).length : 0;
+    const listItems = normalized.match(/^\s*(?:[-*+]\s+|\d+\.\s+)\S/gm)?.length || 0;
+    return {
+        words,
+        hasHeading: /^## Getting started\s*$/m.test(normalized),
+        listItems,
+        hasInlineFormatting: /(?:\*\*[^\n*]+\*\*|__[^\n_]+__|`[^`\n]+`)/.test(normalized),
+    };
+}
+
+function assertEnoughMarkdown(content) {
+    const metrics = inspectMarkdown(content);
+    const failures = [];
+    if (!metrics.hasHeading) failures.push("the exact `## Getting started` heading");
+    if (metrics.listItems < 3) failures.push("at least three Markdown list items");
+    if (!metrics.hasInlineFormatting) failures.push("inline emphasis or code");
+    if (metrics.words < 60 || metrics.words > 160) failures.push("60–160 words");
+    if (failures.length > 0) throw new Error(`Generated note is missing ${failures.join(", ")}.`);
+    return metrics;
+}
+
 function managedNoteNeedsUpdate(task) {
     const note = getManagedNote(task);
     if (!note) return false;
@@ -122,22 +145,33 @@ function withManagedNote(task, content) {
 }
 
 async function generateGettingStarted(task) {
-    const { output } = await generateText({
-        model,
-        abortSignal: AbortSignal.timeout(180_000),
-        output: Output.object({ schema }),
-        system: [
-            "Write a concise getting-started note for a Figranium browser automation task.",
-            "Inspect the complete task JSON and stay strictly grounded in its variables, URLs, actions, extraction logic, settings, and output.",
-            "Begin exactly with 'Getting started'. Use plain text with short numbered steps or bullets.",
-            "Focus on what the user should configure before the first run, how to run it, and what output to expect.",
-            "Keep it compact enough for a sticky note, ideally 80–140 words.",
-            "Do not mention the Templates Hub, previews, marketplace metadata, or the existence of the sticky note itself.",
-            "Never reproduce secrets, credentials, private values, or unsupported assumptions.",
-        ].join(" "),
-        prompt: `Create the getting-started guidance for this task:\n\n\`\`\`json\n${JSON.stringify(redact(task), null, 2)}\n\`\`\``,
-    });
-    return output.gettingStarted;
+    let validationFeedback = "";
+    for (let attempt = 1; attempt <= 3; attempt += 1) {
+        const { output } = await generateText({
+            model,
+            abortSignal: AbortSignal.timeout(180_000),
+            output: Output.object({ schema }),
+            system: [
+                "Write a concise getting-started note for a Figranium browser automation task.",
+                "Inspect the complete task JSON and stay strictly grounded in its variables, URLs, actions, extraction logic, settings, and output.",
+                "Return valid GitHub-flavored Markdown beginning with the exact second-level heading `## Getting started`.",
+                "After the heading, use three to five short list items that cover setup, configuration, running the task, and expected output.",
+                "Use bold lead-ins to make the list scannable and inline code for task variables, selectors, actions, or literal values when the task provides them.",
+                "Keep it compact enough for a sticky note, ideally 80–140 words.",
+                "Do not mention the Templates Hub, previews, marketplace metadata, or the existence of the sticky note itself.",
+                "Never reproduce secrets, credentials, private values, or unsupported assumptions.",
+            ].join(" "),
+            prompt: `Create the getting-started guidance for this task.${validationFeedback}\n\n\`\`\`json\n${JSON.stringify(redact(task), null, 2)}\n\`\`\``,
+        });
+        try {
+            assertEnoughMarkdown(output.gettingStarted);
+            return output.gettingStarted;
+        } catch (error) {
+            if (attempt === 3) throw error;
+            validationFeedback = ` The previous attempt failed validation: ${error instanceof Error ? error.message : "insufficient Markdown"} Please correct every issue.`;
+        }
+    }
+    throw new Error("Unable to generate a valid Markdown note.");
 }
 
 async function main() {
@@ -150,33 +184,49 @@ async function main() {
     console.log(`${eligible.length} preset${eligible.length === 1 ? "" : "s"} ready for getting-started note backfill/normalization.`);
     if (dryRun || eligible.length === 0) return;
 
-    let completed = 0;
-    let skipped = 0;
+    const updates = [];
     for (const preset of eligible) {
-        try {
-            const existingManagedNote = getManagedNote(preset.task);
-            const existingContent = isObject(existingManagedNote) && typeof existingManagedNote.content === "string"
-                ? existingManagedNote.content.trim()
-                : "";
-            const gettingStarted = !force && existingContent
-                ? existingContent
-                : await generateGettingStarted(preset.task);
-            const updatedTask = withManagedNote(preset.task, gettingStarted);
-            await pool.query(
-                "UPDATE presets SET configuration=$2, updated_at=CURRENT_TIMESTAMP WHERE id=$1",
-                [preset.id, JSON.stringify(sanitize(updatedTask))],
-            );
-            completed += 1;
-            console.log(`[${completed}/${eligible.length}] Updated ${preset.title}`);
-            await pause(500);
-        } catch (error) {
-            skipped += 1;
-            console.error(`Skipped ${preset.title}: ${error instanceof Error ? error.message : "Unknown error"}`);
-        }
+        const existingManagedNote = getManagedNote(preset.task);
+        const existingContent = isObject(existingManagedNote) && typeof existingManagedNote.content === "string"
+            ? existingManagedNote.content.trim()
+            : "";
+        const gettingStarted = !force && existingContent
+            ? existingContent
+            : await generateGettingStarted(preset.task);
+        const metrics = assertEnoughMarkdown(gettingStarted);
+        updates.push({ ...preset, updatedTask: withManagedNote(preset.task, gettingStarted), metrics });
+        console.log(`[${updates.length}/${eligible.length}] Generated ${preset.title} (${metrics.words} words, ${metrics.listItems} list items)`);
+        await pause(500);
     }
 
-    console.log(`Backfill complete: ${completed} updated, ${skipped} skipped.`);
-    if (skipped > 0) process.exitCode = 1;
+    const client = await pool.connect();
+    try {
+        await client.query("BEGIN");
+        for (const preset of updates) {
+            await client.query(
+                "UPDATE presets SET configuration=$2, updated_at=CURRENT_TIMESTAMP WHERE id=$1",
+                [preset.id, JSON.stringify(sanitize(preset.updatedTask))],
+            );
+        }
+        await client.query("COMMIT");
+    } catch (error) {
+        await client.query("ROLLBACK");
+        throw error;
+    } finally {
+        client.release();
+    }
+
+    const { rows: verificationRows } = await pool.query("SELECT id, title, configuration FROM presets WHERE id = ANY($1::uuid[])", [updates.map(update => update.id)]);
+    for (const row of verificationRows) {
+        const task = resolveTask(typeof row.configuration === "string" ? JSON.parse(row.configuration) : row.configuration);
+        const note = getManagedNote(task);
+        if (!note || typeof note.content !== "string") {
+            throw new Error(`Verification failed for ${row.title}: managed note not found.`);
+        }
+        assertEnoughMarkdown(note.content);
+    }
+
+    console.log(`Backfill complete: ${updates.length} updated and verified.`);
 }
 
 main()

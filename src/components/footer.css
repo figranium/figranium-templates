@@ -1,0 +1,27 @@
+/* Scoped overrides also replace styles from earlier versions of the footer. */
+.site-footer.site-footer {
+  display: block;
+  margin-left: 72px;
+  padding: 0;
+  border-top: 1px solid var(--border);
+  background: #fff;
+  color: #536071;
+}
+.site-footer .site-footer-inner { width: min(1080px, calc(100% - 64px)); margin: 0 auto; padding: 48px 0 24px; }
+.site-footer .site-footer-top, .site-footer .site-footer-connect, .site-footer .site-footer-bottom { display: flex; justify-content: space-between; gap: 32px; }
+.site-footer .footer-brand img { display: block; width: 136px; height: auto; }
+.site-footer .footer-navigation, .site-footer .footer-social, .site-footer .site-footer-bottom nav { display: flex; flex-wrap: wrap; gap: 12px 24px; }
+.site-footer .footer-navigation { justify-content: flex-end; max-width: 600px; font-size: 13px; }
+.site-footer a:hover { color: var(--primary); }
+.site-footer .site-footer-connect { align-items: center; margin-top: 40px; padding: 24px 0; border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); }
+.site-footer .site-footer-connect h2 { color: #263242; font-size: 14px; font-weight: 600; }
+.site-footer .site-footer-connect p { margin-top: 5px; color: #667080; font-size: 12px; }
+.site-footer .site-footer-connect > div > a { display: inline-block; margin-top: 10px; color: var(--primary); font-size: 12px; }
+.site-footer .footer-social { justify-content: flex-end; font-size: 13px; }
+.site-footer .site-footer-bottom { align-items: center; padding-top: 24px; color: #778396; font-size: 12px; }
+@media (max-width: 1023px) { .site-footer.site-footer { margin-left: 0; } }
+@media (max-width: 720px) {
+  .site-footer .site-footer-inner { width: calc(100% - 40px); }
+  .site-footer .site-footer-top, .site-footer .site-footer-connect, .site-footer .site-footer-bottom { align-items: flex-start; flex-direction: column; gap: 20px; }
+  .site-footer .footer-navigation, .site-footer .footer-social { justify-content: flex-start; }
+}

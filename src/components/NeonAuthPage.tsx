@@ -16,7 +16,7 @@ export function NeonAuthPage({ view, presets }: NeonAuthPageProps) {
     return (
         <NeonAuthUIProvider
             authClient={authClient}
-            defaultTheme="dark"
+            defaultTheme="light"
             navigate={router.push}
             replace={router.replace}
             onSessionChange={() => router.refresh()}
@@ -26,12 +26,12 @@ export function NeonAuthPage({ view, presets }: NeonAuthPageProps) {
             Link={Link}
             organization={{}}
         >
-            <div className="fixed inset-0 z-50 flex min-h-screen items-center justify-center overflow-hidden bg-[#020202]/30 px-4 py-8 backdrop-blur-[24px]">
+            <div className="fixed inset-0 z-50 flex min-h-screen items-center justify-center overflow-hidden bg-slate-200/60 px-4 py-8 backdrop-blur-[24px]">
                 <div aria-hidden="true" className="pointer-events-none absolute inset-0 opacity-78 blur-[24px]">
-                    <div className="min-h-screen bg-background text-foreground lg:ml-[72px]">
+                    <div className="min-h-screen bg-background text-foreground">
                         <Hero isLoggedIn />
-                        <div className="mx-auto max-w-[1320px] px-5 py-8 sm:px-8 lg:px-10 lg:py-10">
-                            <PresetGrid presets={presets} />
+                        <div className="catalog-page">
+                            <PresetGrid presets={presets} counts={{}} />
                         </div>
                     </div>
                 </div>

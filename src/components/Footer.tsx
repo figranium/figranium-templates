@@ -1,16 +1,38 @@
 import Link from "next/link";
+import "./footer.css";
 
 export function Footer() {
     return (
-        <footer className="border-t border-white/[0.075] bg-[#050505] px-5 py-8 lg:ml-[72px] lg:px-10">
-            <div className="mx-auto flex max-w-[1320px] flex-col justify-between gap-6 sm:flex-row sm:items-center">
-                <img src="/logo.svg" alt="Figranium Templates" width={150} height={36} className="h-9 w-auto opacity-70" />
-                <nav className="flex flex-wrap items-center gap-4 text-[10px] font-bold uppercase tracking-[0.12em] text-white/32">
-                    <Link href="https://figranium.dev/docs" className="hover:text-white">Docs</Link>
-                    <Link href="https://figranium.dev/blog" className="hover:text-white">Blog</Link>
-                    <Link href="https://github.com/figranium/figranium" className="hover:text-white">GitHub</Link>
-                    <span>© 2026 Figranium</span>
-                </nav>
+        <footer className="site-footer">
+            <div className="site-footer-inner">
+                <div className="site-footer-top">
+                    <a href="https://figranium.dev" className="footer-brand" aria-label="Figranium home">
+                        <img src="/logo.svg" alt="Figranium" width={136} height={34} />
+                    </a>
+                    <nav className="footer-navigation" aria-label="Footer navigation">
+                        <a href="https://figranium.dev/docs">Docs</a>
+                        <a href="https://community.figranium.dev">Community</a>
+                        <a href="https://figranium.dev/blog">Blog</a>
+                        <a href="https://figranium.dev/releases">Releases</a>
+                        <a href="https://figranium.dev/integrations">Integrations</a>
+                        <Link href="/">Templates</Link>
+                        <a href="https://figranium.dev/vs">Comparisons</a>
+                    </nav>
+                </div>
+                <div className="site-footer-connect">
+                    <div><h2>Stay up to date</h2><p>Get new blog posts and releases from Figranium.</p><a href="https://figranium.dev/blog">Visit the blog <span aria-hidden="true">→</span></a></div>
+                    <nav className="footer-social" aria-label="Figranium social links">
+                        <a href="https://discord.com/invite/kPmfbgu9Xn">Discord</a>
+                        <a href="https://github.com/figranium/figranium">GitHub</a>
+                        <a href="https://x.com/figranium">X</a>
+                        <a href="https://www.youtube.com/@figranium">YouTube</a>
+                        <a href="https://www.instagram.com/figranium">Instagram</a>
+                    </nav>
+                </div>
+                <div className="site-footer-bottom">
+                    <span>© {new Date().getFullYear()} Figranium</span>
+                    <nav aria-label="Legal"><a href="https://figranium.dev/privacy">Privacy</a><a href="https://figranium.dev/terms">Terms</a></nav>
+                </div>
             </div>
         </footer>
     );

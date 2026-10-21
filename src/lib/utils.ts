@@ -11,3 +11,8 @@ export function sanitizeUrl(url: string | null | undefined): string | undefined 
     }
     return undefined;
 }
+
+export function formatTemplateType(type: string): string {
+    const value = type.toLowerCase();
+    return value.charAt(0).toUpperCase() + value.slice(1);
+}

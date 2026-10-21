@@ -77,7 +77,7 @@ export async function getPresets(category?: string, sort?: string, search?: stri
                 }
             } else {
                 // Fallback to SQL ILIKE search
-                conditions.push(`(title ILIKE $${paramIndex} OR description ILIKE $${paramIndex})`);
+                conditions.push(`(title ILIKE $${paramIndex} OR description ILIKE $${paramIndex} OR target_url ILIKE $${paramIndex})`);
                 params.push(`%${searchTerm}%`);
                 paramIndex++;
             }
@@ -97,7 +97,8 @@ export async function getPresets(category?: string, sort?: string, search?: stri
             p.type,
             p.icon,
             p.target_url,
-            p.category
+            p.category,
+            CASE WHEN jsonb_typeof(p.configuration->'actions') = 'array' THEN jsonb_array_length(p.configuration->'actions') ELSE NULL END AS action_count
         FROM presets p
         ${whereClause}
         ORDER BY ${orderBy}
@@ -128,12 +129,15 @@ export async function getPresets(category?: string, sort?: string, search?: stri
             downloads: String(r.downloads || "0"),
             time: r.time_estimate || "—",
             type: r.type as "SCRAPE" | "AGENT",
-            icon: r.icon || r.target_url || "public"
+            icon: r.icon || r.target_url || "public",
+            category: r.category || "QA Testing",
+            targetUrl: r.target_url || "",
+            actionCount: r.action_count
         }));
 
         return { presets, counts };
     } catch (error) {
         console.error("Failed to fetch templates:", error);
-        return { presets: [], counts: {} };
+        return { presets: [], counts: {}, error: true };
     }
 }

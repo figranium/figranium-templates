@@ -22,11 +22,11 @@ export function AppNavLink({ href, icon, children, mobile = false }: AppNavLinkP
             aria-current={isActive ? "page" : undefined}
             title={!mobile && typeof children === "string" ? children : undefined}
             className={clsx(
-                "flex items-center rounded-[10px] transition-all hover:bg-white/[0.055] hover:text-white",
+                "flex items-center rounded-[10px] transition-all hover:bg-slate-100 hover:text-slate-900",
                 mobile
                     ? "h-11 gap-3 px-3 text-[13px]"
                     : "min-h-10 justify-center gap-0 px-0 text-[13px] group-hover/sidebar:justify-start group-hover/sidebar:gap-3 group-hover/sidebar:px-3",
-                isActive ? "bg-white/[0.07] text-white" : "text-white/58",
+                isActive ? "bg-slate-100 text-slate-900" : "text-slate-600",
             )}
         >
             <TablerIcon name={icon} className="text-[19px]" />

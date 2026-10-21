@@ -1,74 +1,29 @@
 "use client";
 
 import { useRouter, useSearchParams } from "next/navigation";
-import { PresetCard } from "./PresetCard";
-import type { PresetProps } from "./PresetCard";
+import { PresetCard, type PresetProps } from "./PresetCard";
 import TablerIcon from "@/components/TablerIcon";
 
-interface PresetGridProps {
-    presets: PresetProps[];
-    adminUsername?: string;
-}
-
-function EmptyState() {
+export function PresetGrid({ presets, counts, adminUsername, error }: { presets: PresetProps[]; counts: Record<string, number>; adminUsername?: string; error?: boolean }) {
     const router = useRouter();
-
-    return (
-        <div className="flex min-h-[360px] w-full flex-col items-center justify-center rounded-[18px] border border-dashed border-white/[0.12] bg-[#050505] px-6 text-center" role="status" aria-live="polite">
-            <div className="mb-5 flex h-14 w-14 items-center justify-center rounded-[14px] border border-white/[0.09] bg-white/[0.025]">
-                <TablerIcon name="search_off" className="text-2xl text-muted-foreground" />
-            </div>
-            <h3 className="text-lg font-semibold text-foreground mb-2">No templates found</h3>
-            <p className="text-muted-foreground max-w-sm mb-6 text-sm">We couldn&apos;t find any templates matching your criteria. Try adjusting your filters or search terms.</p>
-            <button onClick={() => router.push('/')} className="inline-flex h-10 items-center rounded-[10px] bg-white px-4 text-[10px] font-bold uppercase tracking-[0.12em] text-black transition hover:bg-white/88">Clear all filters</button>
-        </div>
-    );
-}
-
-export function PresetGrid({ presets, adminUsername }: PresetGridProps) {
-    const router = useRouter();
-    const searchParams = useSearchParams();
-    const currentSort = searchParams.get("sort") || "popular";
-    const currentPage = parseInt(searchParams.get("page") || "1", 10);
-
-    const handleSortChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-        const params = new URLSearchParams(searchParams.toString());
-        params.set("sort", e.target.value);
-        router.push(`/?${params.toString()}`, { scroll: false });
+    const params = useSearchParams();
+    const update = (key: string, value: string) => {
+        const next = new URLSearchParams(params.toString());
+        if (value) next.set(key, value); else next.delete(key);
+        next.delete("page");
+        router.push(`/?${next.toString()}`, { scroll: false });
     };
-
+    const categories = Object.keys(counts).filter((category) => category !== "All Templates").sort();
+    const selectedCategory = params.get("category") || "";
+    if (selectedCategory && !categories.includes(selectedCategory)) categories.push(selectedCategory);
     return (
-        <div className="w-full">
-            <div className="mb-5 flex items-center justify-between gap-4">
-                <p className="text-[11px] font-bold uppercase tracking-[0.13em] text-white/30"><span className="text-white/70">{presets.length}</span> templates available</p>
-                <div className="relative flex items-center gap-2 text-[11px] text-white/35">
-                    <span className="hidden sm:inline">Sort</span>
-                    <div className="group relative flex h-9 items-center gap-1 rounded-[9px] border border-white/[0.085] bg-black/30 px-3">
-                        <select value={currentSort} onChange={handleSortChange} className="z-10 cursor-pointer appearance-none bg-transparent pr-6 text-[11px] font-medium text-white outline-none" aria-label="Sort templates">
-                            <option value="newest" className="bg-[#121212] text-foreground">Newest</option>
-                            <option value="popular" className="bg-[#121212] text-foreground">Popular</option>
-                            <option value="oldest" className="bg-[#121212] text-foreground">Oldest</option>
-                        </select>
-                        <TablerIcon name="expand_more" className="text-base absolute right-0 pointer-events-none group-hover:text-white transition-colors" />
-                    </div>
-                </div>
+        <section className="catalog-panel" aria-label="Template catalog">
+            <div className="catalog-toolbar">
+                <div className="catalog-title"><h2>Explore templates</h2><p>{error ? "Browse community automations" : `${presets.length} ${presets.length === 1 ? "template" : "templates"} available`}</p></div>
+                <div className="catalog-filters"><label className="catalog-select"><span className="sr-only">Filter by category</span><select value={selectedCategory} onChange={(event) => update("category", event.target.value)}><option value="">All categories</option>{categories.map((category) => <option key={category} value={category}>{category}</option>)}</select></label>
+                <label className="catalog-select"><span className="sr-only">Sort templates</span><select value={params.get("sort") || "popular"} onChange={(event) => update("sort", event.target.value)}><option value="popular">Most popular</option><option value="newest">Newest</option><option value="oldest">Oldest</option></select></label></div>
             </div>
-
-            {presets.length > 0 ? (
-                <>
-                    <div className="mb-12 grid grid-cols-1 gap-4 lg:grid-cols-2 xl:grid-cols-3">
-                        {presets.map((preset) => <PresetCard key={preset.id} {...preset} adminUsername={adminUsername} />)}
-                    </div>
-                    <div className="flex justify-center items-center gap-2">
-                        {currentPage > 1 && (
-                            <button className="flex h-9 w-9 items-center justify-center rounded-[9px] border border-white/[0.085] text-white/45 transition hover:bg-white/[0.05] hover:text-white" aria-label="Previous page">
-                                <TablerIcon name="chevron_left" className="text-[18px]" />
-                            </button>
-                        )}
-                        <button className="flex h-9 w-9 items-center justify-center rounded-[9px] bg-white text-xs font-bold text-black" aria-current="page">{currentPage}</button>
-                    </div>
-                </>
-            ) : <EmptyState />}
-        </div>
+            {error ? <div className="catalog-empty" role="alert"><TablerIcon name="error" /><h2>Templates are unavailable</h2><p>Please try again.</p><button className="secondary-button" onClick={() => router.refresh()}>Retry</button></div> : presets.length ? <div className="catalog-grid">{presets.map((preset) => <PresetCard key={preset.id} {...preset} adminUsername={adminUsername} />)}</div> : <div className="catalog-empty" role="status"><TablerIcon name="search_off" /><h2>No matching templates</h2><p>Try a different search or category.</p><button className="secondary-button" onClick={() => router.push("/")}>Clear filters</button></div>}
+        </section>
     );
 }

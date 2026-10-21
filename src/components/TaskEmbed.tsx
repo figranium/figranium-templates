@@ -27,6 +27,8 @@ export default function TaskEmbed({ task }: TaskEmbedProps) {
             height: 640,
             title: "Figranium task",
             autoResize: true,
+            preferBundled: true,
+            theme: "light",
         });
 
         const iframe = embed.iframe;
@@ -57,7 +59,7 @@ export default function TaskEmbed({ task }: TaskEmbedProps) {
     }, [task]);
 
     return (
-        <div className="overflow-hidden rounded-xl border border-[#262626] bg-[#0a0a0a]">
+        <div className="overflow-hidden rounded-xl border border-[#dce3ed] bg-[#f5f5f5]">
             <div ref={hostRef} className="w-full overflow-hidden" />
         </div>
     );

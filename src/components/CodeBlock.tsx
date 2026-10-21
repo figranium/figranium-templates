@@ -38,7 +38,7 @@ export default function CodeBlock({ code, language = 'javascript' }: CodeBlockPr
                 className={`absolute right-2 top-2 p-1.5 rounded-md border transition-all z-10 cursor-pointer focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-background focus-visible:outline-none
                     ${copied
                         ? "bg-green-500/10 border-green-500/20 text-green-400 opacity-100"
-                        : "bg-[#171717]/80 backdrop-blur-sm border-[#262626] text-muted-foreground opacity-0 group-hover:opacity-100 focus:opacity-100 hover:text-foreground hover:border-zinc-700 hover:bg-[#171717]"
+                        : "bg-[#202631]/80 backdrop-blur-sm border-[#323b4b] text-muted-foreground opacity-0 group-hover:opacity-100 focus:opacity-100 hover:text-foreground hover:border-zinc-700 hover:bg-[#202631]"
                     }`}
             >
                 <TablerIcon name={copied ? "check" : "content_copy"} className="text-base" aria-hidden="true" />
